@@ -1,0 +1,104 @@
+body {
+    height: 100%;
+    background-color: #F0EFF2;
+}
+
+.content {
+    margin: 0 auto;
+    text-align: center;
+    width: 900px;
+}
+
+.title {
+    display: flex;
+    margin-top: 90px;
+    text-align: left;
+}
+.image {
+    margin-top: 17px;
+}
+h1 {
+    font-family: Inter;
+    font-weight: 700;
+    font-size: 30px;
+    margin-left: 20px;
+
+}
+.top-content {
+    margin-top: 60px;
+    border-bottom: 1px solid #000000;
+}
+
+.top-content ul {
+    display: flex;
+}
+
+.top-content li {
+    list-style: none;
+}
+
+.top-content li a {
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+.top-content li:nth-child(2) a {
+    margin-left: 100px;
+}
+.page-title {
+        font-family: Inter;
+        font-size: 16px;
+        color: #000;
+        font-weight: 700;
+        /* font-size:400px;表示していないタブ */
+}
+table {
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+.under-content {
+    width: 900px;
+    margin: 0 auto;
+    text-align: center;
+    margin-top: 46px;
+    background-color: #fff;
+    border-radius: 10px;
+
+}
+.data-label,
+.data-item {
+    font-family: Inter;
+    font-weight: 700;
+    font-size: 16px;
+    color: #737373;
+}
+.data-label {
+    border-bottom: 3px solid #E1E1E1;
+}
+
+.data-item {
+    border-bottom: 2px solid #E1E1E1;
+}
+
+.data-link {
+    text-decoration: none;
+    color: #000;
+}
+@media screen and (min-width: 768px) and (max-width: 850px) {
+    .content {
+        width: 90%;
+    }
+
+    .title {
+        margin-left: 5%;
+    }
+
+    .top-content {
+        width: 90%;
+    }
+
+    .under-content {
+        width: 90%;
+    }
+}
