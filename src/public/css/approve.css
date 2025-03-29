@@ -26,46 +26,57 @@ h1 {
     margin-left: 20px;
 
 }
+
 table {
     border-collapse: collapse;
     margin-bottom: 30px;
-   
+
     height: 450PX;
     background-color: #fff;
     border-radius: 10px;
     table-layout: fixed;
 
 }
+
 tr {
     height: 90px;
 }
-th, td {
+
+th,
+td {
     padding: 10px;
     vertical-align: middle;
     border-bottom: 2px solid #e1e1e1;
 
 }
+
 .data-label,
 .data-item {
     font-family: Inter;
     font-weight: 700;
     font-size: 16px;
-    
-}  
-.name {
+
+}
+
+.name,
+.time-in,
+.reason {
     margin-left: 26px;
-} 
+}
+
 .date-wrapper {
     display: flex;
     align-items: center;
     width: 320px;
     /* 一般ユーザーの時はwidth:300pxで
      */
-    
+
 }
+
 .year {
     margin-left: 26px;
 }
+
 .date-space {
     flex-grow: 1;
     /* 自動的に空間を調整 */
@@ -74,11 +85,13 @@ th, td {
 .data-label {
     color: #737373;
     width: 250px;
-    
+
 }
+
 .work {
-    margin-left :40px;
+    margin-left: 40px;
 }
+
 .data-item {
     width: 650px;
     text-align: justify;
@@ -90,45 +103,21 @@ th, td {
     align-items: center;
     width: 320px;
 }
+
 .time-separator {
     flex-grow: 1;
     /* 空間を自動調整 */
     text-align: center;
 }
-input {
-    width: 103px;
-    height: 29px;
-    border-radius: 4px;
-    border: 1px solid #E1E1E1;
-    
-    font-family: Inter;
-    font-weight: 700;
-    font-size: 16px;
-
-}
-.time-input {
-    text-align: center;
-}
-.reason-input {
-    width: 316px;
-    height: 72px;
-    border-radius: 4px;
-    border: 1px solid #D9D9D9;
-   
-    font-family: Inter;
-    font-weight: 700;
-    font-size: 16px;
-    
-}
 .button {
     text-align: right;
 }
 
-.edit-btn {
-    width: 184px;
+.approve-btn,
+.ok-btn {
+    width: 130px;
     height: 50px;
     border-radius: 5px;
-    background-color: #000;
     color: #fff;
     font-family: Inter;
     font-weight: 700;
@@ -136,19 +125,39 @@ input {
     cursor: pointer;
     border: none;
 }
+.approve-btn {
+    background-color: #000;
+}
+.ok-btn {
+    background-color: #696969;
+}
+.attention {
+    font-family: Inter;
+    font-weight: 800;
+    font-size: 18px;
+    color: rgba(255, 0, 0, 0.5);
+    text-align: right;
+}
+
 @media screen and (min-width: 768px) and (max-width: 850px) {
     .content {
         width: 90%;
     }
+
     .data-label {
         width: 20%;
-    }    
+    }
+
     .data-item {
         width: 50%;
     }
-    
-    .edit-btn {
+
+    .approve-btn ,
+    .ok-btn{
         width: 20%;
         font-size: 20px;
+    }
+    .attention {
+        font-size: 16px;
     }
 }

@@ -6,32 +6,27 @@
 
 @section('content')
 <div class="content">
-    <div class="title">
+    <label class="title">
         <div class="image">
           <img src="{{asset('img/Line 2.png')}}" style="height:40px;width:8px;"alt="" class="img">
         </div>
          <h1>2025年6月12日の勤怠</h1>
-      </div>    
+      </label>    
         <div class="top-content"> 
              <div class="days">
-              <div class="last-day">
-                <div class="image">
-                <img src="{{asset('img/image 2.png')}} "style="height:15px; width:20px;" alt="" class="img">
-                </div>
-                <a href="" class="day-link">前日</a>
-              </div>
-              <div class="today">
+              <label class="last-day">
+                <a href="" class="day-link"><img src="{{asset('img/image 2.png')}} "style="height:15px; width:20px;" alt="" class="img">
+                前日</a>
+              </label>
+              <label class="today">
                 <div class="image">
                 <img src="{{ asset('img/image 1 (1).png')}}" style="height: 25px; width: 25px;"alt="" class="img">
                 </div>
                 <p class="date">2025/06/12</p>
-              </div>
-              <div class="next-day">
-                 <a href="" class="day-link">翌日</a>
-                 <div class="image">
-                <img src="{{ asset('img/image 3.png')}}"style="height:15px; width:20px;" alt="" class="img">
-                </div>
-              </div>
+              </label>
+              <label class="next-day">
+                 <a href="" class="day-link">翌日<img src="{{ asset('img/image 3.png')}}"style="height:15px; width:20px;" alt="" class="img"></a>
+              </label>
             </div>
         </div>
         <div class="under-content">
@@ -79,7 +74,7 @@
               <td class="data-item">18:00</td>
              <td class="data-item">1:00</td>
              <td class="data-item">8:00</td>
-              <td class="data-item">
+            <td class="data-item">
                <a href="" class="data-link">詳細</a>
               </td>
             </tr>
