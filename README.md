@@ -16,3 +16,5 @@
     DB_PASSWORD=laravel_pass  
 4. アプリケーションキーの作成  
     php artisan key:generate  
+5.  マイグレーションの実行  
+    php artisan migrate  
