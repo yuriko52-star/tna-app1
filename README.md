@@ -18,3 +18,7 @@
     php artisan key:generate  
 5.  マイグレーションの実行  
     php artisan migrate  
+6. シーディングの実行  
+    php artisan db:seed  
+
+

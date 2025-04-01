@@ -16,8 +16,8 @@ class BreakTimeFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+   public function definition()
+    { 
         // 前のコード
         // $attendance = Attendance::whereNotNull('clock_in')->inRandomOrder()->first();
 

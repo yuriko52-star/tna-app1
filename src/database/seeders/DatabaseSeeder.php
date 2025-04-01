@@ -18,10 +18,10 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
-                   $this->call(UsersTableSeeder::class);
+           $this->call(UsersTableSeeder::class);
          
          
-        // ここから修正バージョン
+        // ここから勤務、退勤時間
         $users = [2,3];
 
         foreach($users as $user) {
@@ -42,24 +42,54 @@ class DatabaseSeeder extends Seeder
                     'clock_in' => $clockIn,
                     'clock_out' => $clockOut,
                 ]);
-                 for ($i = 0; $i < rand(1, 2); $i++) {
-                    $breakClockIn = $clockIn ? $clockIn->copy()->addHours(rand(2,4))->addMinutes(rand(0,5)*10) : null; 
-                    $breakClockOut = $breakClockIn ? $breakClockIn->copy()->addMinutes(rand(3, 6)*10) : null;
-                    BreakTime::factory()->create([
-                        'attendance_id' => $attendance->id,
-                        'date' => $attendance->date,
-                        'clock_in' => $breakClockIn,
-                        'clock_out' => $breakClockOut,
-                    ]);
-                 }
-                //  問題点、一日複数休憩を取る場合、1回目と2回目がダブっているのが気になった。
-                // 例）１回目　10：30～11：00　2回目　10:40~11:20
-                // だぶらないように設定したいように設定したい。例えば1回目は10：00～10：20　で　2回目は12：30～13：20など。明日やろう
+        // ここから休憩時間
                 
+                
+                if ($date->isWeekend()) {
+                    BreakTime::factory()->create([
+                    'attendance_id' => $attendance->id,
+                    'date' => $attendance->date,
+                    'clock_in' => null,
+                    'clock_out' => null,
+                    ]);
+                    continue; 
+                }
+
+                 $previousBreakClockOut = null; // 直前の休憩終了時間を保存
+
+                $takeFirstBreak = rand(0, 1); // 0: 休憩なし, 1: 休憩あり
+                if ($takeFirstBreak) {
+                        $breakClockIn = $date->copy()->setTime(10, 0);
+                        $breakClockOut = $date->copy()->setTime(10, 15);
+            
+                        BreakTime::factory()->create([
+                            'attendance_id' => $attendance->id,
+                            'date' => $attendance->date,
+                            'clock_in' => $breakClockIn,
+                            'clock_out' => $breakClockOut,
+                            ]);
+
+                        $previousBreakClockOut = $breakClockOut;
+                    }
+            
+        
+                $lunchStartMinutes = rand(0, 5) * 10; // 0, 10, 20, 30, 40, 50 のいずれか
+                $breakClockIn = $date->copy()->setTime(12, $lunchStartMinutes);
+                $breakClockOut = $breakClockIn->copy()->addMinutes(50);
+
+                BreakTime::factory()->create([
+                    'attendance_id' => $attendance->id,
+                    'date' => $attendance->date,
+                    'clock_in' => $breakClockIn,
+                    'clock_out' => $breakClockOut,
+                    ]);
                 
             }
         
         }
       
     }
+    
 } 
+
+    
