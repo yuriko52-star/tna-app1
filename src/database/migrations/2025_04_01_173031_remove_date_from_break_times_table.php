@@ -14,7 +14,7 @@ class RemoveDateFromBreakTimesTable extends Migration
     public function up()
     {
         Schema::table('break_times', function (Blueprint $table) {
-            //
+            $table->dropColumn('date');
         });
     }
 
@@ -26,7 +26,7 @@ class RemoveDateFromBreakTimesTable extends Migration
     public function down()
     {
         Schema::table('break_times', function (Blueprint $table) {
-            //
+            $table->date('date')->nullable();
         });
     }
 }
