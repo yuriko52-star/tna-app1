@@ -41,7 +41,7 @@
                     <!-- </a> -->
                 </li>
                 <li>
-                <form action="{{ Request::is('admin/*') ? url('/admin.logout') : url('/logout') }}" class="" method="post" novalidate >
+                <form action="{{ Request::is('admin/*') ? route('admin.logout') : route('logout') }}" class="" method="post" novalidate >
                 @csrf
                 <button type="submit" class="btn logout-btn">ログアウト</button>
                 </form>

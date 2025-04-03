@@ -16,9 +16,9 @@
     <input type="text" class="text" name="name" id="name" value="{{ old('name') }}">
     <!-- <input type="text" name="name" id="name"class="text"> -->
     <p class="form_error">
-       {{-- @error('name')
+       @error('name')
         {{ $message }}
-        @enderror--}}
+        @enderror
     </p>
     <label for="mail" >
         <h2 class="label-title">メールアドレス</h2>
@@ -26,19 +26,18 @@
    <input type="text" name="email" id="mail" class="text" value="{{ old('email') }}">
    <!-- <input type="text" name="email" class="text"> -->
     <p class="form_error">
-      {{--  @error('email')
+       @error('email')
         {{ $message }}
-        @enderror--}}
+        @enderror
     </p>
     <label for="password" >
         <h2 class="label-title">パスワード</h2>
     </label>
     <input type="password" name="password" id="password"class="text">
     <p class="form_error">
-        {{--@error('password')
+        @error('password')
         {{ $message }}
-        @enderror--}}
-    </p>
+        @enderror
     <label for="password_confirm" >
         <h2 class="label-title">パスワード確認</h2>
     </label>

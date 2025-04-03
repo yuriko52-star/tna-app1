@@ -8,7 +8,7 @@
 
     <div class="content">
         <h1>
-        @if(Request::is('/admin/login'))
+        @if(Request::is('admin/login'))
             管理者ログイン
         @else
             ログイン
@@ -23,9 +23,9 @@
     <input type="email" class="text" name="email" id="mail" value="{{old('email')}}">
    
     <p class="form_error">
-        {{--@error('email')
+        @error('email')
         {{ $message}}
-        @enderror--}}
+        @enderror
     </p>
 
     <label for="password" >
@@ -33,9 +33,9 @@
     </label>
     <input type="password" class="text" name="password" id="password">
     <p class="form_error">
-        {{--@error('password')
+        @error('password')
         {{ $message}}
-        @enderror--}}
+        @enderror
     </p>
     
     <button class="login-btn" type="submit">
@@ -46,7 +46,7 @@
         @endif
     </button>
 
-    @if(Request::is('login'))
+    @if(!Request::is('admin/login'))
     <a href="/register" class="link">会員登録はこちら</a>
     @endif
     </form>

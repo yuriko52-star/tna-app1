@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
+use App\Actions\Fortify\CustomLoginResponse;
+use Laravel\Fortify\Contracts\LoginResponse;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-//  use App\Actions\Fortify\CustomLogoutResponse;
-
+use App\Actions\Fortify\CustomLogoutResponse;
+use Laravel\Fortify\Contracts\LogoutResponse;
 // use Illuminate\Support\Facades\Session;
 // use App\Actions\Fortify\ResetUserPassword;
 // use App\Actions\Fortify\UpdateUserPassword;
@@ -20,11 +22,11 @@ use Laravel\Fortify\Fortify;
 use Illuminate\Support\Facades\Hash;
  use Illuminate\Support\Facades\Auth;
 use App\Models\User;
-// use Laravel\Fortify\Http\Requests\LoginRequest as FortifyLoginRequest;まだ作成していない。作成したら、適用
-// use App\Http\Requests\LoginRequest;同上
+ use Laravel\Fortify\Http\Requests\LoginRequest as FortifyLoginRequest;
+ use App\Http\Requests\LoginRequest;
 // use Illuminate\Support\Facades\View;いるか不明メール認証で？
 // use Laravel\Fortify\Contracts\VerifyEmailViewResponse;メール認証の時にインポート
-// use App\Http\Requests\RegistrationRequest;バリデーション作成したら適用
+ use App\Http\Requests\RegistrationRequest;
 
 
 class FortifyServiceProvider extends ServiceProvider
@@ -34,7 +36,9 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //    $this->app->singleton(LogoutResponse::class, CustomLogoutResponse::class);    
+
+         $this->app->singleton(LoginResponse::class, CustomLoginResponse::class);
+        $this->app->singleton(LogoutResponse::class, CustomLogoutResponse::class);    
     }
 
     /**
@@ -65,7 +69,9 @@ class FortifyServiceProvider extends ServiceProvider
           );
             
 
-
+           Fortify::loginView(function () { 
+                return view('auth.login'); 
+        });
         
         
         Fortify::authenticateUsing(function (Request $request) {
@@ -76,21 +82,24 @@ class FortifyServiceProvider extends ServiceProvider
             }
             return null;
         });
-            Fortify::loginView(function () { 
-                return view('auth.login'); 
-        });
+           
 
         // Fortifyのログイン処理をカスタムコントローラーに変更
-        Route::post('/login', [AuthenticatedSessionController::class, 'store'])->middleware(['guest']);
-
+        /*Route::post('/login', [AuthenticatedSessionController::class, 'store'])->middleware(['guest']);
+**/
          // ログイン後のリダイレクト先をカスタマイズ
+        /*  if($user->isAdmin()) {
+                    return redirect('/admin/attendance/list');
+                }
+                   /adminがなかった */
+
             /*Fortify::authenticated(function (Request $request, $user) {
                 if($user->isAdmin()) {
-                    return redirect('/attendance/list');
+                    return redirect('/admin/attendance/list');
                 }
                 return redirect('/attendance');
         });
-*/
+
 
        
 
@@ -100,5 +109,6 @@ class FortifyServiceProvider extends ServiceProvider
            return Limit::perMinute(10)->by($email . $request->ip());
         });   
         // $this->app->bind(FortifyLoginRequest::class, LoginRequest::class);バリデーションで適用
+        */
     }
 }

@@ -20,6 +20,6 @@ class AdminMiddleware
         if(Auth::check() && Auth::user()->isAdmin()) {
              return $next($request);
         }
-       return redirect('/attendance')->with('error','管理者専用ページです。');
+       return redirect('/login')->withErrors(['email' => '管理者権限が必要です。']);
     }
 }

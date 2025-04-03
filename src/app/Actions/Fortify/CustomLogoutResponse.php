@@ -2,26 +2,23 @@
 
 namespace App\Actions\Fortify;
 
-use Laravel\Fortify\Contracts\LogoutResponse;
+use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
 use Illuminate\Http\Request;
 
-class CustomLogoutResponse implements LogoutResponse
+class CustomLogoutResponse implements LogoutResponseContract
 {
-    /**
-     * Handle logout response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
+   
     public function toResponse($request)
     {
-        // Auth::logout();
-         /*if ($request->is('admin/*')) {
+       // ログアウト後のリダイレクト先を決定
+        $redirectTo = $request->is('admin/*') ? '/admin/login' : '/login';
 
-            return redirect('/admin/login');
-        }
-        return redirect('/login');
-        */
+        return redirect($redirectTo);
+        // セッションを無効化
+        /*$request->session()->invalidate();
+        $request->session()->regenerateToken();
+
       return redirect($request->is('admin/*') ? '/admin/login' : '/login');
+      */
     }
 }
