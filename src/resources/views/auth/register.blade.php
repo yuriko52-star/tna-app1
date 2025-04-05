@@ -14,7 +14,7 @@
         <h2 class="label-title">名前</h2>
     </label>
     <input type="text" class="text" name="name" id="name" value="{{ old('name') }}">
-    <!-- <input type="text" name="name" id="name"class="text"> -->
+    
     <p class="form_error">
        @error('name')
         {{ $message }}
@@ -24,7 +24,7 @@
         <h2 class="label-title">メールアドレス</h2>
     </label>
    <input type="text" name="email" id="mail" class="text" value="{{ old('email') }}">
-   <!-- <input type="text" name="email" class="text"> -->
+   
     <p class="form_error">
        @error('email')
         {{ $message }}

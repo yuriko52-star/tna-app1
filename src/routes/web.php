@@ -29,54 +29,46 @@ Route::get('/login', function () {
 })->name('login');
 // 管理者のログインページ
 Route::get('/admin/login', function () {
-    return view('auth.login'); // 共通ビューを使う
+    return view('auth.login'); 
 })->name('admin.login');
 
-// 一般ユーザー用ログイン
-// Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+
 // 一般ユーザーのログイン処理
  Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
 // 管理者のログイン処理
  Route::post('/admin/login', [AuthenticatedSessionController::class, 'store'])->name('admin.login.store');
-
-// Route::middleware(['auth'])->get('/attendance', [UserController::class, 'attendance'])->name('attendance.record');
 // ユーザー用ログアウト
  Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-//  エラーになったが設定
+
 // 管理者用ログアウト
  Route::post('/admin/logout', [AuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
- //  エラーになったが設定
+ 
 // 一般ユーザーのダッシュボード（認証が必要）
-Route::middleware(['auth:web'])->group(function () {
-    Route::get('/attendance', [UserController::class, 'index'])->name('user.attendance');
+Route::middleware(['auth:web','role:user'])->group(function () {
+     Route::get('/attendance', [UserController::class, 'index'])->name('user.attendance');
+    
+    Route::post('/attendance/clock-in',[AttendanceController::class, 'clockIn'])->name('attendance.clockIn');
+    Route::post('/attendance/clock-out',[AttendanceController::class, 'clockOut'])->name('attendance.clockOut');
+    Route::post('/attendance/break-start',[AttendanceController::class,'breakStart'])->name('attendance.breakStart');
+    Route::post('/attendance/break-end',[AttendanceController::class, 'breakEnd'])->name('attendance.breakEnd');
+
+
+
 });
 // 管理者専用ページ（認証が必要）
-Route::middleware(['auth:web', 'admin'])->group(function () {
+Route::middleware(['auth:web', 'role:admin'])->group(function () {
     Route::get('admin/attendance/list', [AdminController::class, 'index'])->name('admin.attendance.list');
 });
 
-// 管理者用ログイン
-// Route::get('/admin/login', [AuthenticatedSessionController::class, 'create'])->name('admin.login');
-
-
-/*Route::middleware(['auth', 'admin'])->get('/attendance/list', [AdminController::class, 'index'])->name('attendance.list');
-*/
-
-
-// ログアウト
-/* Route::post('/logout', function (Request $request) {
-    // Auth::logout();
-    return redirect('/login');
-})->name('logout');
-*/
-
-/*Route::post('/admin/logout', function (Request $request) {
-    Auth::logout();
-    return redirect('/admin/login');
-})->name('admin.logout');
-*/
 
 
 
-// Route::get('/attendance',[AttendanceController::class, 'index']);
+
+
+
+
+
+
+
+
 Route::get('/preview/{viewName}', [DebugController::class, 'show']);

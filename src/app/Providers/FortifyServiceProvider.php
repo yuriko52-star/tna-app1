@@ -82,33 +82,12 @@ class FortifyServiceProvider extends ServiceProvider
             }
             return null;
         });
-           
-
-        // Fortifyのログイン処理をカスタムコントローラーに変更
-        /*Route::post('/login', [AuthenticatedSessionController::class, 'store'])->middleware(['guest']);
-**/
-         // ログイン後のリダイレクト先をカスタマイズ
-        /*  if($user->isAdmin()) {
-                    return redirect('/admin/attendance/list');
-                }
-                   /adminがなかった */
-
-            /*Fortify::authenticated(function (Request $request, $user) {
-                if($user->isAdmin()) {
-                    return redirect('/admin/attendance/list');
-                }
-                return redirect('/attendance');
-        });
-
-
-       
-
-         RateLimiter::for('login', function (Request $request) {
+        RateLimiter::for('login', function (Request $request) {
              $email = (string) $request->email;
 
            return Limit::perMinute(10)->by($email . $request->ip());
         });   
         // $this->app->bind(FortifyLoginRequest::class, LoginRequest::class);バリデーションで適用
-        */
+        
     }
 }

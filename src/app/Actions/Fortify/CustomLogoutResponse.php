@@ -14,11 +14,6 @@ class CustomLogoutResponse implements LogoutResponseContract
         $redirectTo = $request->is('admin/*') ? '/admin/login' : '/login';
 
         return redirect($redirectTo);
-        // セッションを無効化
-        /*$request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-      return redirect($request->is('admin/*') ? '/admin/login' : '/login');
-      */
+        
     }
 }

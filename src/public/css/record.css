@@ -6,13 +6,14 @@ body {
     width: 730px;
     margin: 0 auto;
     text-align: center;
-    margin-top: 240px;
+    margin-top: 200px;
 }
 .label {
     display: inline-block;
     width: 100px;
     height: 27px;
     padding-top: 4px;
+    margin-bottom: 40px;
     
     border-radius: 50px;
     background-color: #C8C8C8;
@@ -25,12 +26,17 @@ body {
     font-family: Inter;
     font-weight: 400;
     font-size: 40px;
-        
+     margin-bottom: 32px;   
 }
 .time {
     font-family: Inter;
     font-weight: 700;
     font-size: 80px;
+   
+}
+.working {
+    display: flex;
+    justify-content: center;
 }       
 .work-btn ,
 .out-btn,
@@ -44,6 +50,14 @@ body {
     border: none;
     border-radius: 20px;
     cursor: pointer;
+    display: inline-block;
+    margin-bottom: 280px;
+}
+.work-btn {
+    margin-top: 70px;
+}
+.rest-btn {
+    margin-left: 82px;
 }
 .work-btn,
 .out-btn {
@@ -52,9 +66,10 @@ body {
     
 }
 .out-btn ,
-.rest-btn{
+.rest-btn,
+.back-btn {
     display: inline-block;
-    margin: 20px;
+    margin-top: 70px;
 }
 .rest-btn ,
 .back-btn{
@@ -66,6 +81,7 @@ body {
     font-family: Inter;
     font-weight: 700;
     font-size: 26px;
-        
+    margin-top: 100px;   
+    margin-bottom: 310px; 
     text-align: center;
 }

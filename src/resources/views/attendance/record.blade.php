@@ -5,32 +5,49 @@
 @endsection
 
 @section('content')
-<div class="content">
-    <form action="" class="">
+  <div class="content">
+    <!-- <form action="" class=""> -->
   <label for="status" class="label">
-    出勤外
-    <!--出勤中  -->
-    <!-- 休憩中 -->
-    <!-- 退勤済 -->
+    {{ $status }}
   </label> 
-   <div class="date">
-    <!-- 現在の日付が入る -->
-     2025年12月31日(金)
+    <div class="date">
+    {{ $today}}
     </div>
     <div class="time">
-    <!-- 現在の時間が入る -->
-     08：00
+    {{ $currentTime }}
     </div>
-    <!-- <button class="work-btn" type="submit">出勤</button> -->
-     
-        <!-- <button class="out-btn" type="submit">退勤</button> -->
-        <!-- <button class="rest-btn" type="submit">休憩入</button> -->
-     
-    
-    <!-- <button class="back-btn" type="submit">休憩戻</button> -->
-    <p class="message">お疲れ様でした。</p>
-    
 
+  @if($status === '勤務外')
+    <form action="{{ route('attendance.clockIn') }}" method="POST">
+      @csrf
+    
+      <button class="work-btn" type="submit">出勤</button>
     </form>
-</div>
+  @endif
+  @if($status === '出勤中')
+  <div class="working">
+    <form action="{{ route('attendance.clockOut') }}" method="POST">
+      @csrf
+      <div>
+      <button class="work-btn" type="submit">退勤</button>
+      </div>
+    </form>
+    <form action="{{ route('attendance.breakStart') }}" method="POST">
+      @csrf
+      <div>
+      <button class="rest-btn" type="submit">休憩入</button>
+      </div>
+    </form>
+    </div>
+  @endif
+  @if($status === '休憩中')
+    <form action="{{ route('attendance.breakEnd') }}" method="POST">
+      @csrf
+      <button class="back-btn" type="submit">休憩戻</button>
+    </form>
+  @endif  
+  @if($status === '退勤済')
+    <p class="message">お疲れ様でした。</p>
+  </div>
+  @endif
 @endsection

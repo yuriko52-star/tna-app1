@@ -11,10 +11,7 @@ class CustomLoginResponse implements LoginResponseContract
     public function toResponse($request)
     {
 
-        // ログアウト後のリダイレクト先を決定
-        // $redirectTo = $request->is('admin/*') ? '/admin/login' : '/login';
-
-        // return redirect($redirectTo);
+        
         $user = Auth::user();
 
         if ($user->isAdmin()) {

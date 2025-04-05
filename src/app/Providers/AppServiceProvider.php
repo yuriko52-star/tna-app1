@@ -26,9 +26,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         if (Request::is('admin/*')) {
-        Config::set('session.cookie', 'admin_session'); // ✅ 管理者用セッション
+        Config::set('session.cookie', 'admin_session'); 
     } else {
-        Config::set('session.cookie', 'user_session'); // ✅ 一般ユーザー用セッション
+        Config::set('session.cookie', 'user_session'); 
     }
     }
 }
