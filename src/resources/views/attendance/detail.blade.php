@@ -31,7 +31,7 @@
                     <span class="date-space"></span>
                     <!-- <input type="text" class="time-input" value="6月11日"> -->
 
-                    <span>6月11日</span>
+                    <span class="date">6月11日</span>
                 </div>
             </td>
         </tr>

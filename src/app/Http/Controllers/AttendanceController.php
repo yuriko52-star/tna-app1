@@ -23,9 +23,9 @@ class AttendanceController extends Controller
             $attendance->date = $today;
         }
         
-         if(!is_null($attendance->clock_in)) {
-             return redirect()->back()->with('message','すでに出勤済みです。');
-         }
+        //  if(!is_null($attendance->clock_in)) {
+            //  return redirect()->back()->with('message','すでに出勤済みです。');
+        //  }
         
           $attendance->clock_in = now();
           $attendance->save();
@@ -38,7 +38,7 @@ class AttendanceController extends Controller
         $user = Auth::user();
         $attendance = Attendance::where('user_id', $user->id)->where('date', now()->toDateString())->first();
         if(!$attendance || $attendance->clock_out) {
-            return redirect()->back()->with('msssage','または出勤していません。');
+            return redirect()->back()->with('msssage','まだ出勤していません。');
         }
         $attendance->update([
                 'clock_out' => now()

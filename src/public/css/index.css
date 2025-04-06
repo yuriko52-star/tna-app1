@@ -10,6 +10,7 @@ body {
 .title {
     display: flex;
     margin-top: 90px;
+    margin-bottom: 47px;
     text-align: left;
 }
 h1 {
@@ -22,9 +23,8 @@ h1 {
 .top-content {
     width: 900px;
     height: 60px;
-    margin: 0 auto;
+    margin: 0 auto ;
     text-align: center;
-    margin-top: 27px;
     background-color: #fff;
     border-radius: 10px;
 }
@@ -71,9 +71,8 @@ table {
 }
 .under-content {
     width: 900px;
-    margin: 0 auto;
+    margin: 46px auto 110px;
     text-align: center;
-    margin-top: 46px;
     background-color: #fff;
     border-radius: 10px;
 }

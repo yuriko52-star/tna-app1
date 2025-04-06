@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
-        //    $this->call(UsersTableSeeder::class);
+            //  $this->call(UsersTableSeeder::class);
          
          
         // ここから勤務、退勤時間
@@ -48,7 +48,7 @@ class DatabaseSeeder extends Seeder
                 if ($date->isWeekend()) {
                     BreakTime::factory()->create([
                     'attendance_id' => $attendance->id,
-                    'date' => $attendance->date,
+                    // 'date' => $attendance->date,
                     'clock_in' => null,
                     'clock_out' => null,
                     ]);
@@ -64,7 +64,7 @@ class DatabaseSeeder extends Seeder
             
                         BreakTime::factory()->create([
                             'attendance_id' => $attendance->id,
-                            'date' => $attendance->date,
+                            // 'date' => $attendance->date,
                             'clock_in' => $breakClockIn,
                             'clock_out' => $breakClockOut,
                             ]);
@@ -79,7 +79,7 @@ class DatabaseSeeder extends Seeder
 
                 BreakTime::factory()->create([
                     'attendance_id' => $attendance->id,
-                    'date' => $attendance->date,
+                    // 'date' => $attendance->date,
                     'clock_in' => $breakClockIn,
                     'clock_out' => $breakClockOut,
                     ]);

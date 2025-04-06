@@ -46,7 +46,8 @@ Route::get('/admin/login', function () {
 // 一般ユーザーのダッシュボード（認証が必要）
 Route::middleware(['auth:web','role:user'])->group(function () {
      Route::get('/attendance', [UserController::class, 'index'])->name('user.attendance');
-    
+    Route::get('/attendance/list' ,[UserController::class,'showList'])->name('user.attendance.list');
+    Route::get('/attendance/{id}' ,[UserController::class,'detail'])->name('user.attendance.detail');
     Route::post('/attendance/clock-in',[AttendanceController::class, 'clockIn'])->name('attendance.clockIn');
     Route::post('/attendance/clock-out',[AttendanceController::class, 'clockOut'])->name('attendance.clockOut');
     Route::post('/attendance/break-start',[AttendanceController::class,'breakStart'])->name('attendance.breakStart');

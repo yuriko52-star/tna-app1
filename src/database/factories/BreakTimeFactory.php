@@ -39,7 +39,7 @@ class BreakTimeFactory extends Factory
         
         return [
             'attendance_id' => $attendance->id,
-            'date' => $attendance->date,
+            // 'date' => $attendance->date,
             'clock_in' => $clockIn,
             'clock_out' => $clockOut,
         ];

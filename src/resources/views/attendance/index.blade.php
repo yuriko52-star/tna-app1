@@ -6,33 +6,37 @@
 
 @section('content')
 <div class="content">
-    <form action="" class="">
+    
        
       <label class="title">
         <div class="image">
           <img src="{{asset('img/Line 2.png')}}" style="height:40px;width:8px;"alt="" class="img">
         </div>
-          <!-- <h1>勤怠一覧</h1> -->
+        @if(Auth::user()->isAdmin())
           <h1>石黒さんの勤怠</h1>
+          @else
+          <h1>勤怠一覧</h1>
+          @endif 
       </label>    
         <div class="top-content"> 
           <div class="months">
             <label class="last-month">
-              <a href="" class="month-link"><img src="{{asset('img/image 2.png')}} "style="height:15px; width:20px;" alt="" class="img">前月</a>
+              <a href="{{ url('/attendance/list?month=' . $previousMonth) }}" class="month-link"><img src="{{asset('img/image 2.png')}} "style="height:15px; width:20px;" alt="" class="img">前月</a>
             </label>
             <label class="this-month">
                 <div class="image">
                 <img src="{{ asset('img/image 1 (1).png')}}" style="height: 25px; width: 25px;"alt="" class="img">
                 </div>
-                <p class="date">2025/11</p>
+                <p class="date">{{ $thisMonth}}</p>
               </label>
               <label class="next-month">
-                 <a href="" class="month-link">翌月<img src="{{ asset('img/image 3.png')}}"style="height:15px; width:20px;" alt="" class="img"></a>
+                 <a href="{{ url('/attendance/list?month=' . $nextMonth) }}" class="month-link">翌月<img src="{{ asset('img/image 3.png')}}"style="height:15px; width:20px;" alt="" class="img"></a>
               </label>
           </div>
         </div>
         <div class="under-content">
            <table>
+            <thead>
              <colgroup>  
               <col style="width: 150px;">
               <col style="width: 150px;">
@@ -49,42 +53,29 @@
               <th class="data-label">合計</th>
               <th class="data-label">詳細</th>
             </tr>
-
+          </thead>
+          <tbody>
+            @foreach($attendanceData as $day)
             <tr class="row">
-             <td class="data-item">11/01（木）</td>
-              <td class="data-item">09:00</td>
-              <td class="data-item">18:00</td>
-             <td class="data-item">1:00</td>
-             <td class="data-item">8:00</td>
+              <td class="data-item">{{$day['date'] }}</td>
+              <td class="data-item">{{$day['clockIn']}}</td>
+              <td class="data-item">{{ $day['clockOut']}}</td>
+              <td class="data-item">{{$day['breakTime'] }}</td>
+              <td class="data-item">{{ $day['workingTime'] }}</td>
               <td class="data-item">
-               <a href="" class="data-link">詳細</a>
+               <a href="{{route('user.attendance.detail', ['id' => $day['id']]) }}" class="data-link">詳細</a>
               </td>
             </tr>
-            <tr class="row">
-             <td class="data-item">11/01（木）</td>
-              <td class="data-item">09:00</td>
-              <td class="data-item">18:00</td>
-             <td class="data-item">1:00</td>
-             <td class="data-item">8:00</td>
-              <td class="data-item">
-               <a href="" class="data-link">詳細</a>
-              </td>
-            </tr>
-            <tr class="row">
-             <td class="data-item">11/01（木）</td>
-              <td class="data-item">09:00</td>
-              <td class="data-item">18:00</td>
-             <td class="data-item">1:00</td>
-             <td class="data-item">8:00</td>
-              <td class="data-item">
-               <a href="" class="data-link">詳細</a>
-              </td>
-            </tr>
-           </table>
+            @endforeach
+          </tbody>
+          </table>
           </div>
+          @if(Auth::user()->isAdmin())
+          <form action="" class="">
           <div class="button">
             <button class="csv-btn" type="submit">CSV出力</button>
           </div>
-    </form>
+          </form>
+          @endif
 </div>
 @endsection

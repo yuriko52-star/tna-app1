@@ -12,6 +12,7 @@ body {
 .title {
     display: flex;
     margin-top: 90px;
+    margin-bottom: 100px;
     text-align: left;
 }
 
@@ -76,6 +77,9 @@ th, td {
     width: 250px;
     
 }
+.date {
+    margin-right: 23px;
+}
 .work {
     margin-left :40px;
 }
@@ -122,6 +126,8 @@ input {
 }
 .button {
     text-align: right;
+    margin-top: 120px;
+    margin-bottom: 60px;
 }
 
 .edit-btn {
