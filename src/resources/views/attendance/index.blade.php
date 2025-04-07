@@ -63,7 +63,12 @@
               <td class="data-item">{{$day['breakTime'] }}</td>
               <td class="data-item">{{ $day['workingTime'] }}</td>
               <td class="data-item">
+                @if(!empty($day['id']))
                <a href="{{route('user.attendance.detail', ['id' => $day['id']]) }}" class="data-link">詳細</a>
+               @else
+               <a href="{{route('user.attendance.detailByDate',['date'=> $day['raw_date']])}}" class="data-link">詳細</a>
+               @endif
+                
               </td>
             </tr>
             @endforeach

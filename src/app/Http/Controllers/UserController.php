@@ -112,12 +112,13 @@ class UserController extends Controller
             // 表示用データに整形
             $attendanceData[] = [
                 
-                'id'=> optional($data)->id,
+                 'id'=> optional($data)->id ?? 'date-' . $date->format('Ymd'),
+                'raw_date' => $date->format('Y-m-d'),
                 'date' => $date->format('m/d') . '(' . $weekMap[$date->format('D')] . ')' ,
                 'clockIn' => $clockIn ? $clockIn->format('H:i') : '',
                 'clockOut' => $clockOut ? $clockOut->format('H:i') : '',
-                'breakTime' => $this->formatMinutes($totalBreakMinutes),
-                'workingTime' => $this->formatMinutes($workingMinutes),
+                'breakTime' => ($clockIn && $clockOut) ? $this->formatMinutes($totalBreakMinutes) : '',
+                'workingTime' => ($clockIn && $clockOut) ?$this->formatMinutes($workingMinutes) : '',
             ];
         }
         
@@ -131,7 +132,43 @@ class UserController extends Controller
     }
     public function detail($id) {
         $attendance = Attendance::with('breakTimes')->findOrFail($id);
-        return view('attendance.detail',compact('attendance'));
+
+        if($attendance->user_id !== Auth::id()) {
+            abort(403,'この勤怠情報にアクセスする権限がありません。');
+        }
+
+        $date = Carbon::parse($attendance->date);
+        $year = $date->format('Y');
+        $monthDay = $date->format('n月j日');
+        return view('attendance.detail',compact('attendance','year','monthDay'));
 
     }
+    public function detailByDate($date)
+{
+    $user = Auth::user();
+
+    // 該当する勤怠データを取得（なければ null）
+    $attendance = Attendance::with('breakTimes')
+        ->where('user_id', $user->id)
+        ->whereDate('date', $date)
+        ->first();
+
+    // データがない場合は空の Attendance オブジェクトを作成して渡す（修正申請の入力用）
+    if (!$attendance) {
+        $attendance = new Attendance([
+            'date' => $date,
+            'clock_in' => null,
+            'clock_out' => null,
+        ]);
+        $attendance->breakTimes = collect(); // 空のコレクションを渡す
+    }
+
+    // 年・日付表示用に整形
+    $carbonDate = \Carbon\Carbon::parse($date);
+    $year = $carbonDate->format('Y');
+    $monthDay = $carbonDate->format('n月j日');
+
+    return view('attendance.detail', compact('attendance', 'year', 'monthDay'));
+}
+
 }

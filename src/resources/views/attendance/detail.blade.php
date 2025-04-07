@@ -1,5 +1,5 @@
 @extends('layouts.app')
-
+<!--userとadminで画面を分けること。コントローラも -->
 @section('css')
 <link rel="stylesheet" href="{{ asset('css/detail.css') }}" class="">
 @endsection
@@ -13,25 +13,25 @@
           <h1>勤怠詳細</h1> 
     </div> 
     <table>
-        <form action="" class="">
+        
+        <form action="{{ route('attendance.editRequest', ['id' => $attendance->id]) }}" method="POST">
+        @csrf
+            
         <tr>
             <th class="data-label">名前</th>
             <td class="data-item">
-                <span class="name">石黒 ゆりこ</span>
+                <span class="name">{{ $attendance->user->name}}</span>
             </td>
             
         </tr>
         <tr>
-            <!-- コメントは一般ユーザー -->
+            
             <th class="data-label">日付</th>
             <td class="data-item">
                 <div class="date-wrapper">
-                    <!-- <input type="text" class="time-input" value="2025年"> -->
-                    <span class="year">2025年</span>
+                    <span class="year">{{$year}}</span>
                     <span class="date-space"></span>
-                    <!-- <input type="text" class="time-input" value="6月11日"> -->
-
-                    <span class="date">6月11日</span>
+                    <span class="date">{{ $monthDay}}</span>
                 </div>
             </td>
         </tr>
@@ -41,31 +41,39 @@
             </th>
             <td class="data-item">
             <div class="time-wrapper">
-                <input type="text" class="time-input" value="09:00">
+                <input type="text" class="time-input" name="clock_in"value="{{ old('clock_in' ,$attendance->clock_in ? \Carbon\Carbon::parse($attendance->clock_in)->format('H:i') : '') }}">
                 <span class="time-separator">~</span>
-                <input type="text" class="time-input" value="18:00">
+                <input type="text" class="time-input" value="{{ old('clock_out', $attendance->clock_out ? \Carbon\Carbon::parse($attendance->clock_out)->format('H:i') : '') }}">
             </div> 
             </td>
             
         </tr>
+        @foreach($attendance->breakTimes as $i => $break)
+        <!-- $i => $breakがわからん -->
+        
         <tr>
-            <th class="data-label">休憩</th>
+            <th class="data-label">休憩{{ $i> 0 ? $i+1 : '' }}</th>
             <td class="data-item">
             <div class="time-wrapper">
-                <input type="text" class="time-input" value="12:00">
+                <input type="hidden" class=""name="breaks[{{ $i }}][id]" value="{{$break->id}}">
+
+                <input type="text" class="time-input"name="breaks[{{ $i}}][clock_in]" value="{{ old("breaks.$i.clock_in",$break->clock_in  ? \Carbon\Carbon::parse($break->clock_in)->format('H:i') : '' )}}">
+
                 <span class="time-separator">~</span> 
-                <input type="text" class="time-input" value="13:00">
+
+                <input type="text" class="time-input"name="breaks[{{$i}}][clock_out]" value="{{ old("breaks.$i.clock_out",$break->clock_out ? \Carbon\Carbon::parse($break->clock_out)->format('H:i') : '' )}}">
             </div>
             </td>
         </tr>
+        @endforeach
          <tr>
-            <!-- userも必要、figmaにはないので要注意！基本設計にあり。 -->
-            <th class="data-label">休憩2</th>
+            
+            <th class="data-label">休憩{{ count($attendance->breakTimes)+ 1}} </th>
             <td class="data-item">
             <div class="time-wrapper">
-                <input type="text" class="time-input" value="">
+                <input type="text" class="time-input" name="breaks[{{ count($attendance->breakTimes) }}][clock_in]"value="">
                 <span class="time-separator">~</span> 
-                <input type="text" class="time-input" value="">
+                <input type="text" class="time-input"name ="breaks[{{ count($attendance->breakTimes) }}][clock_out]" value="">
             </div>
             </td>
         </tr>
@@ -73,7 +81,7 @@
         <tr>
             <th class="data-label">備考</th>
             <td class="data-item">
-               <textarea class="reason-input"></textarea>
+               <textarea class="reason-input" name="reason"></textarea>
                <!-- <textarea class="reason-input">電車遅延のため</textarea> -->
             </td>
            
