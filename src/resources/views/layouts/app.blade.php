@@ -28,7 +28,7 @@
                 @elseif(Auth::check())
                     @if(($status ?? '')=== '退勤済')
                     <li><a href="{{ url('/attendance/list') }}" class="header-nav-link">今月の出勤一覧</a></li>
-                    <li><a href="{{ url('/stamp_correction_request_list') }}" class="header-nav-link">申請一覧 </a></li>
+                    <li><a href="{{ url('/stamp_correction_request/list') }}" class="header-nav-link">申請一覧 </a></li>
                     @else
                     <li><a href="{{ url('/attendance') }}" class="header-nav-link">勤怠</a></li>
                     <li><a href="{{ url('/attendance/list') }}" class="header-nav-link">勤怠一覧</a></li>

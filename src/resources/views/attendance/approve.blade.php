@@ -14,11 +14,12 @@
     </div> 
     <table>
         <!-- 管理者用 -->
-        <form action="" class="">
+        <!-- <form action="" class=""> -->
         <tr>
             <th class="data-label">名前</th>
             <td class="data-item">
-                <span class="name">石黒 ゆりこ</span>
+                <!-- 値入れる -->
+                <span class="name">石黒 　ゆりこ</span>
             </td>
             
         </tr>
@@ -26,9 +27,11 @@
             <th class="data-label">日付</th>
             <td class="data-item">
                 <div class="date-wrapper">
+                    <!-- 値入れる -->
                     <span class="year">2025年</span>
                     <span class="date-space"></span>
-                    <span>12月11日</span>
+                    <!-- 値入れる -->
+                    <span class="day">12月11日</span>
                 </div>
             </td>
         </tr>
@@ -38,8 +41,10 @@
             </th>
             <td class="data-item">
             <div class="time-wrapper">
+                <!-- 値入れる -->
                 <span class="time-in">09:00</span>
                 <span class="time-separator">~</span>
+                <!-- 値入れる -->
                 <span class="time-out">18:00</span>
             </div> 
             </td>
@@ -48,14 +53,17 @@
             <th class="data-label">休憩</th>
             <td class="data-item">
             <div class="time-wrapper">
+                <!-- 値入れる -->
                 <span class="time-in">12:00</span>
                 <span class="time-separator">~</span>
+                <!-- 値入れる -->
                 <span class="time-out">13:00</span> 
             </div>
             </td>
         </tr>
          <tr>
             <!-- userも必要、figmaにはないので要注意！基本設計にあり。 -->
+             <!-- edit.blade.phpさんしょうにしていれる -->
             <th class="data-label">休憩2</th>
             <td class="data-item">
             <div class="time-wrapper">
@@ -68,6 +76,7 @@
         <tr>
             <th class="data-label">備考</th>
             <td class="data-item">
+                <!-- 値入れる -->
                 <span class="reason">電車遅延のため</span>
             </td>
         </tr>

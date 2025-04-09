@@ -56,7 +56,13 @@ Route::middleware(['auth:web','role:user'])->group(function () {
     Route::post('/attendance/break-start',[AttendanceController::class,'breakStart'])->name('attendance.breakStart');
     Route::post('/attendance/break-end',[AttendanceController::class, 'breakEnd'])->name('attendance.breakEnd');
 
-     Route::post('/attendance/{id}/edit-request', [AttendanceController::class, 'update'])->name('attendance.editRequest');
+     Route::post('/attendance/{id}/edit-request', [AttendanceController::class, 'update'])->name('attendance.update');
+     Route::get('/stamp_correction_request/list', [AttendanceController::class, 'editRequest'])
+    ->name('attendance.editRequest');
+     
+     Route::get('/attendance/edit-detail/{id}',[AttendanceController::class,'editDetail'])->name('attendance.editDetail');
+    // Route::get('/attendance/edit-detail',[AttendanceController::class,'editDetail'])->name('attendance.edit-detail');
+
 
 
 

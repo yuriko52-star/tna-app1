@@ -92,64 +92,193 @@ class AttendanceController extends Controller
         abort(403, '権限がありません');
         }
          // 出退勤の修正申請
-         $clockIn = $request->input('clock_in');
-         $clockOut = $request->input('clock_out');
+         $newClockIn = $request->input('clock_in');
+         $newClockOut = $request->input('clock_out');
+         $defaultClockIn = optional($attendance)->clock_in;
+         $defaultClockOut = optional($attendance)->clock_out;
          $targetDate = $attendance->date;
+         $now = now();
          $reason = $request->input('reason');
-         if($clockIn || $clockOut || $reason) {
+
+         $isClockInChanged = $newClockIn && Carbon::parse($newClockIn)->format('H:i') !== optional($defaultClockIn)->format('H:i');
+        $isClockOutChanged = $newClockOut && Carbon::parse($newClockOut)->format('H:i') !== optional($defaultClockOut)->format('H:i');
+
+         if($isClockInChanged || $isClockOutChanged) {
             AttendanceEdit::create([
-                'attendance_id' => $attendance->id,
+                'attendance_id' => $attendance->id ?? null,
                 'user_id' => $user->id,
-                'request_date' => now(),
+                'request_date' => $now,
                 'target_date' => $targetDate,
-                'new_clock_in' => $clockIn ? Carbon::parse("$targetDate $clockIn") : null,
-                'new_clock_out' => $clockOut ? Carbon::parse("$targetDate $clockOut") : null,
+                'new_clock_in' => $isClockInChanged ? Carbon::parse("$targetDate $newClockIn") : null,
+                'new_clock_out' => $isClockOutChanged ? Carbon::parse("$targetDate $newClockOut") : null,
+                
                 'reason' => $reason,
             ]);
          }
          // 休憩の修正申請
-        //  'breaks', []はどういう意味？
+        
 
          $breaks = $request->input('breaks', []);
 
-         foreach($breaks as $break)
-        //  書き方がわからん。意味も
+         foreach($breaks as $i => $break)
+        
             {
+                $defaultIn = optional($attendance->breakTimes[$i] ?? null)->clock_in;
+                $defaultOut = optional($attendance->breakTimes[$i] ?? null)->clock_out;
+
                 $newIn = $break['clock_in'] ?? null;
                 $newOut = $break['clock_out'] ?? null;
-                $reason = $request->input('reason');
-                if (!$newIn && !$newOut) continue;
-                 $targetDate = $attendance->date;
-                 $newClockIn = $newIn ? Carbon::parse("$targetDate $newIn") : null;
-                 $newClockOut = $newOut ? Carbon::parse("$targetDate $newOut") : null;
-                // 既存の休憩修正（IDがある場合）
-                if(!empty($break['id'])) {
+
+                $isBreakInChanged = $newIn && Carbon::parse($newIn)->format('H:i') !== optional($defaultIn)->format('H:i');
+                $isBreakOutChanged = $newOut && Carbon::parse($newOut)->format('H:i') !== optional($defaultOut)->format('H:i');
+                
+                if ($isBreakInChanged || $isBreakOutChanged) {
                     BreakTimeEdit::create([
-                        'break_time_id' => $break['id'],
+                        'break_time_id' => $break['id'] ?? null,
                         'user_id' => $user->id,
-                        'request_date' => now()->toDateString(),
+                       
+                        'request_date' => $now,
                         'target_date' => $targetDate,
-                        'new_clock_in' => $newClockIn,
-                        'new_clock_out' => $newClockOut,
+                        'new_clock_in' => $isBreakInChanged ? Carbon::parse("$targetDate $newIn") : null,
+                        'new_clock_out' => $isBreakOutChanged ? Carbon::parse("$targetDate $newOut") : null,
                         'reason' => $reason,
                         ]);
                     }
-                else {
-                    BreakTimeEdit::create([
-                        'break_time_id' => null,
-                        'user_id' => $user->id,
-                        'request_date' => now()->toDateString(),
-                        'target_date' => $targetDate,
-                        'new_clock_in' => $newClockIn,
-                        'new_clock_out' => $newClockOut,
-                        'reason' => $reason,
-                    ]);
-                }
-            }
-            return redirect()->route('attendance.editRequest', ['id' => $attendance->id]
-                
-            );
+                 }
+               return redirect()->route('attendance.editRequest');
 
     }
     
+   public function editRequest(Request $request)
+     {
+        $tab = $request->query('tab', 'waiting');
+        
+        // 「承認待ち」なら approved_at が null のものを取得
+        $isWaiting = $tab === 'waiting';
+        $userId = Auth::id();
+        // 出退勤申請の取得
+        $attendanceEdits = AttendanceEdit::with(['user','attendance'])->where('user_id',$userId)
+        ->when($isWaiting, fn($q) => $q->whereNull('approved_at'))
+        ->get();
+        
+        foreach ($attendanceEdits as $edit) {
+            $original = $edit->attendance;
+            if (!$original) continue;
+            //  \Log::debug("Edit ID {$edit->id}");
+            //  \Log::debug("original: " . optional($original->clock_in)->format('H:i'));
+            // \Log::debug("new: " . optional($edit->new_clock_in)->format('H:i'));
+            $attendanceEdits = $attendanceEdits->filter(function ($edit) {
+            $original = $edit->attendance;
+            if (!$original) return false;
+
+            return (
+                    ($edit->new_clock_in && !optional($original->clock_in)->eq($edit->new_clock_in)) ||
+                    ($edit->new_clock_out && !optional($original->clock_out)->eq($edit->new_clock_out))
+                    );
+            });
+        }
+
+
+            // 休憩申請の取得
+            $breakTimeEdits = BreakTimeEdit::with(['user', 'breakTime'])
+            ->when($isWaiting, fn($q) => $q->whereNull('approved_at'))
+            ->where('user_id', $userId) // ★ログインユーザーだけ
+            ->get()
+            ->filter(function ($edit) {
+            $original = $edit->breakTime;
+             if (!$original) return false;
+                    return (
+                        ($edit->new_clock_in && optional($original->clock_in)->format('H:i') !== optional($edit->new_clock_in)->format('H:i')) ||
+                        ($edit->new_clock_out && optional($original->clock_out)->format('H:i') !== optional($edit->new_clock_out)->format('H:i'))
+                    );
+                });
+           
+        // 両方を合体
+
+        $datas = $attendanceEdits->map(function ($edit) {
+        return [
+            'type' => 'attendance',
+            'id' => $edit->id,
+            'user' => $edit->user,
+            'target_date' => $edit->target_date,
+            'request_date' => $edit->request_date,
+            'reason' => $edit->reason,
+            'approved_at' => $edit->approved_at,
+        ];
+        })->merge($breakTimeEdits->map(function ($edit) {
+        return [
+            'type' => 'break',
+            'id' => $edit->id,
+            'user' => $edit->user,
+            'target_date' => $edit->target_date,
+            'request_date' => $edit->request_date,
+            'reason' => $edit->reason,
+            'approved_at' => $edit->approved_at,
+        ];
+        }))->sortByDesc('request_date');
+
+        return view('attendance.edit', [
+        'datas' => $datas,
+        'tab' => $tab
+        ]);
+    }
+ public function editDetail($id)
+{
+    // 1. 出退勤修正データを優先的に取得
+    $attendanceEdit = \App\Models\AttendanceEdit::with('attendance.user')->find($id);
+    // attendance.userはなんのこと？\App\Models\AttendanceEditはAttendanceでいかんのか？
+
+    if ($attendanceEdit) {
+        $attendance = $attendanceEdit->attendance;
+        $user = $attendance->user;
+        $date = $attendance->date;
+
+        $clockIn = $attendanceEdit->new_clock_in ?? $attendance->clock_in;
+        $clockOut = $attendanceEdit->new_clock_out ?? $attendance->clock_out;
+// 修正してなくてもattendance_editsにはデフォルト値がはいっているが。$attendanceEdit->new_clock_inこれだけではだめ？
+        $breakTimes = $attendance->breakTimes;
+        $breakEdits = \App\Models\BreakTimeEdit::where('user_id', $user->id)
+                            ->where('target_date', $date)->get();
+                            // このこーどはいる？
+
+        $reason = $attendanceEdit->reason;
+
+    } else {
+        // 2. 休憩だけの申請のとき
+        $breakEdit = \App\Models\BreakTimeEdit::with('user')->findOrFail($id);
+        $user = $breakEdit->user;
+        $date = $breakEdit->target_date;
+
+        $attendance = \App\Models\Attendance::with('breakTimes')->where('user_id', $user->id)
+                        ->where('date', $date)->firstOrFail();
+
+        $clockIn = $attendance->clock_in;
+        $clockOut = $attendance->clock_out;
+
+        $breakTimes = $attendance->breakTimes;
+        $breakEdits = \App\Models\BreakTimeEdit::where('user_id', $user->id)
+                            ->where('target_date', $date)->get();
+
+        $reason = $breakEdit->reason;
+    }
+
+    $year = \Carbon\Carbon::parse($date)->format('Y年');
+    $monthDay = \Carbon\Carbon::parse($date)->format('m月d日');
+
+    return view('attendance.approve', compact(
+        'user',
+        'year',
+        'monthDay',
+        'clockIn',
+        'clockOut',
+        'breakTimes',
+        'breakEdits',
+        'reason'
+    ));
+
+}
+ 
+
+
+ 
 }

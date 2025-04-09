@@ -15,7 +15,7 @@ class CreateAttendanceEditsTable extends Migration
     {
         Schema::create('attendance_edits', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('attendance_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('attendance_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->date('request_date');
             $table->date('target_date');

@@ -14,7 +14,7 @@
     </div> 
     <table>
         
-        <form action="{{ route('attendance.editRequest', ['id' => $attendance->id]) }}" method="POST">
+        <form action="{{ route('attendance.update', ['id' => $attendance->id]) }}" method="POST">
         @csrf
             
         <tr>
@@ -43,7 +43,7 @@
             <div class="time-wrapper">
                 <input type="text" class="time-input" name="clock_in"value="{{ old('clock_in' ,$attendance->clock_in ? \Carbon\Carbon::parse($attendance->clock_in)->format('H:i') : '') }}">
                 <span class="time-separator">~</span>
-                <input type="text" class="time-input" value="{{ old('clock_out', $attendance->clock_out ? \Carbon\Carbon::parse($attendance->clock_out)->format('H:i') : '') }}">
+                <input type="text" class="time-input"name="clock_out" value="{{ old('clock_out', $attendance->clock_out ? \Carbon\Carbon::parse($attendance->clock_out)->format('H:i') : '') }}">
             </div> 
             </td>
             

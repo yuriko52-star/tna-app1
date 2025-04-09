@@ -11,7 +11,8 @@ body {
 
 .title {
     display: flex;
-    margin-top: 90px;
+    margin-top: 78px;
+    margin-bottom: 65px;
     text-align: left;
 }
 .image {
@@ -62,7 +63,7 @@ td {
 }
 .under-content {
     width: 900px;
-    margin: 0 auto;
+    margin: 0 auto 170px;
     text-align: center;
     margin-top: 46px;
     background-color: #fff;
@@ -98,10 +99,10 @@ td {
     }
 
     .top-content {
-        width: 90%;
+        width: 100%;
     }
 
     .under-content {
-        width: 90%;
+        width: 100%;
     }
 }
