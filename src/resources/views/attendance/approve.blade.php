@@ -18,7 +18,6 @@
         <tr>
             <th class="data-label">名前</th>
             <td class="data-item">
-                <!-- 値入れる -->
                 <span class="name">{{ $user->name}}</span>
             </td>
             
@@ -27,10 +26,8 @@
             <th class="data-label">日付</th>
             <td class="data-item">
                 <div class="date-wrapper">
-                    <!-- 値入れる -->
                     <span class="year">{{$year}}</span>
                     <span class="date-space"></span>
-                    <!-- 値入れる -->
                     <span class="day">{{ $monthDay}}</span>
                 </div>
             </td>
@@ -41,33 +38,28 @@
             </th>
             <td class="data-item">
             <div class="time-wrapper">
-                <!-- 値入れる -->
-                <span class="time-in">{{ $clockIn ? \Carbon\Carbon::parse($clockIn)->format('H:i') : '-' }}</span>
+                
+                <span class="time-in">{{\Carbon\Carbon::parse($workclockIn)->format('H:i')}}</span>
+               
                 <span class="time-separator">~</span>
-                <!-- 値入れる -->
-                <span class="time-out">{{ $clockOut ? \Carbon\Carbon::parse($clockOut)->format('H:i') : '-' }}</span>
+                
+                <span class="time-out">{{\Carbon\Carbon::parse($workclockOut)->format('H:i')}}</span>
             </div> 
             </td>
         </tr>
         @foreach($mergedBreaks as $i => $break)
         <tr>
-             {{-- @if($break['clock_in'] || $break['clock_out'])--}} {{-- どちらかに値があれば表示 --}}
             <th class="data-label">休憩{{ $i > 0 ? $i+1 : ' ' }}</th>
             <td class="data-item">
             <div class="time-wrapper">
-                <!-- 値入れる -->
                 <span class="time-in">{{ $break['clock_in'] ? \Carbon\Carbon::parse($break['clock_in'])->format('H:i') : '-' }}</span>
                 <span class="time-separator">~</span>
-                <!-- 値入れる -->
                 <span class="time-out">{{ $break['clock_out'] ? \Carbon\Carbon::parse($break['clock_out'])->format('H:i') : '-' }}</span> 
             </div>
             </td>
         </tr>
-            {{--@endif--}}
          @endforeach
          <tr>
-            <!-- userも必要、figmaにはないので要注意！基本設計にあり。 -->
-             <!-- edit.blade.phpさんしょうにしていれる -->
             <th class="data-label">休憩{{ count($mergedBreaks) + 1 }}</th>
             <td class="data-item">
             <div class="time-wrapper">
@@ -81,8 +73,7 @@
         <tr>
             <th class="data-label">備考</th>
             <td class="data-item">
-                <!-- 値入れる -->
-                <span class="reason">{{ $reason }}</span>
+               <span class="reason">{{ $reason }}</span>
             </td>
         </tr>
     </table>

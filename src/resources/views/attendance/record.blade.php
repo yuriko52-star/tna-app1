@@ -6,7 +6,7 @@
 
 @section('content')
   <div class="content">
-    <!-- <form action="" class=""> -->
+    
   <label for="status" class="label">
     {{ $status }}
   </label> 

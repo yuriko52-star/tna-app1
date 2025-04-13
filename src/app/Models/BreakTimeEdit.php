@@ -28,4 +28,15 @@ class BreakTimeEdit extends Model
     {
         return $this->belongsTo(BreakTime::class);
     }
+    public function attendance()
+    {
+        return $this->hasOneThrough(
+            Attendance::class,
+            BreakTime::class,
+            'id',
+            'id',
+            'break_time_id',
+            'attendance_id'
+        );
+    }
 }

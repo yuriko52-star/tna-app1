@@ -18,9 +18,9 @@
                 
                     <li>
                   
-                    <a href="{{ route('attendance.editRequest',['tab'=> 'waiting']) }}" class="page-title">承認待ち</a>
+                    <a href="{{ route('attendance.requestList',['tab'=> 'waiting']) }}" class="page-title">承認待ち</a>
                     <li>
-                    <a href="{{ route('attendance.editRequest',['tab' => 'approved']) }}" class="page-title">承認済み</a>
+                    <a href="{{ route('attendance.requestList',['tab' => 'approved']) }}" class="page-title">承認済み</a>
    <!-- 表示しているページのタブの太さが変わるように設定する。してないものは細目で。
  -->
    <!-- 管理者ページはデータの内容が一人一人になる。-->
@@ -48,43 +48,24 @@
             </tr>
             @foreach($datas as $data)
             <tr class="row">
+              <!-- 後々必要 -->
               {{--{{is_null($data['approved_at']) ? '承認待ち' : '承認済み' }}--}}
               
              <td class="data-item">承認待ち</td>
              
              <!-- <td class="data-item">承認済み</td> -->
             
-              <td class="data-item">{{$data['user']->name}}</td>
+              <td class="data-item">{{Auth::user()->name}}</td>
               <td class="data-item">{{\Carbon\Carbon::parse($data['target_date'])->format('Y/m/d') }}</td>
              <td class="data-item">{{$data['reason']}}</td>
              <td class="data-item">{{\Carbon\Carbon::parse($data['request_date'])->format('Y/m/d') }}</td>
               <td class="data-item">
-               <a href="{{ route('attendance.editDetail',['id' => $data['id']])}}" class="data-link">詳細</a>
-               <!-- チャットにきく -->
+               <a href="{{ route('attendance.editDetail', ['date' => \Carbon\Carbon::parse($data['target_date'])->format('Y-m-d')]) }}" class="data-link">詳細</a>
+              
               </td>
             </tr>
             @endforeach
-            <!-- <tr class="row">
-             <td class="data-item">承認待ち</td>
-              <td class="data-item">石黒 ゆりこ</td>
-              <td class="data-item">2025/11/02</td>
-             <td class="data-item">寝坊のため</td>
-             <td class="data-item">2025/11/05</td>
-              <td class="data-item">
-               <a href="" class="data-link">詳細</a>
-              </td>
-            </tr>
-            <tr class="row">
-             <td class="data-item">承認待ち</td>
-              <td class="data-item">石黒 ゆりこ</td>
-              <td class="data-item">2025/11/03</td>
-             <td class="data-item">残業のため</td>
-             <td class="data-item">2025/12/03</td>
-              <td class="data-item">
-               <a href="" class="data-link">詳細</a>
-              </td>
-            </tr>
-             -->
+            
            </table>
           </div>
         </div> 

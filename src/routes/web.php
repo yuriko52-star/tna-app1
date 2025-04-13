@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DebugController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\AdminController;
+
 use App\Http\Controllers\UserController;
  use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController as FortifyAuthenticatedSessionController;
 
@@ -57,11 +58,11 @@ Route::middleware(['auth:web','role:user'])->group(function () {
     Route::post('/attendance/break-end',[AttendanceController::class, 'breakEnd'])->name('attendance.breakEnd');
 
      Route::post('/attendance/{id}/edit-request', [AttendanceController::class, 'update'])->name('attendance.update');
-     Route::get('/stamp_correction_request/list', [AttendanceController::class, 'editRequest'])
-    ->name('attendance.editRequest');
+     Route::get('/stamp_correction_request/list', [UserController::class, 'requestList'])
+    ->name('attendance.requestList');
      
-     Route::get('/attendance/edit-detail/{id}',[AttendanceController::class,'editDetail'])->name('attendance.editDetail');
-    // Route::get('/attendance/edit-detail',[AttendanceController::class,'editDetail'])->name('attendance.edit-detail');
+      Route::get('/attendance/edit-detail/{date}',[UserController::class,'editDetail'])->name('attendance.editDetail');
+    
 
 
 

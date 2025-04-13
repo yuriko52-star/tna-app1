@@ -18,11 +18,11 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         //  \App\Models\User::factory(10)->create();
-            //    $this->call(UsersTableSeeder::class);
+                // $this->call(UsersTableSeeder::class);
          
          
         // ここから勤務、退勤時間
-        $users = [2,3];
+         $users = [2,3];
 
         foreach($users as $user) {
             $dates = collect(range(0,59))->map(fn ($i) => Carbon::create(2025,2,1)->addDays($i));
