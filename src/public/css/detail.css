@@ -142,6 +142,9 @@ input {
     cursor: pointer;
     border: none;
 }
+.form_error {
+    color: red;
+}
 @media screen and (min-width: 768px) and (max-width: 850px) {
     .content {
         width: 90%;

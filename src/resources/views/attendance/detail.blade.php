@@ -43,6 +43,22 @@
                     <span class="time-separator">~</span>
                     <input type="text" class="time-input"name="clock_out" value="{{ old('clock_out', $attendance->clock_out ? \Carbon\Carbon::parse($attendance->clock_out)->format('H:i') : '') }}">
                 </div> 
+                <p class="form_error">
+                    @error('clock_time_invalid')
+                    {{ $message}}
+                    @enderror
+                </p>
+                 <p class="form_error">
+                    @error('clock_in')
+                    {{ $message}} 
+                    @enderror
+                </p>    
+                <p class="form_error">
+                    @error('clock_out')
+                    {{ $message}} 
+                    @enderror
+                </p>    
+                
             </td>
         </tr>
         @foreach($attendance->breakTimes as $i => $break)
@@ -56,6 +72,21 @@
                     <span class="time-separator">~</span> 
                     <input type="text" class="time-input"name="breaks[{{$i}}][clock_out]" value="{{ old("breaks.$i.clock_out",$break->clock_out ? \Carbon\Carbon::parse($break->clock_out)->format('H:i') : '' )}}">
                 </div>
+                <p class="form_error">
+                    @error("breaks.$i.outside_working_time")
+                    {{$message}}
+                    @enderror
+                </p>
+                 <p class="form_error">
+                    @error('breaks.*.clock_in')
+                    {{ $message}} 
+                    @enderror
+                </p>    
+                <p class="form_error">
+                    @error('breaks.*.clock_out')
+                    {{ $message}} 
+                    @enderror
+                </p>    
             </td>
         </tr>
         @endforeach
@@ -63,16 +94,32 @@
             <th class="data-label">休憩{{ count($attendance->breakTimes)+ 1}} </th>
             <td class="data-item">
                 <div class="time-wrapper">
-                    <input type="text" class="time-input" name="breaks[{{ count($attendance->breakTimes) }}][clock_in]"value="">
+                    <input type="text" class="time-input" name="breaks[{{ count($attendance->breakTimes) }}][clock_in]"value="{{ old('breaks.' . count($attendance->breakTimes) . '.clock_in') }}">
                     <span class="time-separator">~</span> 
-                    <input type="text" class="time-input"name ="breaks[{{ count($attendance->breakTimes) }}][clock_out]" value="">
+                    <input type="text" class="time-input"name ="breaks[{{ count($attendance->breakTimes) }}][clock_out]" value="{{ old('breaks.' . count($attendance->breakTimes) . '.clock_out') }}">
+
                 </div>
+                @php
+                    $index = count($attendance->breakTimes);
+                @endphp
+
+            <p class="form_error">
+               @error("breaks.$index.outside_working_time")
+                    {{$message}}
+                @enderror
+            </p>
             </td>
         </tr>
         <tr>
             <th class="data-label">備考</th>
             <td class="data-item">
                <textarea class="reason-input" name="reason"></textarea>
+            
+            <p class="form_error">
+                @error('reason')
+                {{ $message}}
+                @enderror
+            </p>
             </td>
         </tr>
     </table>

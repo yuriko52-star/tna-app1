@@ -9,6 +9,7 @@ use App\Models\BreakTime;
 use App\Models\AttendanceEdit;
 use App\Models\BreakTimeEdit;
 use Carbon\Carbon;
+use App\Http\Requests\AttendanceRequest;
 
 class AttendanceController extends Controller
 {
@@ -84,7 +85,7 @@ class AttendanceController extends Controller
         return redirect()->route('user.attendance');
 
     }
-    public function update(Request $request , $id) 
+    public function update(AttendanceRequest $request , $id) 
     {
        $user = Auth::user();
        $attendance = Attendance::with('breakTimes')->findOrFail($id);
