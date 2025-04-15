@@ -78,8 +78,16 @@ class FortifyServiceProvider extends ServiceProvider
             $user = User::where('email', $request->email)->first();
 
             if($user && Hash::check($request->password, $user->password)) {
+                // リクエストのパスに基づいてガードを切り替え
+            if ($request->is('admin/login') && $user->role === 'admin') {
+                Auth::guard('admin')->login($user);
+                return $user;
+                } elseif ($request->is('login') && $user->role === 'user') {
+                Auth::guard('web')->login($user);
                 return $user;
             }
+        }
+            // 認証失敗
             return null;
         });
         RateLimiter::for('login', function (Request $request) {

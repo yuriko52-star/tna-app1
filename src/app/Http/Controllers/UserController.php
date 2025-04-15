@@ -174,7 +174,7 @@ class UserController extends Controller
 }
 
 
-public function requestList()
+/*public function requestList()
 {
     $user = Auth::user();
      // 勤務修正と休憩修正を日付単位で結合
@@ -189,25 +189,50 @@ public function requestList()
      // 日付ごとにまとめてマージ
     $mergedData = [];
     foreach($attendanceEdits as $date => $edits) {
-        $mergedData[$date]['user'] = $edits->first()->user;
+         $mergedData[$date] = [
+                'user' => $edits->first()->user,
+            'target_date' => $date,
+            'attendance_edits' => $edits,
+            'break_time_edits' => collect(), // 後で追加
+            'request_date' => $edits->first()->request_date,
+            'reason' => $edits->first()->reason,
+         ]; // ← 初期化しておく
+        /*$mergedData[$date]['user'] = $edits->first()->user;
         $mergedData[$date]['target_date'] = $date;
         $mergedData[$date]['attendance_edits'] = $edits;
         $mergedData[$date]['break_time_edits'] = collect();// あとで break も入れる
         $mergedData[$date]['request_date'] = $edits->first()->request_date;
         $mergedData[$date]['reason'] = $edits->first()->reason;
-    }
+        */
+   /* }
     foreach($breakEdits as $date => $edits) {
         if(!isset($mergedData[$date])) {
-            $mergedData[$date]['user'] = $edits->first()->user;
+             $mergedData[$date] = [
+                'user' => $edits->first()->user,
+                'target_date' => $date,
+                'attendance_edits' => collect(),
+                'break_time_edits' => collect(),
+                'request_date' => $edits->first()->request_date,
+                'reason' => $edits->first()->reason,
+             ]; 
+           /* $mergedData[$date]['user'] = $edits->first()->user;
             $mergedData[$date]['target_date'] = $date;
             $mergedData[$date]['attendance_edits'] = collect();
             $mergedData[$date]['reason'] = $edits->first()->reason;
             $mergedData[$date]['request_date'] = $edits->first()->request_date;
-        }
+            */
+       /* }
         $mergedData[$date]['break_time_edits'] = $edits->sortBy('start_time')->values();
+
     }
+        // 現在の return 文の直前にこのコードを追加
+        $mergedData = collect($mergedData)
+        ->sortBy('request_date')
+        ->values();
+
     return view('attendance.edit',['datas' => $mergedData]);
 }
+    */
     public function editDetail(Request $request ,$date )
     {
         $user = Auth::user();
@@ -287,6 +312,9 @@ public function requestList()
         $year = Carbon::parse($date)->format('Y年');
         $monthDay = Carbon::parse($date)->format('m月d日');
         $reason = $attendanceEdit->reason ?? $breakEdits->first()->reason ?? '';
+
+       
+
 
         return view('attendance.approve',compact('user','year','monthDay','workclockIn','workclockOut','mergedBreaks','reason'));
         

@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
  use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController as FortifyAuthenticatedSessionController;
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\RequestListController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,7 +46,7 @@ Route::get('/admin/login', function () {
  Route::post('/admin/logout', [AuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
  
 // 一般ユーザーのダッシュボード（認証が必要）
-Route::middleware(['auth:web','role:user'])->group(function () {
+Route::middleware(['auth:web'])->group(function () {
      Route::get('/attendance', [UserController::class, 'index'])->name('user.attendance');
     Route::get('/attendance/list' ,[UserController::class,'showList'])->name('user.attendance.list');
     Route::get('/attendance/{id}' ,[UserController::class,'detail'])->name('user.attendance.detail');
@@ -58,24 +59,33 @@ Route::middleware(['auth:web','role:user'])->group(function () {
     Route::post('/attendance/break-end',[AttendanceController::class, 'breakEnd'])->name('attendance.breakEnd');
 
      Route::post('/attendance/{id}/edit-request', [AttendanceController::class, 'update'])->name('attendance.update');
-     Route::get('/stamp_correction_request/list', [UserController::class, 'requestList'])
-    ->name('attendance.requestList');
+   
      
       Route::get('/attendance/edit-detail/{date}',[UserController::class,'editDetail'])->name('attendance.editDetail');
-    
-
-
-
+      
+      
 
 });
+   
+ 
+
+
+
+
 // 管理者専用ページ（認証が必要）
-Route::middleware(['auth:web', 'role:admin'])->group(function () {
-    Route::get('admin/attendance/list', [AdminController::class, 'index'])->name('admin.attendance.list');
+Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
+    Route::get('/attendance/list', [AdminController::class, 'index'])->name('admin.attendance.list');
+    Route::get('/staff/list',[AdminController::class, 'staffList'])->name('admin.staff.list');
+ Route::get('/stamp_correction_request/list', [RequestListController::class, 'adminRequestList'])->name('admin.stamp_correction_request.list');   
+    
+    
 });
 
+// 一般ユーザー用ルート
 
 
 
+Route::middleware(['auth:web'])->get('/stamp_correction_request/list', [RequestListController::class, 'userRequestList'])->name('user.stamp_correction_request.list');
 
 
 

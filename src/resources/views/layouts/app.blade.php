@@ -21,18 +21,19 @@
 
         <nav>
             <ul class="header-nav">
-                @if(Auth::check() && Auth::user()->isAdmin())
+                {{--@if(Auth::check() && Auth::user()->isAdmin())--}}
+                @if(Auth::guard('admin')->check() && Auth::guard('admin')->user()->isAdmin())
                 <li><a href="{{ url('/admin/attendance/list') }}" class="header-nav-link">勤怠一覧</a></li>
                 <li><a href="{{ url('/admin/staff/list') }}" class="header-nav-link"> スタッフ一覧</a></li>
-                 <li><a href="{{ url('/stamp_correction_request/list') }}" class="header-nav-link">申請一覧 </a></li>
+                 <li><a href="{{ route('admin.stamp_correction_request.list') }}" class="header-nav-link">申請一覧 </a></li>
                 @elseif(Auth::check())
                     @if(($status ?? '')=== '退勤済')
                     <li><a href="{{ url('/attendance/list') }}" class="header-nav-link">今月の出勤一覧</a></li>
-                    <li><a href="{{ url('/stamp_correction_request/list') }}" class="header-nav-link">申請一覧 </a></li>
+                    <li><a href="{{ route('user.stamp_correction_request.list') }}" class="header-nav-link">申請一覧 </a></li>
                     @else
                     <li><a href="{{ url('/attendance') }}" class="header-nav-link">勤怠</a></li>
                     <li><a href="{{ url('/attendance/list') }}" class="header-nav-link">勤怠一覧</a></li>
-                    <li><a href="{{ url('/stamp_correction_request/list') }}" class="header-nav-link">申請</a></li>
+                    <li><a href="{{ route('user.stamp_correction_request.list') }}" class="header-nav-link">申請</a></li>
                     @endif
                 @endif
                 <li>

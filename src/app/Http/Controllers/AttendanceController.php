@@ -176,7 +176,7 @@ class AttendanceController extends Controller
                         ]);
                     }
                  }
-               return redirect()->route('attendance.requestList');
+               return redirect()->route('user.stamp_correction_request.list');
 
     }
     

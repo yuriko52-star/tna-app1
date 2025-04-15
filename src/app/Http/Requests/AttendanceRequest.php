@@ -25,10 +25,10 @@ class AttendanceRequest extends FormRequest
     public function rules()
     {
         return [
-             'clock_in' => ['nullable', 'numeric','date_format:H:i'],
-            'clock_out' => ['nullable', 'numeric','date_format:H:i'],
-            'breaks.*.clock_in'=> ['nullable', 'numeric','date_format:H:i'] ,
-            'breaks.*.clock_out' => ['nullable','numeric','date_format:H:i'],
+             'clock_in' => ['nullable','date_format:H:i'],
+            'clock_out' => ['nullable', 'date_format:H:i'],
+            'breaks.*.clock_in'=> ['nullable' ,'date_format:H:i'] ,
+            'breaks.*.clock_out' => ['nullable','date_format:H:i'],
             'reason' => ['required','string'],
         ];
     }
@@ -58,13 +58,13 @@ class AttendanceRequest extends FormRequest
     {
         return [
              'clock_in.date_format' => '出勤時間の形式が正しくありません（例: 09:00）',
-             'clock_in.numeric' => '数値で記入してください',
+             
             'clock_out.date_format' => '退勤時間の形式が正しくありません（例: 18:00）',
-            'clock_out.numeric' => '数値で記入してください',
+            
             'breaks.*.clock_in.date_format' => '休憩開始時間の形式が正しくありません（例: 12:00）',
-            'breaks.*.clock_in.numeric' => '数値で記入してください',
+            
             'breaks.*.clock_out.date_format' => '休憩終了時間の形式が正しくありません（例: 13:00）',
-            'breaks.*.clock_out.numeric' => '数値で記入してください',
+            
             'reason.required' => '備考を記入してください',
         ];
     }
