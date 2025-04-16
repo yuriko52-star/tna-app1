@@ -76,7 +76,8 @@ Route::middleware(['auth:web'])->group(function () {
 Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
     Route::get('/attendance/list', [AdminController::class, 'index'])->name('admin.attendance.list');
     Route::get('/staff/list',[AdminController::class, 'staffList'])->name('admin.staff.list');
- Route::get('/stamp_correction_request/list', [RequestListController::class, 'adminRequestList'])->name('admin.stamp_correction_request.list');   
+    Route::get('/stamp_correction_request/list', [RequestListController::class, 'adminRequestList'])->name('admin.stamp_correction_request.list'); 
+    Route::get('/attendance/staff/{id}',[AdminController::class,'showList'])->name('admin.attendance.staff');  
     
     
 });

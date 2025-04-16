@@ -11,7 +11,8 @@
 
 .title {
     display: flex;
-    margin-top: 90px;
+    margin-top: 126px;
+    margin-bottom: 98px;
     text-align: left;
 }
 
@@ -28,8 +29,8 @@ h1 {
 }
 table {
     border-collapse: collapse;
-    margin: 0 auto;
-    margin-top: 46px;
+    margin: 0 auto 320px;
+    /* margin-top: 46px; */
     background-color: #fff;
     border-radius: 10px;
     table-layout: fixed;

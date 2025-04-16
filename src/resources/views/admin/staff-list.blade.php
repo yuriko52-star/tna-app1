@@ -27,15 +27,17 @@
             <th class="data-label">月次勤怠</th>
             <th class="data-label"></th>
         </tr>
+        @foreach($users as $user)
         <tr class="row">
             <td class="data-item"></td>
-            <td class="data-item">石黒 ゆりこ</td>
-            <td class="data-item">test@example.com</td>
-            <td class="data-item"> <a href="" class="data-link">詳細</a></td>
+            <td class="data-item">{{$user->name}}</td>
+            <td class="data-item">{{$user->email}}</td>
+            <td class="data-item"> <a href="{{ route('admin.attendance.staff', ['id' => $user->id]) }}" class="data-link">詳細</a></td>
             <td class="data-item"></td>
         </tr>
+        @endforeach
 
-        <tr class="row">
+        <!-- <tr class="row"> 
             <td class="data-item"></td>
             <td class="data-item">クレオパトラ</td>
             <td class="data-item">cleo@patra.com</td>
@@ -49,7 +51,7 @@
             <td class="data-item">pon@romaroma.com</td>
             <td class="data-item"> <a href="" class="data-link">詳細</a></td>
             <td class="data-item"></td>
-        </tr>
+        </tr>-->
     </table>
 </div>
 @endsection

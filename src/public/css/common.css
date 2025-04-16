@@ -75,7 +75,9 @@ li {
     .header__inner {
         padding: 5px 15px;
     }
-
+    .header-nav {
+        width: 46vw;
+    }
     .header-nav-link {
         font-size: 25px;
         margin-right: 40px;
@@ -92,10 +94,13 @@ li {
     .header__inner {
         padding: 14px 15px;
     }
+    .header__logo {
+        width: 330px;
+    }
     .header-nav {
             /* display: flex; */
             /* justify-content: center; */
-            width: 42vw;
+            width: 45vw;
             /* margin-left: 2%; */
             align-items: center;
         }

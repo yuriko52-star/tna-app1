@@ -13,15 +13,17 @@
           <img src="{{asset('img/Line 2.png')}}" style="height:40px;width:8px;"alt="" class="img">
         </div>
        
-          <h1>勤怠一覧</h1>
+          <h1>{{ $user->name}}さんの勤怠</h1>
           
       </label>    
         <div class="top-content"> 
           <div class="months">
             <label class="last-month">
               
-            
-              <a href="{{ url('/attendance/list?month=' . $previousMonth) }}" class="month-link"><img src="{{asset('img/image 2.png')}} "style="height:15px; width:20px;" alt="" class="img">前月</a>
+              
+               <a href="{{route('admin.attendance.staff' ,['id' => $user->id, 'month' => $previousMonth]) }}" class="month-link">
+                <img src="{{asset('img/image 2.png')}} "style="height:15px; width:20px;" alt="" class="img">前月</a>
+               
               
             </label>
             <label class="this-month">
@@ -32,7 +34,7 @@
               </label>
               <label class="next-month">
                  
-                 <a href="{{ url('/attendance/list?month=' . $nextMonth) }}" class="month-link">翌月<img src="{{ asset('img/image 3.png')}}"style="height:15px; width:20px;" alt="" class="img"></a>
+                 <a href="{{ route('admin.attendance.staff',['id' => $user->id, 'month' => $nextMonth] ) }}" class="month-link">翌月<img src="{{ asset('img/image 3.png')}}"style="height:15px; width:20px;" alt="" class="img"></a>
                 
               </label>
           </div>
@@ -67,8 +69,9 @@
               <td class="data-item">{{ $day['workingTime'] }}</td>
               <td class="data-item">
                 @if(!empty($day['id']))
-               <a href="{{route('user.attendance.detail', ['id' => $day['id']]) }}" class="data-link">詳細</a>
+               <a href="" class="data-link">詳細</a>
                @else
+               <!-- adominにも設定 -->
                <a href="{{route('user.attendance.detailByDate',['date'=> $day['raw_date']])}}" class="data-link">詳細</a>
                @endif
                 
@@ -79,5 +82,12 @@
           </table>
           </div>
           
+          <form action="" class="">
+            <!-- formの位置を後で調べよう -->
+          <div class="button">
+            <button class="csv-btn" type="submit">CSV出力</button>
+          </div>
+          </form>
+         
 </div>
 @endsection
