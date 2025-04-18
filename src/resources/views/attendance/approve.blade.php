@@ -47,7 +47,8 @@
             </div> 
             </td>
         </tr>
-        @foreach($mergedBreaks as $i => $break)
+    @foreach($mergedBreaks as $i => $break)
+        
         <tr>
             <th class="data-label">休憩{{ $i > 0 ? $i+1 : ' ' }}</th>
             <td class="data-item">
@@ -59,6 +60,7 @@
             </td>
         </tr>
          @endforeach
+         
          <tr>
             <th class="data-label">休憩{{ count($mergedBreaks) + 1 }}</th>
             <td class="data-item">

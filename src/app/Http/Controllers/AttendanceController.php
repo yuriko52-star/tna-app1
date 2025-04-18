@@ -179,5 +179,45 @@ class AttendanceController extends Controller
                return redirect()->route('user.stamp_correction_request.list');
 
     }
-    
+    public function store(AttendanceRequest $request)
+    {
+       $user = Auth::user();
+       $targetDate = $request->input('date');
+       $now = now();
+       $reason = $request->input('reason');
+       $newClockIn = $request->input('clock_in');
+       $newClockOut = $request->input('clock_out');
+       
+       if($newClockIn || $newClockOut) {
+        AttendanceEdit::create([
+             'attendance_id' => null, // 新規なのでnull
+            'user_id' => $user->id,
+            'request_date' => $now,
+            'target_date' => $targetDate,
+            'new_clock_in' => $newClockIn ? Carbon::parse("$targetDate $newClockIn") : null,
+            'new_clock_out' => $newClockOut ? Carbon::parse("$targetDate $newClockOut") : null,
+            'reason' => $reason,
+        ]);
+       }
+       $breaks = $request->input('breaks', []);
+
+       foreach($breaks as $break) {
+        $newIn = $break['clock_in'] ?? null;
+        $newOut = $break['clock_out'] ?? null;
+
+        if($newIn || $newOut) {
+            BreakTimeEdit::create([
+                'break_time_id' => null,
+                'user_id' => $user->id,
+                'request_date' => $now,
+                'target_date' => $targetDate,
+                'new_clock_in' => $newIn ? Carbon::parse("$targetDate $newIn") : null,
+                'new_clock_out' => $newOut ? Carbon::parse("$targetDate $newOut") : null,
+                'reason' => $reason,
+            ]);
+        }
+       }
+       return redirect()->route('user.stamp_correction_request.list');
+    }
+       
 }   

@@ -49,8 +49,9 @@ Route::get('/admin/login', function () {
 Route::middleware(['auth:web'])->group(function () {
      Route::get('/attendance', [UserController::class, 'index'])->name('user.attendance');
     Route::get('/attendance/list' ,[UserController::class,'showList'])->name('user.attendance.list');
-    Route::get('/attendance/{id}' ,[UserController::class,'detail'])->name('user.attendance.detail');
     Route::get('/attendance/date/{date}', [UserController::class, 'detailByDate'])->name('user.attendance.detailByDate');
+    Route::get('/attendance/{id}' ,[UserController::class,'detail'])->name('user.attendance.detail');
+    
     
 
     Route::post('/attendance/clock-in',[AttendanceController::class, 'clockIn'])->name('attendance.clockIn');
@@ -58,7 +59,8 @@ Route::middleware(['auth:web'])->group(function () {
     Route::post('/attendance/break-start',[AttendanceController::class,'breakStart'])->name('attendance.breakStart');
     Route::post('/attendance/break-end',[AttendanceController::class, 'breakEnd'])->name('attendance.breakEnd');
 
-     Route::post('/attendance/{id}/edit-request', [AttendanceController::class, 'update'])->name('attendance.update');
+     Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
+     Route::patch('/attendance/{id}/edit-request', [AttendanceController::class, 'update'])->name('attendance.update');
    
      
       Route::get('/attendance/edit-detail/{date}',[UserController::class,'editDetail'])->name('attendance.editDetail');
@@ -74,10 +76,13 @@ Route::middleware(['auth:web'])->group(function () {
 
 // 管理者専用ページ（認証が必要）
 Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
-    Route::get('/attendance/list', [AdminController::class, 'index'])->name('admin.attendance.list');
+    Route::get('/attendance/list', [AdminController::class, 'index'])->name('admin.attendance.index');
     Route::get('/staff/list',[AdminController::class, 'staffList'])->name('admin.staff.list');
+    
     Route::get('/stamp_correction_request/list', [RequestListController::class, 'adminRequestList'])->name('admin.stamp_correction_request.list'); 
     Route::get('/attendance/staff/{id}',[AdminController::class,'showList'])->name('admin.attendance.staff');  
+    Route::get('/attendance/{id}',[AdminController::class,'detailForAdmin'])->name('admin.attendance.detail');
+    Route::get('/attendance/{id}/detail/{date}',[AdminController::class ,'detailByDateForAdmin'])->name('admin.attendance.detailByDateForAdmin');
     
     
 });

@@ -69,7 +69,7 @@ class RequestListController extends Controller
             $mergedData[$date]['break_time_edits'] = $edits->sortBy('start_time')->values();
         }
 
-        $mergedData = collect($mergedData)->sortBy('request_date')->values();
+        $mergedData = collect($mergedData)->sortBy('target_date')->values();
 
         return view('attendance.edit', ['datas' => $mergedData]);
     }
@@ -108,7 +108,7 @@ class RequestListController extends Controller
             $mergedData[$date]['break_time_edits'] = $edits->sortBy('start_time')->values();
         }
 
-        $mergedData = collect($mergedData)->sortBy('request_date')->values();
+        $mergedData = collect($mergedData)->sortBy('target_date')->values();
 
         return view('admin.edit', ['datas' => $mergedData]);
     }

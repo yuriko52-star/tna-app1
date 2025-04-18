@@ -1,5 +1,5 @@
 @extends('layouts.app')
-<!-- userとadminで 画面を変える-->
+
 @section('css')
 <link rel="stylesheet" href="{{ asset('css/edit.css') }}" class="">
 @endsection
@@ -15,21 +15,15 @@
         <div class="top-content">
             <nav>
                 <ul>
-                
-                    <li>
-                  
-                  
-                    <a href="{{ route('user.stamp_correction_request.list',['tab'=> 'waiting']) }}" class="page-title">承認待ち</a>
-                  
-                    <li>
-                     
-                      
-                    <a href="{{ route('user.stamp_correction_request.list',['tab' => 'approved']) }}" class="page-title">承認済み</a>
+                <li>
+                  <a href="{{ route('user.stamp_correction_request.list',['tab'=> 'waiting']) }}" class="page-title">承認待ち</a>
+                <li>
+                  <a href="{{ route('user.stamp_correction_request.list',['tab' => 'approved']) }}" class="page-title">承認済み</a>
                     
    <!-- 表示しているページのタブの太さが変わるように設定する。してないものは細目で。
  -->
    <!-- 管理者ページはデータの内容が一人一人になる。-->
-                    </li>
+                </li>
                 </ul>
             </nav>
         </div> 

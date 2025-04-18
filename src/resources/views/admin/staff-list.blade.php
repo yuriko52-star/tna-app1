@@ -36,22 +36,6 @@
             <td class="data-item"></td>
         </tr>
         @endforeach
-
-        <!-- <tr class="row"> 
-            <td class="data-item"></td>
-            <td class="data-item">クレオパトラ</td>
-            <td class="data-item">cleo@patra.com</td>
-            <td class="data-item"> <a href="" class="data-link">詳細</a></td>
-            <td class="data-item"></td>
-        </tr>
-
-        <tr class="row">
-            <td class="data-item"></td>
-            <td class="data-item">ポンペイウス</td>
-            <td class="data-item">pon@romaroma.com</td>
-            <td class="data-item"> <a href="" class="data-link">詳細</a></td>
-            <td class="data-item"></td>
-        </tr>-->
     </table>
 </div>
 @endsection

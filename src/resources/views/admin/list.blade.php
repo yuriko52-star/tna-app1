@@ -10,22 +10,22 @@
         <div class="image">
           <img src="{{asset('img/Line 2.png')}}" style="height:40px;width:8px;"alt="" class="img">
         </div>
-         <h1>2025年6月12日の勤怠</h1>
+         <h1>{{ $today}}の勤怠</h1>
       </label>    
         <div class="top-content"> 
              <div class="days">
               <label class="last-day">
-                <a href="" class="day-link"><img src="{{asset('img/image 2.png')}} "style="height:15px; width:20px;" alt="" class="img">
+                <a href="{{ route('admin.attendance.index') }}?day={{$previousDay}}" class="day-link"><img src="{{asset('img/image 2.png')}} "style="height:15px; width:20px;" alt="" class="img">
                 前日</a>
               </label>
               <label class="today">
                 <div class="image">
                 <img src="{{ asset('img/image 1 (1).png')}}" style="height: 25px; width: 25px;"alt="" class="img">
                 </div>
-                <p class="date">2025/06/12</p>
+                <p class="date">{{ $thisDay}}</p>
               </label>
               <label class="next-day">
-                 <a href="" class="day-link">翌日<img src="{{ asset('img/image 3.png')}}"style="height:15px; width:20px;" alt="" class="img"></a>
+                 <a href="{{ route('admin.attendance.index') }}?day={{$nextDay}}" class="day-link">翌日<img src="{{ asset('img/image 3.png')}}"style="height:15px; width:20px;" alt="" class="img"></a>
               </label>
             </div>
         </div>
@@ -47,38 +47,20 @@
               <th class="data-label">合計</th>
               <th class="data-label">詳細</th>
             </tr>
-
+            @foreach($attendanceData as $day)
             <tr class="row">
-             <td class="data-item">石黒　ゆりこ</td>
-              <td class="data-item">09:00</td>
-              <td class="data-item">18:00</td>
-             <td class="data-item">1:00</td>
-             <td class="data-item">8:00</td>
+             <td class="data-item">{{ $day['user_name']}}</td>
+              <td class="data-item">{{$day['clockIn']}}</td>
+              <td class="data-item">{{ $day['clockOut']}}</td>
+             <td class="data-item">{{$day['breakTime'] }}</td>
+             <td class="data-item">{{ $day['workingTime'] }}</td>
               <td class="data-item">
-               <a href="" class="data-link">詳細</a>
+               <a href="{{route('admin.attendance.detail',['id' => $day['id']])}}" class="data-link">詳細</a>
               </td>
             </tr>
-            <tr class="row">
-             <td class="data-item">クレオパトラ</td>
-              <td class="data-item">09:00</td>
-              <td class="data-item">18:00</td>
-             <td class="data-item">1:00</td>
-             <td class="data-item">8:00</td>
-              <td class="data-item">
-               <a href="" class="data-link">詳細</a>
-              </td>
-            </tr>
-            <tr class="row">
-             <td class="data-item">織田　信長</td>
-              <td class="data-item">09:00</td>
-              <td class="data-item">18:00</td>
-             <td class="data-item">1:00</td>
-             <td class="data-item">8:00</td>
-            <td class="data-item">
-               <a href="" class="data-link">詳細</a>
-              </td>
-            </tr>
-           </table>
+            @endforeach
+            
+          </table>
         </div>    
 </div>
 @endsection

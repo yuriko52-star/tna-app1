@@ -114,7 +114,7 @@ class UserController extends Controller
             // 表示用データに整形
             $attendanceData[] = [
                 
-                 'id'=> optional($data)->id ?? 'date-' . $date->format('Ymd'),
+                 'id'=> optional($data)->id, 
                 'raw_date' => $date->format('Y-m-d'),
                 'date' => $date->format('m/d') . '(' . $weekMap[$date->format('D')] . ')' ,
                 'clockIn' => $clockIn ? $clockIn->format('H:i') : '',
@@ -146,112 +146,43 @@ class UserController extends Controller
 
     }
     public function detailByDate($date)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
     // 該当する勤怠データを取得（なければ null）
-    $attendance = Attendance::with('breakTimes')
+        $attendance = Attendance::with('breakTimes')
         ->where('user_id', $user->id)
         ->whereDate('date', $date)
         ->first();
 
     // データがない場合は空の Attendance オブジェクトを作成して渡す（修正申請の入力用）
-    if (!$attendance) {
-        $attendance = new Attendance([
+        if (!$attendance) {
+            $attendance = new Attendance([
+            'user_id' => $user->id,
             'date' => $date,
             'clock_in' => null,
             'clock_out' => null,
-        ]);
-        $attendance->breakTimes = collect(); // 空のコレクションを渡す
+            ]);
+            $attendance->breakTimes = collect(); // 空のコレクションを渡す
+        }
+
+        // 年・日付表示用に整形
+        $carbonDate = \Carbon\Carbon::parse($date);
+        $year = $carbonDate->format('Y');
+        $monthDay = $carbonDate->format('n月j日');
+
+        return view('attendance.detail', compact('attendance', 'year', 'monthDay'));
     }
 
-    // 年・日付表示用に整形
-    $carbonDate = \Carbon\Carbon::parse($date);
-    $year = $carbonDate->format('Y');
-    $monthDay = $carbonDate->format('n月j日');
-
-    return view('attendance.detail', compact('attendance', 'year', 'monthDay'));
-}
-
-
-/*public function requestList()
-{
-    $user = Auth::user();
-     // 勤務修正と休憩修正を日付単位で結合
-    $attendanceEdits = AttendanceEdit::with(['user','attendance'])
-    ->where('user_id',Auth::id())
-    ->get()
-    ->groupBy('target_date');
-    $breakEdits = BreakTimeEdit::with(['user','breakTime', 'attendance'])
-    ->where('user_id',Auth::id())
-    ->get()
-    ->groupBy('target_date');
-     // 日付ごとにまとめてマージ
-    $mergedData = [];
-    foreach($attendanceEdits as $date => $edits) {
-         $mergedData[$date] = [
-                'user' => $edits->first()->user,
-            'target_date' => $date,
-            'attendance_edits' => $edits,
-            'break_time_edits' => collect(), // 後で追加
-            'request_date' => $edits->first()->request_date,
-            'reason' => $edits->first()->reason,
-         ]; // ← 初期化しておく
-        /*$mergedData[$date]['user'] = $edits->first()->user;
-        $mergedData[$date]['target_date'] = $date;
-        $mergedData[$date]['attendance_edits'] = $edits;
-        $mergedData[$date]['break_time_edits'] = collect();// あとで break も入れる
-        $mergedData[$date]['request_date'] = $edits->first()->request_date;
-        $mergedData[$date]['reason'] = $edits->first()->reason;
-        */
-   /* }
-    foreach($breakEdits as $date => $edits) {
-        if(!isset($mergedData[$date])) {
-             $mergedData[$date] = [
-                'user' => $edits->first()->user,
-                'target_date' => $date,
-                'attendance_edits' => collect(),
-                'break_time_edits' => collect(),
-                'request_date' => $edits->first()->request_date,
-                'reason' => $edits->first()->reason,
-             ]; 
-           /* $mergedData[$date]['user'] = $edits->first()->user;
-            $mergedData[$date]['target_date'] = $date;
-            $mergedData[$date]['attendance_edits'] = collect();
-            $mergedData[$date]['reason'] = $edits->first()->reason;
-            $mergedData[$date]['request_date'] = $edits->first()->request_date;
-            */
-       /* }
-        $mergedData[$date]['break_time_edits'] = $edits->sortBy('start_time')->values();
-
-    }
-        // 現在の return 文の直前にこのコードを追加
-        $mergedData = collect($mergedData)
-        ->sortBy('request_date')
-        ->values();
-
-    return view('attendance.edit',['datas' => $mergedData]);
-}
-    */
     public function editDetail(Request $request ,$date )
     {
         $user = Auth::user();
         $targetDate = Carbon::parse($date)->format('Y-m-d');
-    $userId =  Auth::id();
+        $userId =  Auth::id();
     // 出勤データと修正データを取得
         $attendance = Attendance::where('user_id',$userId)
         ->where('date' ,$targetDate)
         ->first();
-        /*if (!$attendance) {
-    dd([
-    'targetDate' => $targetDate,
-    'userId' => $userId,
-    'attendance' => Attendance::where('user_id', $userId)->where('date', $targetDate)->first(),
-    'rawAttendance' => Attendance::where('user_id', $userId)->get()->toArray()
-]);
-}
-*/
-
         $attendanceEdit = AttendanceEdit::where('user_id',$userId)
         ->where('target_date',$targetDate)
         ->first();
@@ -312,12 +243,7 @@ class UserController extends Controller
         $year = Carbon::parse($date)->format('Y年');
         $monthDay = Carbon::parse($date)->format('m月d日');
         $reason = $attendanceEdit->reason ?? $breakEdits->first()->reason ?? '';
-
-       
-
-
-        return view('attendance.approve',compact('user','year','monthDay','workclockIn','workclockOut','mergedBreaks','reason'));
         
+        return view('attendance.approve',compact('user','year','monthDay','workclockIn','workclockOut','mergedBreaks','reason'));
     }
-
-}
+ }

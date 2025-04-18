@@ -69,10 +69,10 @@
               <td class="data-item">{{ $day['workingTime'] }}</td>
               <td class="data-item">
                 @if(!empty($day['id']))
-               <a href="" class="data-link">詳細</a>
+               <a href="{{ route('admin.attendance.detail',['id' => $day['id']]) }}" class="data-link">詳細</a>
                @else
-               <!-- adominにも設定 -->
-               <a href="{{route('user.attendance.detailByDate',['date'=> $day['raw_date']])}}" class="data-link">詳細</a>
+              
+               <a href="{{route('admin.attendance.detailByDateForAdmin',['id' => $user->id,'date'=> $day['raw_date']])}}" class="data-link">詳細</a>
                @endif
                 
               </td>

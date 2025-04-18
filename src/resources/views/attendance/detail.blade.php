@@ -13,8 +13,12 @@
           <h1>勤怠詳細</h1> 
     </div> 
     <table>
-        
+        @if($attendance->id)
         <form action="{{ route('attendance.update', ['id' => $attendance->id]) }}" method="POST">
+            @method('PATCH')
+        @else
+        <form action="{{ route('attendance.store') }}" method="POST">
+        @endif
         @csrf
             
         <tr>
@@ -31,6 +35,8 @@
                     <span class="date-space"></span>
                     <span class="date">{{ $monthDay}}</span>
                 </div>
+                <input type="hidden" name="date" value="{{ $attendance->date }}">
+
             </td>
         </tr>
         <tr>
@@ -61,16 +67,17 @@
                 
             </td>
         </tr>
+       
         @foreach($attendance->breakTimes as $i => $break)
         <tr>
             <th class="data-label">休憩{{ $i> 0 ? $i+1 : '' }}</th>
             <td class="data-item">
                 <div class="time-wrapper">
-                    <input type="hidden" class=""name="breaks[{{ $i }}][id]" value="{{$break->id}}">
+                    <input type="hidden" class=""name="breaks[{{ $i }}][id]" value="{{$break->id ?? ' '}}">
 
-                    <input type="text" class="time-input"name="breaks[{{ $i}}][clock_in]" value="{{ old("breaks.$i.clock_in",$break->clock_in  ? \Carbon\Carbon::parse($break->clock_in)->format('H:i') : '' )}}">
+                    <input type="text" class="time-input"name="breaks[{{ $i}}][clock_in]" value="{{ old("breaks.$i.clock_in",$break->clock_in  ? \Carbon\Carbon::parse($break->clock_in)->format('H:i') : '') }}">
                     <span class="time-separator">~</span> 
-                    <input type="text" class="time-input"name="breaks[{{$i}}][clock_out]" value="{{ old("breaks.$i.clock_out",$break->clock_out ? \Carbon\Carbon::parse($break->clock_out)->format('H:i') : '' )}}">
+                    <input type="text" class="time-input"name="breaks[{{$i}}][clock_out]" value="{{ old("breaks.$i.clock_out",$break->clock_out ? \Carbon\Carbon::parse($break->clock_out)->format('H:i') : '') }}">
                 </div>
                 <p class="form_error">
                     @error("breaks.$i.outside_working_time")
@@ -90,26 +97,31 @@
             </td>
         </tr>
         @endforeach
+
+        @php
+        $existing = count($attendance->breakTimes);
+        $additional = 2; // 追加したい休憩欄の数
+        @endphp
+        @for ($i = $existing; $i < $existing + $additional; $i++)
          <tr>
-            <th class="data-label">休憩{{ count($attendance->breakTimes)+ 1}} </th>
+            <th class="data-label">休憩{{ $i === 0 ? '' :$i+ 1}} </th>
             <td class="data-item">
                 <div class="time-wrapper">
-                    <input type="text" class="time-input" name="breaks[{{ count($attendance->breakTimes) }}][clock_in]"value="{{ old('breaks.' . count($attendance->breakTimes) . '.clock_in') }}">
+                    <input type="text" class="time-input" name="breaks[{{$i}}][clock_in]"value="{{ old("breaks.$i.clock_in") }}">
                     <span class="time-separator">~</span> 
-                    <input type="text" class="time-input"name ="breaks[{{ count($attendance->breakTimes) }}][clock_out]" value="{{ old('breaks.' . count($attendance->breakTimes) . '.clock_out') }}">
+                    <input type="text" class="time-input"name ="breaks[{{$i}}][clock_out]" value="{{ old("breaks.$i.clock_out") }}">
 
                 </div>
-                @php
-                    $index = count($attendance->breakTimes);
-                @endphp
+                
 
             <p class="form_error">
-               @error("breaks.$index.outside_working_time")
+               @error("breaks.$i.outside_working_time")
                     {{$message}}
                 @enderror
             </p>
             </td>
         </tr>
+       @endfor
         <tr>
             <th class="data-label">備考</th>
             <td class="data-item">
