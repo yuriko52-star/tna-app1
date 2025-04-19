@@ -212,29 +212,43 @@ class AdminController extends Controller
      public function update(AttendanceRequest $request , $id) 
     {
         $admin = Auth::guard('admin')->user();
-    //    $user = Auth::user();
+    
         
 
        $attendance = Attendance::with('breakTimes')->findOrFail($id);
        $user = $attendance->user;
-       /* if ($attendance->user_id !== $user->id) {
-        abort(403, '権限がありません');
-        }
-        */
-        // $targetDate = \Carbon\Carbon::parse($targetDate);
-        // $year = $targetDate->format('Y');
-        // $monthDay = $targetDate->format('n月j日');
-         // 出退勤の修正申請
+       
          
          $newClockIn = $request->input('clock_in');
+         if ($newClockIn === '') {
+            $newClockIn = null;
+            }
          $newClockOut = $request->input('clock_out');
+         if ($newClockOut === '') {
+            $newClockOut = null;
+        }
         
         $defaultClockIn = optional($attendance)->clock_in;
          $defaultClockOut = optional($attendance)->clock_out;
-         $targetDate = $request->input('target_date');
-          $year = Carbon::parse($attendance->date)->format('Y年');
+        //  下のコードを追加したよ
+        //  $defaultTargetDate = optional($attendance)->date;
+        $year = $request->input('target_year');
+        $month = $request->input('target_month');
+        $day = $request->input('target_day');
+
+    try {
+        $targetDate = Carbon::createFromDate($year, $month, $day);
+        $formattedDate = $targetDate->format('Y-m-d'); // ← ここが重要！
+    } catch (\Exception $e) {
+    return back()->withErrors(['target_date' => '日付が正しくありません']);
+    }
+
+         /*$targetDateInput = $request->input('target_date');
+         $targetDate = $targetDateInput ? Carbon::parse($targetDateInput) : Carbon::parse($attendance->date);
+         */
+          /*$year = Carbon::parse($attendance->date)->format('Y年');
          $monthDay = Carbon::parse($attendance->date)->format('n月j日');
-         
+         */
         //  $targetDate = $attendance->date;
           $now = now();
          $reason = $request->input('reason');
@@ -249,9 +263,11 @@ class AdminController extends Controller
                 'attendance_id' => $attendance->id,
                 'user_id' => $user->id,
                 'request_date' => $now,
-                'target_date' => $targetDate,
-                'new_clock_in' => $isClockInChanged ? Carbon::parse("$targetDate $newClockIn") : null,
-                'new_clock_out' => $isClockOutChanged ? Carbon::parse("$targetDate $newClockOut") : null,
+                'target_date' => $targetDate->format('Y-m-d'),
+                'new_clock_in' => $isClockInChanged ? Carbon::parse($targetDate->format('Y-m-d') . ' ' . $newClockIn) : null,
+                'new_clock_out' => $isClockOutChanged ? Carbon::parse($targetDate->format('Y-m-d') . ' ' . $newClockOut) : null,
+
+                
                 'reason' => $reason,
             ]);
          }
@@ -263,8 +279,8 @@ class AdminController extends Controller
        {
             $breakId = $break['id'] ?? null;
 
-            $newIn = $break['clock_in'] ?? null;
-            $newOut = $break['clock_out'] ?? null;
+            $newIn = trim($break['clock_in'] ?? ' ') ?: null;
+            $newOut = trim($break['clock_out'] ?? ' ') ?: null;
                 // 新規追加の休憩（break_idがない）
             if ($breakId === null) {
         // 両方入力されていれば新規登録
@@ -273,10 +289,12 @@ class AdminController extends Controller
                 'break_time_id' => null, // 新規なのでnull
                 'user_id' => $user->id,
                 'request_date' => $now,
-                'target_date' => $targetDate,
+                'target_date' => $targetDate->format('Y-m-d'),
                 
-                'new_clock_in' => $newIn ? Carbon::parse("$targetDate $newIn") : null,
-                'new_clock_out' => $newOut ? Carbon::parse("$targetDate $newOut") : null,
+                
+                'new_clock_in' => $newIn ? Carbon::parse($targetDate->format('Y-m-d') . ' ' . $newIn) : null,
+                'new_clock_out' => $newOut ? Carbon::parse($targetDate->format('Y-m-d') . ' ' . $newOut) : null,
+                
                 
                 'reason' => $reason,
             ]);
@@ -305,9 +323,10 @@ class AdminController extends Controller
                         'user_id' => $user->id,
                        
                         'request_date' => $now,
-                        'target_date' => $targetDate,
-                        'new_clock_in' => $isBreakInChanged ? Carbon::parse("$targetDate $newIn") : null,
-                        'new_clock_out' => $isBreakOutChanged ? Carbon::parse("$targetDate $newOut") : null,
+                        'target_date' => $targetDate->format('Y-m-d'),
+                        
+                         'new_clock_in' => $isBreakInChanged ? Carbon::parse($targetDate->format('Y-m-d') . ' ' . $newIn) : null,
+                         'new_clock_out' => $isBreakOutChanged ? Carbon::parse($targetDate->format('Y-m-d') . ' ' . $newOut) : null,
                         'reason' => $reason,
                         ]);
                     }

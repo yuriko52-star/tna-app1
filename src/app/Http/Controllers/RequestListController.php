@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AttendanceEdit;
 use App\Models\BreakTimeEdit;
+use Carbon\Carbon;
 
 class RequestListController extends Controller
 {
@@ -78,12 +79,20 @@ class RequestListController extends Controller
     {
         $admin = Auth::guard('admin')->user();
         // 管理者用の処理
-        $attendanceEdits = AttendanceEdit::with(['user','attendance'])->get()->groupBy('target_date');
-        $breakEdits = BreakTimeEdit::with(['user','breakTime', 'attendance'])->get()->groupBy('target_date');
+        $attendanceEdits = AttendanceEdit::with(['user','attendance'])
+        ->get()
+        ->groupBy('target_date');
+       
+        
+        $breakEdits = BreakTimeEdit::with(['user','breakTime', 'attendance'])->get()
+        ->groupBy('target_date');
+        
+        
 
         $mergedData = [];
 
         foreach ($attendanceEdits as $date => $edits) {
+            
             $mergedData[$date] = [
                 'user' => $edits->first()->user,
                 'target_date' => $date,
@@ -105,7 +114,7 @@ class RequestListController extends Controller
                     'reason' => $edits->first()->reason,
                 ];
             }
-            $mergedData[$date]['break_time_edits'] = $edits->sortBy('start_time')->values();
+            $mergedData[$date]['break_time_edits'] = $edits->values();
         }
 
         $mergedData = collect($mergedData)->sortBy('target_date')->values();

@@ -33,15 +33,87 @@
             
             <th class="data-label">日付</th>
             <td class="data-item">
-                <div class="date-wrapper">
-                    <input type="text" name="date_year"class="time-input" value="{{old('date_year',$year)}}">
+                <style>
+                    .date-select-wrapper select {
+                        margin-right: 8px;
+                        padding: 5px;
+                        font-size: 1rem;
+                        appearance: none;
+                         border-radius: 4px;
+                        border: 1px solid #E1E1E1;
+                        width:100px;
+                        font-family: Inter;
+                        font-weight: 700;
+                        font-size: 16px;
+                        
+                        }
+                    /* .date-display { 
+                        display: flex;
+                        gap: 2px;
+                         align-items: center;
+                    }
+                    .date-display input {
+                        margin-left:25px;
+                        border: none;
+                        background: none;
+                        font-weight: bold;
+                        font-size: 1em;
+                    }
+                    .admin-date-space {
+                       
+                        width:80px;
+
+                    }
+                        */
+                </style>
+                <div class="date-select-wrapper">
+                    @php
+    $parsedDate = \Carbon\Carbon::parse($attendance->date);
+@endphp
+
+    {{-- 年 --}}
+    <select name="target_year">
+        @for ($y = 2023; $y <= 2026; $y++)
+            <option value="{{ $y }}" {{ (old('target_year', $parsedDate->year) == $y) ? 'selected' : '' }}>
+                {{ $y }}年
+            </option>
+        @endfor
+    </select>
+
+    {{-- 月 --}}
+    <select name="target_month">
+        @for ($m = 1; $m <= 12; $m++)
+            <option value="{{ $m }}" {{ (old('target_month', $parsedDate->month) == $m) ? 'selected' : '' }}>
+                {{ $m }}月
+            </option>
+        @endfor
+    </select>
+
+    {{-- 日 --}}
+    <select name="target_day">
+        @for ($d = 1; $d <= 31; $d++)
+            <option value="{{ $d }}" {{ (old('target_day', $parsedDate->day) == $d) ? 'selected' : '' }}>
+                {{ $d }}日
+            </option>
+        @endfor
+    </select>
+</div>
+
+                {{--<div class="date-display">
+                  <input type="text" value="{{ \Carbon\Carbon::parse($attendance->date)->format('Y年') }}">
+                <span class="admin-date-space"></span>
+                    <input type="text"  value="{{ \Carbon\Carbon::parse($attendance->date)->format('n月j日') }}">
+  
+                </div>
+                <input type="date" name="target_date" value="{{ old('target_date', \Carbon\Carbon::parse($attendance->date)->format('Y-m-d')) }}">--}}
+                    {{--<input type="text" name="date_year"class="time-input" value="{{old('date_year',$year)}}">
                     <!--  valueに値を入れる-->
                     <span class="date-space"></span>
-                    <input type="text" class="time-input"name="date_month_day" value="{{ old('date_month_day' ,$monthDay}}">
+                    <input type="text" class="time-input"name="date_month_day" value="{{ old('date_month_day' ,$monthDay}}">--}}
                     <!--  valueに値を入れる-->
 
                     
-                </div>
+                
             </td>
         </tr>
         <tr>
@@ -51,10 +123,10 @@
             <td class="data-item">
             <div class="time-wrapper">
                 <input type="text" class="time-input" name="clock_in"value="{{ old('clock_in' ,$attendance->clock_in ? \Carbon\Carbon::parse($attendance->clock_in)->format('H:i') : '') }}">
-                <!--  valueに値を入れる-->
+                
                 <span class="time-separator">~</span>
                 <input type="text" class="time-input" name="clock_out"value="{{ old('clock_out', $attendance->clock_out ? \Carbon\Carbon::parse($attendance->clock_out)->format('H:i') : '') }}">
-                <!--  valueに値を入れる-->
+                
             </div> 
                  <p class="form_error">
                     @error('clock_time_invalid')
@@ -80,6 +152,7 @@
             <th class="data-label">休憩{{ $i> 0 ? $i+1 : '' }}</th>
             <td class="data-item">
             <div class="time-wrapper">
+                <input type="hidden" name="breaks[{{ $i }}][id]" value="{{ $break->id }}">
                 <input type="text" name="breaks[{{ $i}}][clock_in]"class="time-input" value="{{ old("breaks.$i.clock_in",$break->clock_in  ? \Carbon\Carbon::parse($break->clock_in)->format('H:i') : '') }}">
                 <!--  valueに値を入れる-->
                 <span class="time-separator">~</span> 

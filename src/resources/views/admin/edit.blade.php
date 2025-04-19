@@ -58,6 +58,7 @@
             
               <td class="data-item">{{$data['user']->name}}</td>
               <td class="data-item">{{\Carbon\Carbon::parse($data['target_date'])->format('Y/m/d') }}</td>
+                {{--<pre>{{ dd($data['break_time_edits']) }}</pre>--}}
              <td class="data-item">{{$data['reason']}}</td>
              <td class="data-item">{{\Carbon\Carbon::parse($data['request_date'])->format('Y/m/d') }}</td>
               <td class="data-item">
