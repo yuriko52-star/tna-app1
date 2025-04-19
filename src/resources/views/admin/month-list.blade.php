@@ -68,7 +68,7 @@
               <td class="data-item">{{$day['breakTime'] }}</td>
               <td class="data-item">{{ $day['workingTime'] }}</td>
               <td class="data-item">
-                @if(!empty($day['id']))
+                @if(!empty($day['id']) && is_numeric($day['id']))
                <a href="{{ route('admin.attendance.detail',['id' => $day['id']]) }}" class="data-link">詳細</a>
                @else
               

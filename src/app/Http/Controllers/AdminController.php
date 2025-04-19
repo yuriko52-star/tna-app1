@@ -9,6 +9,7 @@ use App\Models\AttendanceEdit;
 use App\Models\BreakTimeEdit;
 use App\Models\User;
 use Carbon\Carbon;
+use App\Http\Requests\AttendanceRequest;
 
 class AdminController extends Controller
 {
@@ -129,7 +130,7 @@ class AdminController extends Controller
 
     // 該当する勤怠データを取得（なければ null）
     $attendance = Attendance::with('breakTimes')
-        // ->where('user_id', $user->id)
+         ->where('user_id', $user->id)
         ->whereDate('date', $date)
         ->first();
 
@@ -148,8 +149,10 @@ class AdminController extends Controller
     $carbonDate = \Carbon\Carbon::parse($date);
     $year = $carbonDate->format('Y');
     $monthDay = $carbonDate->format('n月j日');
+    // raw_date をここで定義（ビューで詳細リンクに使う用）
+    $raw_date = $carbonDate->format('Y-m-d');
 
-    return view('admin.detail', compact('attendance', 'year', 'monthDay','user'));
+    return view('admin.detail', compact('attendance', 'year', 'monthDay','user','raw_date'));
 }
 
     public function index(Request $request)
@@ -205,6 +208,156 @@ class AdminController extends Controller
         
         return view ('admin.list' ,compact('thisDay','previousDay','nextDay','today','attendanceData',));
     }
-}
+
+     public function update(AttendanceRequest $request , $id) 
+    {
+        $admin = Auth::guard('admin')->user();
+    //    $user = Auth::user();
+        
+
+       $attendance = Attendance::with('breakTimes')->findOrFail($id);
+       $user = $attendance->user;
+       /* if ($attendance->user_id !== $user->id) {
+        abort(403, '権限がありません');
+        }
+        */
+        // $targetDate = \Carbon\Carbon::parse($targetDate);
+        // $year = $targetDate->format('Y');
+        // $monthDay = $targetDate->format('n月j日');
+         // 出退勤の修正申請
+         
+         $newClockIn = $request->input('clock_in');
+         $newClockOut = $request->input('clock_out');
+        
+        $defaultClockIn = optional($attendance)->clock_in;
+         $defaultClockOut = optional($attendance)->clock_out;
+         $targetDate = $request->input('target_date');
+          $year = Carbon::parse($attendance->date)->format('Y年');
+         $monthDay = Carbon::parse($attendance->date)->format('n月j日');
+         
+        //  $targetDate = $attendance->date;
+          $now = now();
+         $reason = $request->input('reason');
+        // 出勤・退勤の変更判定（時間のみ比較）
+        $isClockInChanged = $newClockIn !== null && $defaultClockIn && Carbon::parse($defaultClockIn)->format('H:i') !== $newClockIn;
+        $isClockOutChanged = $newClockOut !== null && $defaultClockOut && Carbon::parse($defaultClockOut)->format('H:i') !== $newClockOut;
+        $isClockInDeleted = $newClockIn === null && $defaultClockIn !== null;
+        $isClockOutDeleted = $newClockOut === null && $defaultClockOut !== null;
+
+        if ($isClockInChanged || $isClockOutChanged || $isClockInDeleted || $isClockOutDeleted) {
+                AttendanceEdit::create([
+                'attendance_id' => $attendance->id,
+                'user_id' => $user->id,
+                'request_date' => $now,
+                'target_date' => $targetDate,
+                'new_clock_in' => $isClockInChanged ? Carbon::parse("$targetDate $newClockIn") : null,
+                'new_clock_out' => $isClockOutChanged ? Carbon::parse("$targetDate $newClockOut") : null,
+                'reason' => $reason,
+            ]);
+         }
+         // 休憩の修正申請
+        $breaks = $request->input('breaks', []);
+        //  $breakTimeMap = $attendance->breakTimes->keyBy('id'); // ← IDで紐付け！消してみた。
+
+         foreach($breaks as $break)
+       {
+            $breakId = $break['id'] ?? null;
+
+            $newIn = $break['clock_in'] ?? null;
+            $newOut = $break['clock_out'] ?? null;
+                // 新規追加の休憩（break_idがない）
+            if ($breakId === null) {
+        // 両方入力されていれば新規登録
+                if ($newIn !== null || $newOut !== null) {
+                BreakTimeEdit::create([
+                'break_time_id' => null, // 新規なのでnull
+                'user_id' => $user->id,
+                'request_date' => $now,
+                'target_date' => $targetDate,
+                
+                'new_clock_in' => $newIn ? Carbon::parse("$targetDate $newIn") : null,
+                'new_clock_out' => $newOut ? Carbon::parse("$targetDate $newOut") : null,
+                
+                'reason' => $reason,
+            ]);
+        }
+        continue;
+    }
+    
+        //  既存の休憩：修正 or 削除のチェック
+            $defaultBreak = $attendance->breakTimes->firstWhere('id', $breakId);
+            $defaultIn = optional($defaultBreak)->clock_in;
+            $defaultOut = optional($defaultBreak)->clock_out;
+    
+        // 修正
+                
+                
+            $isBreakInChanged = $newIn !== null && $defaultIn && Carbon::parse($defaultIn)->format('H:i') !== $newIn;
+            $isBreakOutChanged = $newOut !== null && $defaultOut && Carbon::parse($defaultOut)->format('H:i') !== $newOut;
+            $isBreakDeleted = $newIn === null && $newOut === null && ($defaultIn || $defaultOut);
+
+             if ($isBreakInChanged || $isBreakOutChanged || $isBreakDeleted) {
+                    BreakTimeEdit::create([
+                        
+                        
+                        'break_time_id' => $breakId ,
+
+                        'user_id' => $user->id,
+                       
+                        'request_date' => $now,
+                        'target_date' => $targetDate,
+                        'new_clock_in' => $isBreakInChanged ? Carbon::parse("$targetDate $newIn") : null,
+                        'new_clock_out' => $isBreakOutChanged ? Carbon::parse("$targetDate $newOut") : null,
+                        'reason' => $reason,
+                        ]);
+                    }
+                 }
+                
+               return redirect()->route('admin.stamp_correction_request.list');
+
+    }
+    public function store(AttendanceRequest $request)
+    {
+       $user = Auth::user();
+       $targetDate = $request->input('date');
+       $now = now();
+       $reason = $request->input('reason');
+       $newClockIn = $request->input('clock_in');
+       $newClockOut = $request->input('clock_out');
+       
+       if($newClockIn || $newClockOut) {
+        AttendanceEdit::create([
+             'attendance_id' => null, // 新規なのでnull
+            'user_id' => $user->id,
+            'request_date' => $now,
+            'target_date' => $targetDate,
+            'new_clock_in' => $newClockIn ? Carbon::parse("$targetDate $newClockIn") : null,
+            'new_clock_out' => $newClockOut ? Carbon::parse("$targetDate $newClockOut") : null,
+            'reason' => $reason,
+        ]);
+       }
+       $breaks = $request->input('breaks', []);
+
+       foreach($breaks as $break) {
+        $newIn = $break['clock_in'] ?? null;
+        $newOut = $break['clock_out'] ?? null;
+
+        if($newIn || $newOut) {
+            BreakTimeEdit::create([
+                'break_time_id' => null,
+                'user_id' => $user->id,
+                'request_date' => $now,
+                'target_date' => $targetDate,
+                'new_clock_in' => $newIn ? Carbon::parse("$targetDate $newIn") : null,
+                'new_clock_out' => $newOut ? Carbon::parse("$targetDate $newOut") : null,
+                'reason' => $reason,
+            ]);
+        }
+       }
+       return redirect()->route('user.stamp_correction_request.list');
+    }
+       
+}   
+
      
 
