@@ -25,7 +25,7 @@ class AttendanceRequest extends FormRequest
     public function rules()
     {
         return [
-             'clock_in' => ['nullable','date_format:H:i'],
+             'clock_in' => ['nullable','date_format:H:i',],
             'clock_out' => ['nullable', 'date_format:H:i'],
             'breaks.*.clock_in'=> ['nullable' ,'date_format:H:i'] ,
             'breaks.*.clock_out' => ['nullable','date_format:H:i'],
@@ -57,13 +57,15 @@ class AttendanceRequest extends FormRequest
     public function messages()
     {
         return [
-             'clock_in.date_format' => '出勤時間の形式が正しくありません（例: 09:00）',
+              'clock_in.date_format' => '出勤時間の形式が正しくありません（例: 09:00）',
+            //  'clock_in.date_format' => '半角数字で入力してください（例: 09:00）',
              
-            'clock_out.date_format' => '退勤時間の形式が正しくありません（例: 18:00）',
+             'clock_out.date_format' => '退勤時間の形式が正しくありません（例: 18:00）',
+            // 'clock_out.date_format' => '半角数字で入力してください（例: 18:00）',
             
-            'breaks.*.clock_in.date_format' => '休憩開始時間の形式が正しくありません（例: 12:00）',
+            'breaks.*.clock_in.date_format' => '出勤時間の形式が正しくありません（例: 09:00）',
             
-            'breaks.*.clock_out.date_format' => '休憩終了時間の形式が正しくありません（例: 13:00）',
+            'breaks.*.clock_out.date_format' => '出勤時間の形式が正しくありません（例: 09:00) ',
             
             'reason.required' => '備考を記入してください',
         ];

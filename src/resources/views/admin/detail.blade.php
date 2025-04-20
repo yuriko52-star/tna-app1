@@ -17,7 +17,7 @@
         <form action="{{ route('admin.attendance.update', ['id' => $attendance->id]) }}" method="POST">
             @method('PATCH')
         @else
-        <form action="{{ route('admin.attendance.store') }}" method="POST">
+        <form action="{{ route('admin.attendance.store.new',['id' => $user->id]) }}" method="POST">
         @endif
         @csrf
         
@@ -147,6 +147,25 @@
             </td>
             
         </tr>
+          @php
+    // 出勤情報があるかチェック
+    $hasAttendance = isset($attendance) && $attendance->id !== null;
+
+    // 出勤しているかどうか（時間が入っているか）
+    $hasWorked = $hasAttendance && ($attendance->clock_in || $attendance->clock_out);
+
+    // 新規 or 土日（時間がすべてnull）の場合 → 休憩欄を2つ出す
+    $showEmptyBreaks = !$hasWorked;
+
+    // 既存休憩数（あっても null の日なら 0 に扱う）
+    $existingCount = $showEmptyBreaks ? 0 : $attendance->breakTimes->count();
+
+    // 追加する休憩欄の数
+    $additional = $showEmptyBreaks ? 2 : 1;
+@endphp
+
+{{-- 既存の休憩表示（時間がある人のみ） --}}
+@if ($hasWorked)
         @foreach($attendance->breakTimes as $i => $break)
         <tr>
             <th class="data-label">休憩{{ $i> 0 ? $i+1 : '' }}</th>
@@ -159,6 +178,7 @@
                 <input type="text" class="time-input" name="breaks[{{$i}}][clock_out]"value="{{ old("breaks.$i.clock_out",$break->clock_out ? \Carbon\Carbon::parse($break->clock_out)->format('H:i') : '') }}">
                 <!--  valueに値を入れる-->
             </div>
+                <p>
                     @error("breaks.$i.outside_working_time")
                     {{$message}}
                     @enderror
@@ -172,17 +192,16 @@
                     @error('breaks.*.clock_out')
                     {{ $message}} 
                     @enderror
+                </p>
             </td>
         </tr>
         @endforeach
-         @php
-        $existing = count($attendance->breakTimes);
-        $additional = 1; // 追加したい休憩欄の数
-        @endphp
-        @for ($i = $existing; $i < $existing + $additional; $i++)
-         <tr>
-            
-            <th class="data-label">休憩{{ $i === 0 ? '' :$i+ 1}} </th>
+        @endif
+{{-- 追加の空の休憩欄 --}}
+@for ($j = 0; $j < $additional; $j++)
+    @php $i = $existingCount + $j; @endphp
+    <tr>
+        <th class="data-label">休憩{{ $i === 0 ? '' :$i+ 1}} </th>
             <td class="data-item">
             <div class="time-wrapper">
                 <input type="text" name="breaks[{{$i}}][clock_in]"class="time-input" value="{{ old("breaks.$i.clock_in") }}">
@@ -197,7 +216,7 @@
         <tr>
             <th class="data-label">備考</th>
             <td class="data-item">
-               <textarea class="reason-input" name="reason"></textarea>
+               <textarea class="reason-input" name="reason">{{old('reason')}}</textarea>
                <!--  値を入れる-->
               <p class="form_error">
                 @error('reason')

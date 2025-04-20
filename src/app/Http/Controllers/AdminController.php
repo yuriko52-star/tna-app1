@@ -335,47 +335,69 @@ class AdminController extends Controller
                return redirect()->route('admin.stamp_correction_request.list');
 
     }
-    public function store(AttendanceRequest $request)
+    public function store(AttendanceRequest $request,$id)
     {
-       $user = Auth::user();
-       $targetDate = $request->input('date');
+         $admin = Auth::guard('admin')->user();
+
+       
+    
+    //  $user = Auth::user();
+        
+           $user = User::findOrFail($id);
+    //    $targetDate = $request->input('date');
        $now = now();
        $reason = $request->input('reason');
        $newClockIn = $request->input('clock_in');
        $newClockOut = $request->input('clock_out');
-       
+        $year = $request->input('target_year');
+        $month = $request->input('target_month');
+        $day = $request->input('target_day');
+        try {
+        $targetDate = Carbon::createFromDate($year, $month, $day);
+        // $formattedDate = $targetDate->format('Y-m-d'); // ← ここが重要！
+    } catch (\Exception $e) {
+    return back()->withErrors(['target_date' => '日付が正しくありません']);
+    }
        if($newClockIn || $newClockOut) {
         AttendanceEdit::create([
              'attendance_id' => null, // 新規なのでnull
             'user_id' => $user->id,
             'request_date' => $now,
-            'target_date' => $targetDate,
-            'new_clock_in' => $newClockIn ? Carbon::parse("$targetDate $newClockIn") : null,
-            'new_clock_out' => $newClockOut ? Carbon::parse("$targetDate $newClockOut") : null,
+            'target_date' => $targetDate->format('Y-m-d'),
+            'new_clock_in' => $newClockIn ? Carbon::parse($targetDate->format('Y-m-d') . ' ' .  $newClockIn) : null,
+            'new_clock_out' => $newClockOut ? Carbon::parse($targetDate->format('Y-m-d') . ' ' .  $newClockOut) : null,
             'reason' => $reason,
         ]);
        }
        $breaks = $request->input('breaks', []);
 
        foreach($breaks as $break) {
-        $newIn = $break['clock_in'] ?? null;
-        $newOut = $break['clock_out'] ?? null;
+        $newIn = trim($break['clock_in'] ?? ' ') ?: null;
+        $newOut = trim($break['clock_out'] ?? ' ') ?: null;
 
-        if($newIn || $newOut) {
-            BreakTimeEdit::create([
-                'break_time_id' => null,
-                'user_id' => $user->id,
-                'request_date' => $now,
-                'target_date' => $targetDate,
-                'new_clock_in' => $newIn ? Carbon::parse("$targetDate $newIn") : null,
-                'new_clock_out' => $newOut ? Carbon::parse("$targetDate $newOut") : null,
-                'reason' => $reason,
-            ]);
+        // if($newIn || $newOut) {
+        //  if ($breakId === null) {
+        // 両方入力されていれば新規登録
+                if ($newIn !== null || $newOut !== null) {
+                BreakTimeEdit::create([
+                    'break_time_id' => null,
+                    'user_id' => $user->id,
+                    'request_date' => $now,
+                    'target_date' => $targetDate->format('Y-m-d'),
+                    'new_clock_in' => $newIn ? Carbon::parse($targetDate->format('Y-m-d') . ' ' .  $newIn) : null,
+                    'new_clock_out' => $newOut ? Carbon::parse($targetDate->format('Y-m-d') . ' ' .   $newOut) : null,
+                    'reason' => $reason,
+                ]);
+                }
+            // }
         }
-       }
-       return redirect()->route('user.stamp_correction_request.list');
+            return redirect()->route('admin.stamp_correction_request.list');
     }
        
+    public function approvePage()
+    {
+        return view('admin.approve');
+    }
 }   
 
      

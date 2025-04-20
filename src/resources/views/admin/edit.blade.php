@@ -63,7 +63,8 @@
              <td class="data-item">{{\Carbon\Carbon::parse($data['request_date'])->format('Y/m/d') }}</td>
               <td class="data-item">
                 <!-- 仮に入れてるだけ -->
-               <a href="{{ route('attendance.editDetail', ['date' => \Carbon\Carbon::parse($data['target_date'])->format('Y-m-d')]) }}" class="data-link">詳細</a>
+               {{--<a href="{{ route('attendance.editDetail', ['date' => \Carbon\Carbon::parse($data['target_date'])->format('Y-m-d')]) }}" class="data-link">詳細</a>--}}
+               <a href="/stamp_correction_request/approve/{attendance_correct_request}" class="data-link">詳細</a>
               
               </td>
             </tr>

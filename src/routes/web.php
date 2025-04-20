@@ -84,8 +84,9 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
     
     Route::get('/attendance/detail/{id}/{date}',[AdminController::class ,'detailByDateForAdmin'])->name('admin.attendance.detailByDateForAdmin');
     Route::get('/attendance/{id}',[AdminController::class,'detailForAdmin'])->name('admin.attendance.detail');
-     Route::post('/attendance', [AdminController::class, 'store'])->name('admin.attendance.store');
+     Route::post('/attendance/store/{id}', [AdminController::class, 'store'])->name('admin.attendance.store.new');
      Route::patch('/attendance/{id}/edit-request', [AdminController::class, 'update'])->name('admin.attendance.update');
+     Route::get('/stamp_correction_request/approve/{attendance_correct_request}',[AdminController::class, 'approvePage']);
     
 });
 
