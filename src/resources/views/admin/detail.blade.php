@@ -166,37 +166,52 @@
 
 {{-- 既存の休憩表示（時間がある人のみ） --}}
 @if ($hasWorked)
-        @foreach($attendance->breakTimes as $i => $break)
+    @php $displayedIndex = 0; @endphp
+        @foreach($attendance->breakTimes as $break)
+            @php
+            $hasTime = $break->clock_in || $break->clock_out;
+            @endphp
+
+            @if ($hasTime)
+
         <tr>
-            <th class="data-label">休憩{{ $i> 0 ? $i+1 : '' }}</th>
+            <th class="data-label">{{ $displayedIndex === 0 ? '休憩' : '休憩' . ($displayedIndex + 1)}}</th>
             <td class="data-item">
             <div class="time-wrapper">
-                <input type="hidden" name="breaks[{{ $i }}][id]" value="{{ $break->id }}">
-                <input type="text" name="breaks[{{ $i}}][clock_in]"class="time-input" value="{{ old("breaks.$i.clock_in",$break->clock_in  ? \Carbon\Carbon::parse($break->clock_in)->format('H:i') : '') }}">
+                <input type="hidden" name="breaks[{{ $displayedIndex  }}][id]" value="{{ $break->id ?? ' '}}">
+                <input type="text" name="breaks[{{$displayedIndex }}][clock_in]"class="time-input" value="{{ old("breaks.$displayedIndex.clock_in",$break->clock_in  ? \Carbon\Carbon::parse($break->clock_in)->format('H:i') : '') }}">
                 <!--  valueに値を入れる-->
                 <span class="time-separator">~</span> 
-                <input type="text" class="time-input" name="breaks[{{$i}}][clock_out]"value="{{ old("breaks.$i.clock_out",$break->clock_out ? \Carbon\Carbon::parse($break->clock_out)->format('H:i') : '') }}">
+                <input type="text" class="time-input" name="breaks[{{$displayedIndex}}][clock_out]"value="{{ old("breaks.$displayedIndex.clock_out",$break->clock_out ? \Carbon\Carbon::parse($break->clock_out)->format('H:i') : '') }}">
                 <!--  valueに値を入れる-->
             </div>
-                <p>
-                    @error("breaks.$i.outside_working_time")
+            <p class="form_error">
+                @error("breaks.$displayedIndex.break_time_invalid")
+                {{$message}}
+                @enderror
+            </p>
+                <p class="form_error">
+                    @error("breaks.$displayedIndex.outside_working_time")
                     {{$message}}
                     @enderror
                 </p>
                  <p class="form_error">
-                    @error('breaks.*.clock_in')
+                    @error("breaks.$displayedIndex.clock_in")
                     {{ $message}} 
                     @enderror
                 </p>    
-                <p class="form_error">
-                    @error('breaks.*.clock_out')
+            <p class="form_error">
+                    @error("breaks.$displayedIndex.clock_out")
                     {{ $message}} 
                     @enderror
                 </p>
             </td>
         </tr>
-        @endforeach
+         @php $displayedIndex++; @endphp
         @endif
+        @endforeach
+        
+    @endif
 {{-- 追加の空の休憩欄 --}}
 @for ($j = 0; $j < $additional; $j++)
     @php $i = $existingCount + $j; @endphp
@@ -209,7 +224,26 @@
                 <span class="time-separator">~</span> 
                 <input type="text" name ="breaks[{{$i}}][clock_out]"class="time-input" value="{{ old("breaks.$i.clock_out") }}">
             </div>
-            <!-- バリデはあと -->
+            <p class="form_error">
+                    @error("breaks.$i.outside_working_time")
+                    {{$message}}
+                    @enderror
+            </p>
+            <p class="form_error">
+                    @error("breaks.$i.clock_in")
+                    {{ $message}} 
+                    @enderror
+            </p>    
+            <p class="form_error">
+               @error("breaks.$i.clock_out")
+                    {{$message}}
+                @enderror
+            </p>
+            <p class="form_error">
+                @error("breaks.$i.break_time_invalid")
+                {{$message}}
+                @enderror
+            </p>
             </td>
         </tr>
         @endfor

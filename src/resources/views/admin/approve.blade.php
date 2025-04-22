@@ -47,10 +47,16 @@
             </div> 
             </td>
         </tr>
-   @foreach($mergedBreaks as $i => $break)
-        
+    @php $displayedIndex = 0; @endphp
+
+   @foreach($mergedBreaks as $break)
+    @php
+        $hasTime = $break['clock_in'] || $break['clock_out'];
+    @endphp
+
+    @if ($hasTime)    
         <tr>
-    <th class="data-label">休憩{{ $i > 0 ? $i+1 : ' ' }}</th>
+    <th class="data-label">{{  $displayedIndex === 0 ? '休憩' : '休憩' . ($displayedIndex + 1) }}</th>
             <td class="data-item">
             <div class="time-wrapper">
                 <span class="time-in">{{ $break['clock_in'] ? \Carbon\Carbon::parse($break['clock_in'])->format('H:i') : '-' }}</span>
@@ -59,10 +65,12 @@
             </div>
             </td>
         </tr>
+        @php $displayedIndex++; @endphp
+        @endif
          @endforeach
          
          <tr>
-            <th class="data-label">休憩{{ count($mergedBreaks) + 1 }}</th>
+            <th class="data-label">{{ $displayedIndex === 0 ? '休憩' : '休憩' . ($displayedIndex + 1)}}</th>
             <td class="data-item">
             <div class="time-wrapper">
                 <span class="time-in"></span>

@@ -265,15 +265,17 @@ $isClockOutChanged = $newClockOut !== null && (
         // $isClockOutChanged = $newClockOut !== null && $defaultClockOut && Carbon::parse($defaultClockOut)->format('H:i') !== $newClockOut;
         $isClockInDeleted = $newClockIn === null && $defaultClockIn !== null;
         $isClockOutDeleted = $newClockOut === null && $defaultClockOut !== null;
+        $originalDate = Carbon::parse($attendance->date)->format('Y-m-d');
+        $isDateChanged = $formattedDate !== $originalDate;
 
-        if ($isClockInChanged || $isClockOutChanged || $isClockInDeleted || $isClockOutDeleted) {
+        if ($isClockInChanged || $isClockOutChanged || $isClockInDeleted || $isClockOutDeleted || $isDateChanged) {
                 AttendanceEdit::create([
                 'attendance_id' => $attendance->id,
                 'user_id' => $user->id,
                 'request_date' => $now,
-                'target_date' => $targetDate->format('Y-m-d'),
-                'new_clock_in' => $isClockInChanged ? Carbon::parse($targetDate->format('Y-m-d') . ' ' . $newClockIn) : null,
-                'new_clock_out' => $isClockOutChanged ? Carbon::parse($targetDate->format('Y-m-d') . ' ' . $newClockOut) : null,
+                'target_date' => $formattedDate,
+                'new_clock_in' => $isClockInChanged ? Carbon::parse($formattedDate . ' ' . $newClockIn) : null,
+                'new_clock_out' => $isClockOutChanged ? Carbon::parse($formattedDate . ' ' . $newClockOut) : null,
 
                 
                 'reason' => $reason,

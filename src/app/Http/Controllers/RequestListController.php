@@ -84,7 +84,12 @@ class RequestListController extends Controller
         ->groupBy('target_date');
        
         
-        $breakEdits = BreakTimeEdit::with(['user','breakTime', 'attendance'])->get()
+        $breakEdits = BreakTimeEdit::with(['user','breakTime', 'attendance'])
+            ->where(function ($query) {
+                $query->whereNotNull('new_clock_in')
+                    ->orWhereNotNull('new_clock_out');
+    })
+        ->get()
         ->groupBy('target_date');
         
         
