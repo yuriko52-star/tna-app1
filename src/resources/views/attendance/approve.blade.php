@@ -13,9 +13,7 @@
           <h1>勤怠詳細</h1> 
     </div> 
     <table>
-        <!-- 管理者用 -->
-        <!-- <form action="" class=""> -->
-        <tr>
+       <tr>
             <th class="data-label">名前</th>
             <td class="data-item">
                 <span class="name">{{ $user->name}}</span>
@@ -87,17 +85,8 @@
             </td>
         </tr>
     </table>
-    <!-- <div class="button"> -->
-        <!-- <button class="approve-btn" type="submit">承認</button> -->
-<!-- 承認されたら・・ -->
- <!-- <button class="ok-btn" type="submit">承認済み</button> -->
-    <!-- </div> -->
-    <!-- 一般ユーザー -->
     <p class="attention">
         *承認待ちのため修正はできません。
     </p>
-     
-
-    <!-- </form> -->
-</div>
+    </div>
 @endsection   

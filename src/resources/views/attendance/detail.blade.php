@@ -106,17 +106,22 @@
                     <input type="text" class="time-input"name="breaks[{{$displayedIndex}}][clock_out]" value="{{ old("breaks.$displayedIndex.clock_out",$break->clock_out ? \Carbon\Carbon::parse($break->clock_out)->format('H:i') : '') }}">
                 </div>
                 <p class="form_error">
+                @error("breaks.$displayedIndex.break_time_invalid")
+                {{$message}}
+                @enderror
+            </p>
+                <p class="form_error">
                     @error("breaks.$displayedIndex.outside_working_time")
                     {{$message}}
                     @enderror
                 </p>
                  <p class="form_error">
-                    @error('breaks.*.clock_in')
+                    @error("breaks.$displayedIndex.clock_in")
                     {{ $message}} 
                     @enderror
                 </p>    
                 <p class="form_error">
-                    @error('breaks.*.clock_out')
+                    @error("breaks.$displayedIndex.clock_out")
                     {{ $message}} 
                     @enderror
                 </p>    
@@ -138,21 +143,34 @@
                     <input type="text" class="time-input"name ="breaks[{{$i}}][clock_out]" value="{{ old("breaks.$i.clock_out") }}">
 
                 </div>
-                
-
-            <p class="form_error">
+                <p class="form_error">
                @error("breaks.$i.outside_working_time")
                     {{$message}}
                 @enderror
+                </p>
+            <p class="form_error">
+                    @error("breaks.$i.clock_in")
+                    {{ $message}} 
+                    @enderror
+            </p>    
+            <p class="form_error">
+               @error("breaks.$i.clock_out")
+                    {{$message}}
+                @enderror
             </p>
-            </td>
-        </tr>
+            <p class="form_error">
+                @error("breaks.$i.break_time_invalid")
+                {{$message}}
+                @enderror
+            </p>
+        </td>
+    </tr>
        
-       @endfor
-        <tr>
-            <th class="data-label">備考</th>
-            <td class="data-item">
-               <textarea class="reason-input" name="reason"></textarea>
+    @endfor
+    <tr>
+        <th class="data-label">備考</th>
+        <td class="data-item">
+            <textarea class="reason-input" name="reason"></textarea>
             
             <p class="form_error">
                 @error('reason')

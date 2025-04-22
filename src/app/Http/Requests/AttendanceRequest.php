@@ -41,7 +41,6 @@ class AttendanceRequest extends FormRequest
 
         if($clockIn && $clockOut && $clockIn > $clockOut) {
             $validator->errors()->add('clock_time_invalid', '出勤時間もしくは退勤時間が不適切な値です');
-            
         } 
         foreach($this->input('breaks', []) as $index => $break) {
             $breakIn = $break['clock_in'] ?? null;
@@ -51,34 +50,25 @@ class AttendanceRequest extends FormRequest
             }
              if($breakIn && $breakOut && $breakIn > $breakOut) {
             $validator->errors()->add("breaks.$index.break_time_invalid", '開始時間もしくは終了時間が不適切な値です');
-            
-        } 
-           
+            } 
         }
-       }) ;
+       });
     }
 
     public function messages()
     {
         $messages = [
-              'clock_in.date_format' => '出勤時間をスペースを入れずに半角で入力してください（例: 09:00）',
-           
-             
-             'clock_out.date_format' => '退勤時間をスペースを入れずに半角で入力してください（例: 18:00）',
-            
-            
-            
-            
+            'clock_in.date_format' => '出勤時間をスペースを入れずに半角で入力してください（例: 09:00）',
+           'clock_out.date_format' => '退勤時間をスペースを入れずに半角で入力してください（例: 18:00）',
             'reason.required' => '備考を記入してください',
         ];
 
         foreach ($this->input('breaks', []) as $index => $break) {
         //   $label = $index === 0 ? '休憩' : '休憩' . ($index + 1);
-
-        $messages["breaks.$index.clock_in.date_format"] = "開始時間はスペースを入れずに半角で入力してください（例: 10:00）";
-        $messages["breaks.$index.clock_out.date_format"] = "終了時間はスペースを入れずに半角で入力してください(例: 10:30)";
-    }
-
-    return $messages;
+            $messages["breaks.$index.clock_in.date_format"] = "開始時間はスペースを入れずに半角で入力してください（例: 10:00）";
+            $messages["breaks.$index.clock_out.date_format"] = "終了時間はスペースを入れずに半角で入力してください(例: 10:30)";
+        }
+        
+        return $messages;
     }
 }

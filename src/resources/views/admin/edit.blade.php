@@ -24,7 +24,7 @@
                     <a href="{{ route('admin.stamp_correction_request.list',['tab' => 'approved']) }}" class="page-title">承認済み</a>
    <!-- 表示しているページのタブの太さが変わるように設定する。してないものは細目で。
  -->
-   <!-- 管理者ページはデータの内容が一人一人になる。-->
+   
                     </li>
                 </ul>
             </nav>
@@ -50,7 +50,7 @@
             @foreach($datas as $data)
              @php
         $attendanceEdit = $data['attendance_edits']->first(); // 最初の1件を仮に取り出す
-    @endphp
+            @endphp
             <tr class="row">
               <!-- 後々必要 -->
               {{--{{is_null($data['approved_at']) ? '承認待ち' : '承認済み' }}--}}
@@ -61,13 +61,10 @@
             
               <td class="data-item">{{$data['user']->name}}</td>
               <td class="data-item">{{\Carbon\Carbon::parse($data['target_date'])->format('Y/m/d') }}</td>
-                {{--<pre>{{ dd($data['break_time_edits']) }}</pre>--}}
+               
              <td class="data-item">{{$data['reason']}}</td>
              <td class="data-item">{{\Carbon\Carbon::parse($data['request_date'])->format('Y/m/d') }}</td>
               <td class="data-item">
-                <!--$attendanceEdit->idでいいのか疑問 -->
-
-
                 @if($attendanceEdit && $attendanceEdit->id)
                     <a href="{{ route('admin.approvePage', ['attendance_correct_request' => $attendanceEdit->id]) }}" class="data-link">詳細</a>
                @else

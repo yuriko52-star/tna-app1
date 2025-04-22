@@ -19,18 +19,15 @@
         @else
         <form action="{{ route('admin.attendance.store.new',['id' => $user->id]) }}" method="POST">
         @endif
-        @csrf
+            @csrf
         
         <tr>
             <th class="data-label">名前</th>
             <td class="data-item">
                 <span class="name">{{ $attendance->user->name}}</span>
-                <!--値を入れる-->
             </td>
-            
         </tr>
         <tr>
-            
             <th class="data-label">日付</th>
             <td class="data-item">
                 <style>
@@ -45,33 +42,13 @@
                         font-family: Inter;
                         font-weight: 700;
                         font-size: 16px;
-                        
-                        }
-                    /* .date-display { 
-                        display: flex;
-                        gap: 2px;
-                         align-items: center;
                     }
-                    .date-display input {
-                        margin-left:25px;
-                        border: none;
-                        background: none;
-                        font-weight: bold;
-                        font-size: 1em;
-                    }
-                    .admin-date-space {
-                       
-                        width:80px;
-
-                    }
-                        */
+                    
                 </style>
                 <div class="date-select-wrapper">
                     @php
-    $parsedDate = \Carbon\Carbon::parse($attendance->date);
-@endphp
-
-    {{-- 年 --}}
+                        $parsedDate = \Carbon\Carbon::parse($attendance->date);
+                    @endphp
     <select name="target_year">
         @for ($y = 2023; $y <= 2026; $y++)
             <option value="{{ $y }}" {{ (old('target_year', $parsedDate->year) == $y) ? 'selected' : '' }}>
@@ -79,8 +56,6 @@
             </option>
         @endfor
     </select>
-
-    {{-- 月 --}}
     <select name="target_month">
         @for ($m = 1; $m <= 12; $m++)
             <option value="{{ $m }}" {{ (old('target_month', $parsedDate->month) == $m) ? 'selected' : '' }}>
@@ -88,8 +63,6 @@
             </option>
         @endfor
     </select>
-
-    {{-- 日 --}}
     <select name="target_day">
         @for ($d = 1; $d <= 31; $d++)
             <option value="{{ $d }}" {{ (old('target_day', $parsedDate->day) == $d) ? 'selected' : '' }}>
@@ -98,22 +71,6 @@
         @endfor
     </select>
 </div>
-
-                {{--<div class="date-display">
-                  <input type="text" value="{{ \Carbon\Carbon::parse($attendance->date)->format('Y年') }}">
-                <span class="admin-date-space"></span>
-                    <input type="text"  value="{{ \Carbon\Carbon::parse($attendance->date)->format('n月j日') }}">
-  
-                </div>
-                <input type="date" name="target_date" value="{{ old('target_date', \Carbon\Carbon::parse($attendance->date)->format('Y-m-d')) }}">--}}
-                    {{--<input type="text" name="date_year"class="time-input" value="{{old('date_year',$year)}}">
-                    <!--  valueに値を入れる-->
-                    <span class="date-space"></span>
-                    <input type="text" class="time-input"name="date_month_day" value="{{ old('date_month_day' ,$monthDay}}">--}}
-                    <!--  valueに値を入れる-->
-
-                    
-                
             </td>
         </tr>
         <tr>
@@ -148,23 +105,23 @@
             
         </tr>
           @php
-    // 出勤情報があるかチェック
+    
     $hasAttendance = isset($attendance) && $attendance->id !== null;
 
-    // 出勤しているかどうか（時間が入っているか）
+   
     $hasWorked = $hasAttendance && ($attendance->clock_in || $attendance->clock_out);
 
-    // 新規 or 土日（時間がすべてnull）の場合 → 休憩欄を2つ出す
+    
     $showEmptyBreaks = !$hasWorked;
 
-    // 既存休憩数（あっても null の日なら 0 に扱う）
+    
     $existingCount = $showEmptyBreaks ? 0 : $attendance->breakTimes->count();
 
-    // 追加する休憩欄の数
+    
     $additional = $showEmptyBreaks ? 2 : 1;
 @endphp
 
-{{-- 既存の休憩表示（時間がある人のみ） --}}
+
 @if ($hasWorked)
     @php $displayedIndex = 0; @endphp
         @foreach($attendance->breakTimes as $break)
@@ -180,10 +137,10 @@
             <div class="time-wrapper">
                 <input type="hidden" name="breaks[{{ $displayedIndex  }}][id]" value="{{ $break->id ?? ' '}}">
                 <input type="text" name="breaks[{{$displayedIndex }}][clock_in]"class="time-input" value="{{ old("breaks.$displayedIndex.clock_in",$break->clock_in  ? \Carbon\Carbon::parse($break->clock_in)->format('H:i') : '') }}">
-                <!--  valueに値を入れる-->
+                
                 <span class="time-separator">~</span> 
                 <input type="text" class="time-input" name="breaks[{{$displayedIndex}}][clock_out]"value="{{ old("breaks.$displayedIndex.clock_out",$break->clock_out ? \Carbon\Carbon::parse($break->clock_out)->format('H:i') : '') }}">
-                <!--  valueに値を入れる-->
+               
             </div>
             <p class="form_error">
                 @error("breaks.$displayedIndex.break_time_invalid")
@@ -212,7 +169,7 @@
         @endforeach
         
     @endif
-{{-- 追加の空の休憩欄 --}}
+
 @for ($j = 0; $j < $additional; $j++)
     @php $i = $existingCount + $j; @endphp
     <tr>
@@ -251,7 +208,7 @@
             <th class="data-label">備考</th>
             <td class="data-item">
                <textarea class="reason-input" name="reason">{{old('reason')}}</textarea>
-               <!--  値を入れる-->
+               
               <p class="form_error">
                 @error('reason')
                 {{ $message}}

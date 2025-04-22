@@ -21,7 +21,7 @@
 
         <nav>
             <ul class="header-nav">
-                {{--@if(Auth::check() && Auth::user()->isAdmin())--}}
+                
                 @if(Auth::guard('admin')->check() && Auth::guard('admin')->user()->isAdmin())
                 <li><a href="{{ url('/admin/attendance/list') }}" class="header-nav-link">勤怠一覧</a></li>
                 <li><a href="{{ url('/admin/staff/list') }}" class="header-nav-link"> スタッフ一覧</a></li>

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DebugController;
+// use App\Http\Controllers\DebugController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\AdminController;
 
@@ -107,4 +107,4 @@ Route::middleware(['auth:web'])->get('/stamp_correction_request/list', [RequestL
 
 
 
-Route::get('/preview/{viewName}', [DebugController::class, 'show']);
+// Route::get('/preview/{viewName}', [DebugController::class, 'show']);
