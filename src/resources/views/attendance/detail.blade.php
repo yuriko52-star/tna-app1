@@ -67,7 +67,7 @@
                 
             </td>
         </tr>
-       @php
+@php
     // 出勤情報があるかチェック
     $hasAttendance = isset($attendance) && $attendance->id !== null;
 
@@ -86,20 +86,27 @@
 
 {{-- 既存の休憩表示（時間がある人のみ） --}}
 @if ($hasWorked)
+ @php $displayedIndex = 0; @endphp
+    @foreach($attendance->breakTimes as $break)
+        @php
+            $hasTime = $break->clock_in || $break->clock_out;
+        @endphp
 
-        @foreach($attendance->breakTimes as $i => $break)
+        @if ($hasTime)
+
+       
         <tr>
-            <th class="data-label">休憩{{ $i> 0 ? $i+1 : '' }}</th>
+            <th class="data-label">{{ $displayedIndex === 0 ? '休憩' : '休憩' . ($displayedIndex + 1)}}</th>
             <td class="data-item">
                 <div class="time-wrapper">
-                    <input type="hidden" class=""name="breaks[{{ $i }}][id]" value="{{$break->id ?? ' '}}">
+                    <input type="hidden" class=""name="breaks[{{ $displayedIndex }}][id]" value="{{$break->id ?? ' '}}">
 
-                    <input type="text" class="time-input"name="breaks[{{ $i}}][clock_in]" value="{{ old("breaks.$i.clock_in",$break->clock_in  ? \Carbon\Carbon::parse($break->clock_in)->format('H:i') : '') }}">
+                    <input type="text" class="time-input"name="breaks[{{ $displayedIndex}}][clock_in]" value="{{ old("breaks.$displayedIndex.clock_in",$break->clock_in  ? \Carbon\Carbon::parse($break->clock_in)->format('H:i') : '') }}">
                     <span class="time-separator">~</span> 
-                    <input type="text" class="time-input"name="breaks[{{$i}}][clock_out]" value="{{ old("breaks.$i.clock_out",$break->clock_out ? \Carbon\Carbon::parse($break->clock_out)->format('H:i') : '') }}">
+                    <input type="text" class="time-input"name="breaks[{{$displayedIndex}}][clock_out]" value="{{ old("breaks.$displayedIndex.clock_out",$break->clock_out ? \Carbon\Carbon::parse($break->clock_out)->format('H:i') : '') }}">
                 </div>
                 <p class="form_error">
-                    @error("breaks.$i.outside_working_time")
+                    @error("breaks.$displayedIndex.outside_working_time")
                     {{$message}}
                     @enderror
                 </p>
@@ -115,6 +122,8 @@
                 </p>    
             </td>
         </tr>
+        @php $displayedIndex++; @endphp
+        @endif
         @endforeach
 @endif
 {{-- 追加の空の休憩欄 --}}
@@ -138,6 +147,7 @@
             </p>
             </td>
         </tr>
+       
        @endfor
         <tr>
             <th class="data-label">備考</th>

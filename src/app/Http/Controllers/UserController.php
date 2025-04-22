@@ -10,7 +10,7 @@ use App\Models\BreakTime;
 use App\Models\BreakTimeEdit;
 use Carbon\Carbon;
 
-class UserController extends Controller
+class UserController extends AttendanceDetailController
 {
     
     public function index() {
@@ -177,7 +177,10 @@ class UserController extends Controller
     public function editDetail(Request $request ,$date )
     {
         $user = Auth::user();
-        $targetDate = Carbon::parse($date)->format('Y-m-d');
+
+        $data = $this->getAttendanceDetailData($user->id, $date);
+        return view('attendance.approve',$data);
+        /*$targetDate = Carbon::parse($date)->format('Y-m-d');
         $userId =  Auth::id();
     // 出勤データと修正データを取得
         $attendance = Attendance::where('user_id',$userId)
@@ -245,5 +248,7 @@ class UserController extends Controller
         $reason = $attendanceEdit->reason ?? $breakEdits->first()->reason ?? '';
         
         return view('attendance.approve',compact('user','year','monthDay','workclockIn','workclockOut','mergedBreaks','reason'));
+        */
     }
+        
  }

@@ -33,7 +33,7 @@ class RequestListController extends Controller
     {
          $user = Auth::guard('web')->user();
     // 一般ユーザー用の処理
-        $attendanceEdits = AttendanceEdit::with(['user','attendance'])
+        $attendanceEdits = AttendanceEdit::with(['user'])
             ->where('user_id', $user->id)
             ->get()
             ->groupBy('target_date');

@@ -11,7 +11,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use App\Http\Requests\AttendanceRequest;
 
-class AdminController extends Controller
+class AdminController extends AttendanceDetailController
 {
     
     public function staffList()
@@ -252,9 +252,17 @@ class AdminController extends Controller
         //  $targetDate = $attendance->date;
           $now = now();
          $reason = $request->input('reason');
+$isClockInChanged = $newClockIn !== null && (
+    $defaultClockIn === null || Carbon::parse($defaultClockIn)->format('H:i') !== $newClockIn
+);
+$isClockOutChanged = $newClockOut !== null && (
+    $defaultClockOut === null || Carbon::parse($defaultClockOut)->format('H:i') !== $newClockOut
+);
+
+
         // 出勤・退勤の変更判定（時間のみ比較）
-        $isClockInChanged = $newClockIn !== null && $defaultClockIn && Carbon::parse($defaultClockIn)->format('H:i') !== $newClockIn;
-        $isClockOutChanged = $newClockOut !== null && $defaultClockOut && Carbon::parse($defaultClockOut)->format('H:i') !== $newClockOut;
+        // $isClockInChanged = $newClockIn !== null && $defaultClockIn && Carbon::parse($defaultClockIn)->format('H:i') !== $newClockIn;
+        // $isClockOutChanged = $newClockOut !== null && $defaultClockOut && Carbon::parse($defaultClockOut)->format('H:i') !== $newClockOut;
         $isClockInDeleted = $newClockIn === null && $defaultClockIn !== null;
         $isClockOutDeleted = $newClockOut === null && $defaultClockOut !== null;
 
@@ -394,10 +402,28 @@ class AdminController extends Controller
             return redirect()->route('admin.stamp_correction_request.list');
     }
        
-    public function approvePage()
+    public function approvePage($attendance_correct_request)
     {
-        return view('admin.approve');
+        $edit = AttendanceEdit::findOrFail($attendance_correct_request);
+    $userId = $edit->user_id;
+    $targetDate = $edit->target_date;
+
+    $data = $this->getAttendanceDetailData($userId, $targetDate);
+        return view('admin.approve',$data);
     }
+    public function approveOnlyBreak(Request $request)
+{
+    $userId = $request->query('user_id');
+    $targetDate = $request->query('date');
+
+    if (!$userId || !$targetDate) {
+        abort(404, '必要なパラメータがありません。');
+    }
+
+    $data = $this->getAttendanceDetailData($userId, $targetDate);
+    return view('admin.approve', $data);
+}
+
 }   
 
      

@@ -103,8 +103,16 @@ class AttendanceController extends Controller
          $now = now();
          $reason = $request->input('reason');
         // 出勤・退勤の変更判定（時間のみ比較）
-        $isClockInChanged = $newClockIn !== null && $defaultClockIn && Carbon::parse($defaultClockIn)->format('H:i') !== $newClockIn;
-        $isClockOutChanged = $newClockOut !== null && $defaultClockOut && Carbon::parse($defaultClockOut)->format('H:i') !== $newClockOut;
+$isClockInChanged = $newClockIn !== null && (
+    $defaultClockIn === null || Carbon::parse($defaultClockIn)->format('H:i') !== $newClockIn
+);
+$isClockOutChanged = $newClockOut !== null && (
+    $defaultClockOut === null || Carbon::parse($defaultClockOut)->format('H:i') !== $newClockOut
+);
+
+
+        // $isClockInChanged = $newClockIn !== null && $defaultClockIn && Carbon::parse($defaultClockIn)->format('H:i') !== $newClockIn;
+        // $isClockOutChanged = $newClockOut !== null && $defaultClockOut && Carbon::parse($defaultClockOut)->format('H:i') !== $newClockOut;
         $isClockInDeleted = $newClockIn === null && $defaultClockIn !== null;
         $isClockOutDeleted = $newClockOut === null && $defaultClockOut !== null;
 

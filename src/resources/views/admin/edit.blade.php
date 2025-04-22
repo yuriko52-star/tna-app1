@@ -48,6 +48,9 @@
               <th class="data-label">詳細</th>
             </tr>
             @foreach($datas as $data)
+             @php
+        $attendanceEdit = $data['attendance_edits']->first(); // 最初の1件を仮に取り出す
+    @endphp
             <tr class="row">
               <!-- 後々必要 -->
               {{--{{is_null($data['approved_at']) ? '承認待ち' : '承認済み' }}--}}
@@ -62,9 +65,17 @@
              <td class="data-item">{{$data['reason']}}</td>
              <td class="data-item">{{\Carbon\Carbon::parse($data['request_date'])->format('Y/m/d') }}</td>
               <td class="data-item">
-                <!-- 仮に入れてるだけ -->
-               {{--<a href="{{ route('attendance.editDetail', ['date' => \Carbon\Carbon::parse($data['target_date'])->format('Y-m-d')]) }}" class="data-link">詳細</a>--}}
-               <a href="/stamp_correction_request/approve/{attendance_correct_request}" class="data-link">詳細</a>
+                <!--$attendanceEdit->idでいいのか疑問 -->
+
+
+                @if($attendanceEdit && $attendanceEdit->id)
+                    <a href="{{ route('admin.approvePage', ['attendance_correct_request' => $attendanceEdit->id]) }}" class="data-link">詳細</a>
+               @else
+                    <a href="{{ route('admin.approveOnlyBreak', [
+                'user_id' => $data['user']->id,
+                 'date' => $data['target_date']
+                 ]) }}" class="data-link">詳細</a>
+               @endif
               
               </td>
             </tr>

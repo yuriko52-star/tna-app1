@@ -18,7 +18,7 @@
         <tr>
             <th class="data-label">名前</th>
             <td class="data-item">
-                {{--<span class="name">{{ $user->name}}</span>--}
+                <span class="name">{{ $user->name}}</span>
             </td>
             
         </tr>
@@ -26,9 +26,9 @@
             <th class="data-label">日付</th>
             <td class="data-item">
                 <div class="date-wrapper">
-                    {{--<span class="year">{{$year}}</span>--}}
+                    <span class="year">{{$year}}</span>
                     <span class="date-space"></span>
-                    {{--$_COOKIE<span class="day">{{ $monthDay}}</span>--}}
+                    <span class="day">{{ $monthDay}}</span>
                 </div>
             </td>
         </tr>
@@ -39,30 +39,30 @@
             <td class="data-item">
             <div class="time-wrapper">
                 
-                {{--<span class="time-in">{{\Carbon\Carbon::parse($workclockIn)->format('H:i')}}</span>--}}
+                <span class="time-in">{{\Carbon\Carbon::parse($workclockIn)->format('H:i')}}</span>
                
                 <span class="time-separator">~</span>
                 
-                {{--<span class="time-out">{{\Carbon\Carbon::parse($workclockOut)->format('H:i')}}</span>--}}
+                <span class="time-out">{{\Carbon\Carbon::parse($workclockOut)->format('H:i')}}</span>
             </div> 
             </td>
         </tr>
-   {{-- @foreach($mergedBreaks as $i => $break)--}}
+   @foreach($mergedBreaks as $i => $break)
         
         <tr>
-    {{--<th class="data-label">休憩{{ $i > 0 ? $i+1 : ' ' }}</th>--}}
+    <th class="data-label">休憩{{ $i > 0 ? $i+1 : ' ' }}</th>
             <td class="data-item">
             <div class="time-wrapper">
-                {{--<span class="time-in">{{ $break['clock_in'] ? \Carbon\Carbon::parse($break['clock_in'])->format('H:i') : '-' }}</span>--}}
+                <span class="time-in">{{ $break['clock_in'] ? \Carbon\Carbon::parse($break['clock_in'])->format('H:i') : '-' }}</span>
                 <span class="time-separator">~</span>
-                {{--<span class="time-out">{{ $break['clock_out'] ? \Carbon\Carbon::parse($break['clock_out'])->format('H:i') : '-' }}</span>--}} 
+                <span class="time-out">{{ $break['clock_out'] ? \Carbon\Carbon::parse($break['clock_out'])->format('H:i') : '-' }}</span>
             </div>
             </td>
         </tr>
-        {{-- @endforeach--}}
+         @endforeach
          
          <tr>
-            {{--<th class="data-label">休憩{{ count($mergedBreaks) + 1 }}</th>--}}
+            <th class="data-label">休憩{{ count($mergedBreaks) + 1 }}</th>
             <td class="data-item">
             <div class="time-wrapper">
                 <span class="time-in"></span>
@@ -75,7 +75,7 @@
         <tr>
             <th class="data-label">備考</th>
             <td class="data-item">
-               {{--<span class="reason">{{ $reason }}</span>--}}
+               <span class="reason">{{ $reason }}</span>
             </td>
         </tr>
     </table>
