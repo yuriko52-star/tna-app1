@@ -84,13 +84,16 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
     
     Route::get('/attendance/detail/{id}/{date}',[AdminController::class ,'detailByDateForAdmin'])->name('admin.attendance.detailByDateForAdmin');
     Route::get('/attendance/{id}',[AdminController::class,'detailForAdmin'])->name('admin.attendance.detail');
+     Route::post('/attendance-edit/{id}/approve',[AdminController::class,'approveAttendanceEdit'])->name('admin.attendanceEdit.approve');
+     Route::post('/break-edit/{id}/approve',[AdminController::class,'approveBreakEdit'])->name('admin.breakEdit.approve');
      Route::post('/attendance/store/{id}', [AdminController::class, 'store'])->name('admin.attendance.store.new');
      Route::patch('/attendance/{id}/edit-request', [AdminController::class, 'update'])->name('admin.attendance.update');
     
      // 出勤修正なし（休憩だけ）→ GETパラメータで受ける
-Route::get('/stamp_correction_request/approve', [AdminController::class, 'approveOnlyBreak'])
+    Route::get('/stamp_correction_request/approve', [AdminController::class, 'approveOnlyBreak'])
     ->name('admin.approveOnlyBreak');
      Route::get('/stamp_correction_request/approve/{attendance_correct_request}',[AdminController::class, 'approvePage'])->name('admin.approvePage');
+    
     
 });
 

@@ -16,13 +16,10 @@
             <nav>
                 <ul>
                 <li>
-                  <a href="{{ route('user.stamp_correction_request.list',['tab'=> 'waiting']) }}" class="page-title">承認待ち</a>
+                  <a href="{{ route('user.stamp_correction_request.list',['tab'=> 'waiting']) }}" class="tab-link {{ request('tab') === 'waiting' ? 'active-tab' : '' }}">承認待ち</a>
+                </li>
                 <li>
-                  <a href="{{ route('user.stamp_correction_request.list',['tab' => 'approved']) }}" class="page-title">承認済み</a>
-                    
-   <!-- 表示しているページのタブの太さが変わるように設定する。してないものは細目で。
- -->
-   
+                  <a href="{{ route('user.stamp_correction_request.list',['tab' => 'approved']) }}" class="tab-link {{ request('tab') === 'approved' ? 'active-tab' : '' }}">承認済み</a>
                 </li>
                 </ul>
             </nav>

@@ -14,7 +14,7 @@
     </div> 
     <table>
        
-        <!-- <form action="" class=""> -->
+        
         <tr>
             <th class="data-label">名前</th>
             <td class="data-item">
@@ -88,13 +88,17 @@
         </tr>
     </table>
     <div class="button">
-        <button class="approve-btn" type="submit">承認</button>
-<!-- 承認されたら・・ -->
- <!-- <button class="ok-btn" type="submit">承認済み</button> -->
+        @if(is_null($edit->approved_at))
+            <form action="{{ $edit instanceof App\Models\BreakTimeEdit 
+                ? route('admin.breakEdit.approve', ['id' => $edit->id]) 
+                : route('admin.attendanceEdit.approve', ['id' => $edit->id])
+        }}" method="POST">
+            @csrf
+                <button class="approve-btn" type="submit">承認</button>
+            </form>
+        @else
+                <button class="ok-btn" type="submit">承認済み</button>
+        @endif
     </div>
-    
-     
-
-    <!-- </form> -->
 </div>
 @endsection   

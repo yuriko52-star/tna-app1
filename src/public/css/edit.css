@@ -46,12 +46,20 @@ h1 {
 .top-content li:nth-child(2) a {
     margin-left: 100px;
 }
-.page-title {
+.tab-link {
         font-family: Inter;
         font-size: 16px;
         color: #000;
-        font-weight: 700;
+        font-weight: 400;
         /* font-weight:400px;表示していないタブ */
+}
+.tab-link:hover {
+    color:#555;
+}
+.active-tab {
+    color: #007BFF;
+    font-weight: 700;
+    font-size: 18px;
 }
 table {
     border-collapse: collapse;

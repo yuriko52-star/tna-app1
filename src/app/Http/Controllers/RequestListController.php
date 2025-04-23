@@ -32,8 +32,31 @@ class RequestListController extends Controller
     protected function userRequestList()
     {
          $user = Auth::guard('web')->user();
+         $tab = request('tab','waiting');
+
+         $queryAttendance = AttendanceEdit::with(['user', 'attendance'])
+        ->where('edited_by_admin', false);
+
+    $queryBreak = BreakTimeEdit::with(['user', 'breakTime', 'attendance'])
+        ->where(function ($query) {
+            $query->whereNotNull('new_clock_in')
+                  ->orWhereNotNull('new_clock_out');
+        })
+        ->where('edited_by_admin', false);
+
+    if ($tab === 'waiting') {
+        $queryAttendance->whereNull('approved_at');
+        $queryBreak->whereNull('approved_at');
+    } elseif ($tab === 'approved') {
+        $queryAttendance->whereNotNull('approved_at');
+        $queryBreak->whereNotNull('approved_at');
+    }
+
+    $attendanceEdits = $queryAttendance->get()->groupBy('target_date');
+    $breakEdits = $queryBreak->get()->groupBy('target_date');
+
     // 一般ユーザー用の処理
-        $attendanceEdits = AttendanceEdit::with(['user'])
+        /*$attendanceEdits = AttendanceEdit::with(['user'])
             ->where('user_id', $user->id)
             ->whereNull('approved_at')
             ->where('edited_by_admin',false)
@@ -46,6 +69,7 @@ class RequestListController extends Controller
             ->where('edited_by_admin',false)
             ->get()
             ->groupBy('target_date');
+            */
 
         $mergedData = [];
 
@@ -76,14 +100,36 @@ class RequestListController extends Controller
 
         $mergedData = collect($mergedData)->sortBy('target_date')->values();
 
-        return view('attendance.edit', ['datas' => $mergedData]);
+        return view('attendance.edit', ['datas' => $mergedData,
+        'tab' => $tab,
+        ]);
     }
 
     protected function adminRequestList()
     {
         $admin = Auth::guard('admin')->user();
-        // 管理者用の処理
-        $attendanceEdits = AttendanceEdit::with(['user','attendance'])
+        $tab = request('tab','waiting');
+
+        $queryAttendance = AttendanceEdit::with(['user', 'attendance'])
+        ->where('edited_by_admin', false);
+
+    $queryBreak = BreakTimeEdit::with(['user', 'breakTime', 'attendance'])
+        ->where(function ($query) {
+            $query->whereNotNull('new_clock_in')
+                  ->orWhereNotNull('new_clock_out');
+        })
+        ->where('edited_by_admin', false);
+
+    if ($tab === 'waiting') {
+        $queryAttendance->whereNull('approved_at');
+        $queryBreak->whereNull('approved_at');
+    } elseif ($tab === 'approved') {
+        $queryAttendance->whereNotNull('approved_at');
+        $queryBreak->whereNotNull('approved_at');
+    }
+    $attendanceEdits = $queryAttendance->get()->groupBy('target_date');
+    $breakEdits = $queryBreak->get()->groupBy('target_date');
+        /*$attendanceEdits = AttendanceEdit::with(['user','attendance'])
         ->whereNull('approved_at')
         ->where('edited_by_admin',false)
         ->get()
@@ -100,8 +146,15 @@ class RequestListController extends Controller
         ->get()
         ->groupBy('target_date');
         
+        if($tab === 'waiting') {
+            $attendanceEdits->whereNull('approved_at');
+            $breakEdits->whereNull('approved_at');
+         } elseif ($tab === 'approved') {
+            $attendanceEdits ->whereNotNull('approved_at');
+            $breakEdits->whereNotNull('approved_at');
+         }
         
-
+*/
         $mergedData = [];
 
         foreach ($attendanceEdits as $date => $edits) {
@@ -132,7 +185,9 @@ class RequestListController extends Controller
 
         $mergedData = collect($mergedData)->sortBy('target_date')->values();
 
-        return view('admin.edit', ['datas' => $mergedData]);
+        return view('admin.edit', ['datas' => $mergedData,
+        'tab' => $tab,
+    ]);
     }
 }
 
