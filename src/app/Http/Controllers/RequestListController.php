@@ -25,7 +25,7 @@ class RequestListController extends Controller
         } elseif ($user) {
             return $this->userRequestList($user);
         }
-// ?なぜlogin?adminならadmin/loginだけどなあ
+
     return redirect('/login');
     }
 
@@ -35,11 +35,15 @@ class RequestListController extends Controller
     // 一般ユーザー用の処理
         $attendanceEdits = AttendanceEdit::with(['user'])
             ->where('user_id', $user->id)
+            ->whereNull('approved_at')
+            ->where('edited_by_admin',false)
             ->get()
             ->groupBy('target_date');
 
         $breakEdits = BreakTimeEdit::with(['user','breakTime', 'attendance'])
             ->where('user_id', $user->id)
+            ->whereNull('approved_at')
+            ->where('edited_by_admin',false)
             ->get()
             ->groupBy('target_date');
 
@@ -80,6 +84,8 @@ class RequestListController extends Controller
         $admin = Auth::guard('admin')->user();
         // 管理者用の処理
         $attendanceEdits = AttendanceEdit::with(['user','attendance'])
+        ->whereNull('approved_at')
+        ->where('edited_by_admin',false)
         ->get()
         ->groupBy('target_date');
        
@@ -89,6 +95,8 @@ class RequestListController extends Controller
                 $query->whereNotNull('new_clock_in')
                     ->orWhereNotNull('new_clock_out');
     })
+        ->whereNull('approved_at')
+        ->where('edited_by_admin',false)
         ->get()
         ->groupBy('target_date');
         

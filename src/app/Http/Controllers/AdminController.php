@@ -279,6 +279,7 @@ $isClockOutChanged = $newClockOut !== null && (
 
                 
                 'reason' => $reason,
+                'edited_by_admin' => true,
             ]);
          }
          // 休憩の修正申請
@@ -307,6 +308,7 @@ $isClockOutChanged = $newClockOut !== null && (
                 
                 
                 'reason' => $reason,
+                'edited_by_admin' => true,
             ]);
         }
         continue;
@@ -338,6 +340,7 @@ $isClockOutChanged = $newClockOut !== null && (
                          'new_clock_in' => $isBreakInChanged ? Carbon::parse($targetDate->format('Y-m-d') . ' ' . $newIn) : null,
                          'new_clock_out' => $isBreakOutChanged ? Carbon::parse($targetDate->format('Y-m-d') . ' ' . $newOut) : null,
                         'reason' => $reason,
+                        'edited_by_admin' => true,
                         ]);
                     }
                  }
@@ -377,6 +380,7 @@ $isClockOutChanged = $newClockOut !== null && (
             'new_clock_in' => $newClockIn ? Carbon::parse($targetDate->format('Y-m-d') . ' ' .  $newClockIn) : null,
             'new_clock_out' => $newClockOut ? Carbon::parse($targetDate->format('Y-m-d') . ' ' .  $newClockOut) : null,
             'reason' => $reason,
+            'edited_by_admin' => true,
         ]);
        }
        $breaks = $request->input('breaks', []);
@@ -397,7 +401,9 @@ $isClockOutChanged = $newClockOut !== null && (
                     'new_clock_in' => $newIn ? Carbon::parse($targetDate->format('Y-m-d') . ' ' .  $newIn) : null,
                     'new_clock_out' => $newOut ? Carbon::parse($targetDate->format('Y-m-d') . ' ' .   $newOut) : null,
                     'reason' => $reason,
+                    'edited_by_admin' => true,
                 ]);
+
                 }
             // }
         }

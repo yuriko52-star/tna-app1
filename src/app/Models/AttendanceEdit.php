@@ -17,7 +17,8 @@ class AttendanceEdit extends Model
         'new_clock_in',
         'new_clock_out',
         'reason',
-        'approved_at'
+        'approved_at',
+        'edited_by_admin',
     ];
     public function user ()
     {
