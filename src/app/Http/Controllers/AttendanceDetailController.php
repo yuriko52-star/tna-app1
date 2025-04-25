@@ -71,7 +71,9 @@ class AttendanceDetailController extends Controller
         }
     }
 
-    $mergedBreaks = collect($mergedBreaks)->sortBy('clock_in')->values();
+    $mergedBreaks = collect($mergedBreaks)->unique(function ($item) {
+        return $item['clock_in'] . '-' . $item['clock_out'];
+    })->sortBy('clock_in')->values();
 
     return [
         'user' => $user,

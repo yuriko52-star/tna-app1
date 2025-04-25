@@ -413,50 +413,51 @@ $isClockOutChanged = $newClockOut !== null && (
     public function approvePage($attendance_correct_request)
     {
         $edit = AttendanceEdit::findOrFail($attendance_correct_request);
-    $userId = $edit->user_id;
-    $targetDate = $edit->target_date;
+        $userId = $edit->user_id;
+        $targetDate = $edit->target_date;
 
-    $data = $this->getAttendanceDetailData($userId, $targetDate);
-    $data['edit'] = $edit;
+        $breakEdits = BreakTimeEdit::where('user_id', $userId)
+         ->where('target_date', $targetDate)
+         ->get();
+
+        $data = $this->getAttendanceDetailData($userId, $targetDate);
+        $data['edit'] = $edit;
+        $data['break_edits'] = $breakEdits;
+
         return view('admin.approve',$data);
     }
-    public function approveOnlyBreak(Request $request)
-{
-    $userId = $request->query('user_id');
-    $targetDate = $request->query('date');
 
-    if (!$userId || !$targetDate) {
-        abort(404, '必要なパラメータがありません。');
-    }
-    $edit = BreakTimeEdit::where('user_id', $userId)
+    public function approveOnlyBreak(Request $request)
+    {
+        $userId = $request->query('user_id');
+        $targetDate = $request->query('date');
+
+        if (!$userId || !$targetDate) {
+            abort(404, '必要なパラメータがありません。');
+        }
+        $edit = BreakTimeEdit::where('user_id', $userId)
         ->where('target_date', $targetDate)
         ->latest()
         ->first();
 
-    $data = $this->getAttendanceDetailData($userId, $targetDate);
+        $data = $this->getAttendanceDetailData($userId, $targetDate);
 
-    /* $edit = BreakTimeEdit::where('user_id', $userId)
-        ->where('target_date', $targetDate)
-        ->first(); // or firstOrFail();
-        */
+        $data['edit'] = $edit;
 
-
-    $data['edit'] = $edit;
-
-    return view('admin.approve', $data);
-}
-
-public function approveAttendanceEdit($id)
-{
-    // $data['edit'] = $edit;
-    $edit = AttendanceEdit::findOrFail($id);
-    if ($edit->approved_at) {
-        return redirect()->back()->with('message', 'すでに承認済みです。');
+        return view('admin.approve', $data);
     }
-    $edit->approved_at = now();
-    $edit->save();
 
-    if(is_null($edit->attendance_id)) {
+    public function approveAttendanceEdit($id)
+    {
+    // $data['edit'] = $edit;
+        $edit = AttendanceEdit::findOrFail($id);
+        if ($edit->approved_at) {
+        return redirect()->back()->with('message', 'すでに承認済みです。');
+        }
+        $edit->approved_at = now();
+        $edit->save();
+
+        if(is_null($edit->attendance_id)) {
         
         Attendance::create([
             'user_id' => $edit->user_id,
@@ -464,67 +465,108 @@ public function approveAttendanceEdit($id)
             'clock_in' => $edit->new_clock_in,
             'clock_out' => $edit->new_clock_out,
         ]);
-    }else {
-        $attendance = $edit->attendance;
+        }else {
+            $attendance = $edit->attendance;
 
-        if($attendance) {
+            if($attendance) {
             $attendance->clock_in = $edit->new_clock_in ?? $attendance->clock_in;
             $attendance->clock_out = $edit->new_clock_out ?? $attendance->clock_out;
             $attendance->date = $edit->target_date ?? $attendance->date;
             $attendance->save();
+            }
         }
-    }
-    return redirect()->back()->with('message', '承認が完了しました。');
+         // ✅ 追加処理: 対応する休憩の申請も承認する
+    $breakEdits = BreakTimeEdit::where('user_id', $edit->user_id)
+        ->where('target_date', $edit->target_date)
+        ->distinct()
+        ->whereNull('approved_at') // 未承認のものだけ
+        ->get();
 
-    } 
-    public function approveBreakEdit($id)
-    {
-        $edit = BreakTimeEdit::findOrFail($id);
-
-        // 既存の休憩時間を取得または新規作成
-    /*if ($edit->break_time_id) {
-        $breakTime = BreakTime::find($edit->break_time_id);
-    } else {
-        $breakTime = new BreakTime([
-            'user_id' => $edit->user_id,
-            'date' => $edit->target_date,
-        ]);
-    }
-*/
-        if($edit->approved_at) {
-            return redirect()->back()->with('message', 'すでに承認されています。'); 
+    foreach ($breakEdits as $bedit) {
+        // 削除申請
+        if ($bedit->break_time_id && is_null($bedit->new_clock_in) && is_null($bedit->new_clock_out)) {
+            $break = $bedit->breakTime;
+            if ($break) $break->delete();
         }
-        $attendanceId = $edit->attendance_id;
-        $edit->approved_at = now();
-        $edit->save();
-
-        if (is_null($edit->break_time_id)) {
-        // 新規作成
-        breakTime::create([
-            'user_id' => $edit->user_id,
-            'attendance_id' => optional($edit->attendance)->id,
-            'date' => $edit->target_date,
-            'clock_in' => $edit->new_clock_in,
-            'clock_out' => $edit->new_clock_out,
-        ]);
-    } else {
-        // 既存修正
-        $break = $edit->breakTime;
-       if ($break) {
-            if (is_null($edit->new_clock_in) && is_null($edit->new_clock_out)) {
-                // 削除
-                $break->delete();
-            } else {
-                // 修正
-                $break->clock_in = $edit->new_clock_in ?? $break->clock_in;
-                $break->clock_out = $edit->new_clock_out ?? $break->clock_out;
+        // 新規追加
+         elseif (is_null($bedit->break_time_id)) {
+            $attendance = Attendance::firstOrCreate(
+                ['user_id' => $bedit->user_id, 'date' => $bedit->target_date],
+                ['clock_in' => null, 'clock_out' => null]
+            );
+            BreakTime::create([
+                'user_id' => $bedit->user_id,
+                'attendance_id' => $attendance->id,
+                'clock_in' => $bedit->new_clock_in,
+                'clock_out' => $bedit->new_clock_out,
+            ]);
+        }
+        // 修正
+        else {
+            $break = $bedit->breakTime;
+            if ($break) {
+                $break->clock_in = $bedit->new_clock_in ?? $break->clock_in;
+                $break->clock_out = $bedit->new_clock_out ?? $break->clock_out;
                 $break->save();
             }
         }
+            $bedit->approved_at = now();
+            $bedit->save();
     }
-    
+            // return redirect()->back()->with('message', '承認が完了しました。');
+            return redirect()->route('admin.approvePage', ['attendance_correct_request' => $edit->id])
+                 ->with('message', '承認が完了しました。');
 
-    return redirect()->back()->with('message', '出勤データの承認が完了しました。');
-}
+
+    } 
+        public function approveBreakEdit($id)
+
+    {
+        // \Log::info('🔥 Break 承認処理に入りました', ['id' => $id]);
+
+        // \Log::info("break_time_id", ['value' => $edit->break_time_id]);
+        // \Log::info("new_clock_in", ['value' => $edit->new_clock_in]);
+        // \Log::info("new_clock_out", ['value' => $edit->new_clock_out]);
+         $edit = BreakTimeEdit::findOrFail($id);
+        // 同一ユーザーかつ同一日の未承認の休憩申請を取得
+        $edits = BreakTimeEdit::where('user_id', $edit->user_id)
+        ->where('target_date', $edit->target_date)
+        ->whereNull('approved_at')
+        ->get();
+
+        foreach($edits as $edit) {
+            if ($edit->break_time_id && is_null($edit->new_clock_in) && is_null($edit->new_clock_out)) {
+             $break = $edit->breakTime;
+            if ($break) {
+                    $break->delete();
+                }
+             }elseif (is_null($edit->break_time_id)) {
+        if(!is_null($edit->new_clock_in) || !is_null($edit->new_clock_out)) {
+        
+        // 新規作成  
+            $attendance = Attendance::firstOrCreate(
+                ['user_id' => $edit->user_id, 'date' => $edit->target_date],
+                ['clock_in' => null, 'clock_out' => null]
+            );
+            BreakTime::create([
+                'user_id' => $edit->user_id,
+                'attendance_id' => $attendance->id,
+               'clock_in' => $edit->new_clock_in,
+                'clock_out' => $edit->new_clock_out,
+                ]);
+            }
+        }else {
+                $break = $edit->breakTime;
+                 if ($break) {
+                    $break->clock_in = $edit->new_clock_in ?? $break->clock_in;
+                    $break->clock_out = $edit->new_clock_out ?? $break->clock_out;
+                    $break->save();
+                }
+            }
     
+        $edit->approved_at = now();
+        $edit->save();
+        }
+         return redirect()->back()->with('message', '出勤データの承認が完了しました。');
+    }
 }

@@ -11,6 +11,10 @@
           <img src="{{asset('img/Line 2.png')}}" style="height:40px;width:8px;"alt="" class="img">
         </div>
           <h1>勤怠詳細</h1> 
+
+           <h2>修正対象: {{ $edit instanceof \App\Models\BreakTimeEdit ? '休憩' : '出退勤' }}</h2>
+    <p>ID: {{ $edit->id }} / 日付: {{ $edit->target_date }}</p>
+
     </div> 
     <table>
        
@@ -87,18 +91,26 @@
             </td>
         </tr>
     </table>
+    @php
+    $isBreakEdit = $edit instanceof \App\Models\BreakTimeEdit;
+    $formAction = $isBreakEdit
+        ? route('admin.breakEdit.approve', ['id' => $edit->id])
+        : route('admin.attendanceEdit.approve', ['id' => $edit->id]);
+    @endphp
     <div class="button">
-        @if(is_null($edit->approved_at))
-            <form action="{{ $edit instanceof App\Models\BreakTimeEdit 
-                ? route('admin.breakEdit.approve', ['id' => $edit->id]) 
-                : route('admin.attendanceEdit.approve', ['id' => $edit->id])
-        }}" method="POST">
-            @csrf
-                <button class="approve-btn" type="submit">承認</button>
-            </form>
-        @else
+    @if($edit->approved_at)
+      <button class="ok-btn"type="submit" disabled>承認済み</button>
+    @else
+       <form action="{{ $formAction}}" method="POST">
+        @csrf
+        <button class="approve-btn" type="submit">承認</button>
+    </form>
+    @endif
+                
+            
+       {{-- @else
                 <button class="ok-btn" type="submit">承認済み</button>
-        @endif
+        @endif--}}
     </div>
 </div>
 @endsection   
