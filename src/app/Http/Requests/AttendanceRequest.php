@@ -25,7 +25,7 @@ class AttendanceRequest extends FormRequest
     public function rules()
     {
         return [
-             'clock_in' => ['nullable','date_format:H:i',],
+            'clock_in' => ['nullable','date_format:H:i',],
             'clock_out' => ['nullable', 'date_format:H:i'],
             'breaks.*.clock_in'=> ['nullable' ,'date_format:H:i'] ,
             'breaks.*.clock_out' => ['nullable','date_format:H:i'],

@@ -594,11 +594,19 @@ if ($isDateChanged) {
        $newClockIn = $request->input('clock_in');
        $newClockOut = $request->input('clock_out');
         $year = $request->input('target_year');
-        $month = $request->input('target_month');
-        $day = $request->input('target_day');
+        $year = preg_replace('/[^0-9]/', '', $year);
+        $monthDay = $request->input('target_month_day');
+
+            if(preg_match('/(\d+)月(\d+)日/', $monthDay, $matches)) {
+                $month = $matches[1];
+                $day = $matches[2];
+            }else {
+         return back()->withErrors(['target_month_day' => '月日を正しく入力してください（例：4月26日）']); 
+            }
+
         try {
         $targetDate = Carbon::createFromDate($year, $month, $day);
-        // $formattedDate = $targetDate->format('Y-m-d'); // ← ここが重要！
+        //  $formattedDate = $targetDate->format('Y-m-d'); // ← ここが重要！
     } catch (\Exception $e) {
     return back()->withErrors(['target_date' => '日付が正しくありません']);
     }
@@ -660,7 +668,7 @@ if ($isDateChanged) {
                 }
             // }
         }
-            return redirect()->route('admin.stamp_correction_request.list');
+            return redirect()->route('admin.attendance.staff',['id' => $attendance->user_id]);
     }
        
     public function approvePage($attendance_correct_request)
