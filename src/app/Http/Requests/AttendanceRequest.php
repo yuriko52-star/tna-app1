@@ -30,6 +30,8 @@ class AttendanceRequest extends FormRequest
             'breaks.*.clock_in'=> ['nullable' ,'date_format:H:i'] ,
             'breaks.*.clock_out' => ['nullable','date_format:H:i'],
             'reason' => ['required','string'],
+            'target_year' =>  ['required', 'regex:/^\d{4}年$/'],
+            'target_month_day' => ['required', 'regex:/^\d{1,2}月\d{1,2}日$/'],
         ];
     }
     public function withValidator($validator) 
@@ -61,6 +63,10 @@ class AttendanceRequest extends FormRequest
             'clock_in.date_format' => '出勤時間をスペースを入れずに半角で入力してください（例: 09:00）',
            'clock_out.date_format' => '退勤時間をスペースを入れずに半角で入力してください（例: 18:00）',
             'reason.required' => '備考を記入してください',
+            'target_year.required' => '年を入力してください',
+             'target_year.regex' => '年は「2025年」のように入力してください',
+            'target_month_day.required' => '月日を入力してください',
+            'target_month_day.regex' => '月日は「4月26日」のように入力してください',
         ];
 
         foreach ($this->input('breaks', []) as $index => $break) {

@@ -211,6 +211,11 @@ class AdminController extends AttendanceDetailController
 
 public function update(AttendanceRequest $request, $id)
 {
+    if ($errors = session('errors')) {
+    \Log::error('バリデーションエラー', ['errors' => $errors->all()]);
+}
+    // \Log::info('target_month_dayの値', ['value' => $request->input('target_month_day')]);
+
     $admin = Auth::guard('admin')->user();
     $attendance = Attendance::with('breakTimes')->findOrFail($id);
     $user = $attendance->user;
@@ -224,9 +229,17 @@ public function update(AttendanceRequest $request, $id)
 
     // 日付処理
     $year = $request->input('target_year');
-    $month = $request->input('target_month');
-    $day = $request->input('target_day');
+    $year = preg_replace('/[^0-9]/', '', $year);
+    $monthDay = $request->input('target_month_day');
+    if(preg_match('/(\d+)月(\d+)日/', $monthDay, $matches)) {
+        $month = $matches[1];
+        $day = $matches[2];
+    }else {
+         return back()->withErrors(['target_month_day' => '月日を正しく入力してください（例：4月26日）']); 
+        
 
+    }
+    
     try {
         $targetDate = Carbon::createFromDate($year, $month, $day);
         $formattedDate = $targetDate->format('Y-m-d');
@@ -244,13 +257,14 @@ public function update(AttendanceRequest $request, $id)
     $isClockOutDeleted = $newClockOut === null && $defaultClockOut !== null;
     $isDateChanged = $formattedDate !== $originalDate;
 
-    // \u3010\u65e5\u4ed8\u5909\u66f4\u3042\u308a\u306a\u3089\u5148\u306b\u79fb\u52d5\u5148\u3092\u6d88\u3059
+    // もし日付が変更されていたら
     if ($isDateChanged) {
+        // 移動先の日付に、同じユーザーの別出勤データがあったら削除
         Attendance::where('user_id', $user->id)
             ->where('date', $formattedDate)
             ->where('id', '!=', $attendance->id)
             ->delete();
-
+    // 
         BreakTime::whereHas('attendance', function ($query) use ($user, $formattedDate, $attendance) {
             $query->where('user_id', $user->id)
                   ->where('date', $formattedDate)
@@ -258,7 +272,7 @@ public function update(AttendanceRequest $request, $id)
         })->delete();
     }
 
-    // AttendanceEdit\u306e\u767b\u9332
+    //  変更があれば AttendanceEdit に履歴を作成
     if ($isClockInChanged || $isClockOutChanged || $isClockInDeleted || $isClockOutDeleted || $isDateChanged) {
         AttendanceEdit::create([
             'attendance_id' => $attendance->id,
@@ -272,21 +286,23 @@ public function update(AttendanceRequest $request, $id)
         ]);
     }
 
-    // Attendance\u306e\u672c\u4f53\u3092\u66f4\u65b0
+     // 本番の Attendance を直接更新
     $attendance->date = $formattedDate;
     $attendance->clock_in = $newClockIn ? Carbon::parse($formattedDate . ' ' . $newClockIn) : null;
     $attendance->clock_out = $newClockOut ? Carbon::parse($formattedDate . ' ' . $newClockOut) : null;
     $attendance->save();
 
-    // \u4f11\u61a9\u6642\u9593\u306e\u5909\u66f4
+    // ===== 休憩時間の処理 ===== 
     $breaks = $request->input('breaks', []);
-    $attendance->breakTimes()->delete(); // \u5148\u306b\u5168\u6d88\u3057
-
+    // ① 既存の休憩をすべて削除
+    $attendance->breakTimes()->delete(); 
+    // ② 新しい休憩を登録
     foreach ($breaks as $break) {
         $newIn = trim($break['clock_in'] ?? '') ?: null;
         $newOut = trim($break['clock_out'] ?? '') ?: null;
 
         if ($newIn || $newOut) {
+            // BreakTimeEdit 登録（管理者編集履歴）
             BreakTimeEdit::create([
                 'break_time_id' => null,
                 'user_id' => $user->id,
@@ -297,7 +313,7 @@ public function update(AttendanceRequest $request, $id)
                 'reason' => $reason,
                 'edited_by_admin' => true,
             ]);
-
+             // BreakTime 登録
             BreakTime::create([
                 'attendance_id' => $attendance->id,
                 'user_id' => $user->id,
@@ -307,7 +323,7 @@ public function update(AttendanceRequest $request, $id)
         }
     }
 
-    return redirect()->route('admin.stamp_correction_request.list')
+    return redirect()->route('admin.attendance.staff',['id' => $attendance->user_id])
         ->with('message', '更新が完了しました。');
 }
 

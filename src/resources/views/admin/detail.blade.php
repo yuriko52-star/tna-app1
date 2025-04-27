@@ -30,7 +30,30 @@
         <tr>
             <th class="data-label">日付</th>
             <td class="data-item">
-                <style>
+                <div class="date-wrapper">
+                    @php
+                        $parsedDate = \Carbon\Carbon::parse($attendance->date);
+                    @endphp
+                     <input type="text"name="target_year" class="date-input" value="{{ old('target_year', $parsedDate->format('Y') . '年') }}">
+                     
+                     
+                     
+                     <span class="date-space"></span>
+                     <input type="text" class="date-input" name="target_month_day" value="{{ old('target_month_day', $parsedDate->format('n月j日')) }}">
+                    
+                </div>
+                <p class="form_error">
+                @error('target_year')
+                     {{$message}}
+                     @enderror
+                </p>
+                <p class="form_error">
+                     @error('target_month_day')
+                      {{ $message }} 
+                      @enderror
+                      </p>
+                <!-- <input type="text" class=""> -->
+                {{--<style>
                     .date-select-wrapper select {
                         margin-right: 8px;
                         padding: 5px;
@@ -70,7 +93,7 @@
             </option>
         @endfor
     </select>
-</div>
+</div>--}}
             </td>
         </tr>
         <tr>

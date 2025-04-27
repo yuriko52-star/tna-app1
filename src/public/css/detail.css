@@ -110,6 +110,10 @@ input {
     font-size: 16px;
 
 }
+.date-input {
+    border: none;
+    text-align: center;
+}
 .time-input {
     text-align: center;
 }
