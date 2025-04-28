@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Carbon\Carbon;
 
-class AttendanceRequest extends FormRequest
+class UserAttendanceRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,11 +29,9 @@ class AttendanceRequest extends FormRequest
             'breaks.*.clock_in'=> ['nullable' ,'date_format:H:i'] ,
             'breaks.*.clock_out' => ['nullable','date_format:H:i'],
             'reason' => ['required','string'],
-             'target_year' =>  ['required', 'regex:/^\d{4}年$/'],
-             'target_month_day' => ['required', 'regex:/^\d{1,2}月\d{1,2}日$/'],
         ];
     }
-    public function withValidator($validator) 
+     public function withValidator($validator) 
     {
        $validator->after(function($validator)
        {
@@ -56,25 +53,21 @@ class AttendanceRequest extends FormRequest
         }
        });
     }
-
-    public function messages()
+     public function messages()
     {
         $messages = [
             'clock_in.date_format' => '出勤時間をスペースを入れずに半角で入力してください（例: 09:00）',
            'clock_out.date_format' => '退勤時間をスペースを入れずに半角で入力してください（例: 18:00）',
             'reason.required' => '備考を記入してください',
-            'target_year.required' => '年を入力してください',
-             'target_year.regex' => '年は「2025年」のように入力してください',
-            'target_month_day.required' => '月日を入力してください',
-            'target_month_day.regex' => '月日は「4月26日」のように入力してください',
-        ];
+           ];
 
         foreach ($this->input('breaks', []) as $index => $break) {
-        //   $label = $index === 0 ? '休憩' : '休憩' . ($index + 1);
+        
             $messages["breaks.$index.clock_in.date_format"] = "開始時間はスペースを入れずに半角で入力してください（例: 10:00）";
             $messages["breaks.$index.clock_out.date_format"] = "終了時間はスペースを入れずに半角で入力してください(例: 10:30)";
         }
         
         return $messages;
     }
+
 }

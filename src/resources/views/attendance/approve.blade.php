@@ -85,8 +85,12 @@
             </td>
         </tr>
     </table>
+    <!-- 承認されたらメッセージを変えたい -->
     <p class="attention">
         *承認待ちのため修正はできません。
+    </p>
+    <p class="attention">
+        *承認されました。
     </p>
     </div>
 @endsection   

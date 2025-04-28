@@ -739,6 +739,7 @@ if ($isDateChanged) {
          // ✅ 追加処理: 対応する休憩の申請も承認する
     $breakEdits = BreakTimeEdit::where('user_id', $edit->user_id)
         ->where('target_date', $edit->target_date)
+        ->where('edited_by_admin', 0)
         ->distinct()
         ->whereNull('approved_at') // 未承認のものだけ
         ->get();
@@ -792,6 +793,7 @@ if ($isDateChanged) {
         // 同一ユーザーかつ同一日の未承認の休憩申請を取得
         $edits = BreakTimeEdit::where('user_id', $edit->user_id)
         ->where('target_date', $edit->target_date)
+        ->where('edited_by_admin', 0)
         ->whereNull('approved_at')
         ->get();
 

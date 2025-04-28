@@ -28,4 +28,11 @@ class Attendance extends Model
     {
         return $this->hasMany(BreakTime::class);
     }
+    public function getHasPendingEditAttribute()
+    {
+        return $this->attendanceEdits()
+            ->whereNull('approved_at')
+            ->where('edited_by_admin',0)
+            ->exists();
+    }
 }

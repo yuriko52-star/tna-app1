@@ -42,12 +42,28 @@
               <th class="data-label">申請日時</th>
               <th class="data-label">詳細</th>
             </tr>
+              <tr class="row">
             @foreach($datas as $data)
-            <tr class="row">
-              <!-- 後々必要 -->
-              {{--{{is_null($data['approved_at']) ? '承認待ち' : '承認済み' }}--}}
-              
-             <td class="data-item">承認待ち</td>
+            @php
+              $attendanceEdit = $data['attendance_edits']->first();
+              $breakEdit = $data['break_time_edits']->first();
+
+              // approved_at があるものを優先して $edit に使う
+              $edit = null;
+              if ($attendanceEdit && $attendanceEdit->approved_at) {
+              $edit = $attendanceEdit;
+              } elseif ($breakEdit && $breakEdit->approved_at) {
+              $edit = $breakEdit;
+              } else {
+              $edit = $attendanceEdit ?? $breakEdit;
+              }
+            @endphp
+          
+              <td class="data-item">
+                 {{is_null(optional($edit)->approved_at) ? '承認待ち' : '承認済み' }}
+               
+              </td>  
+             <!-- <td class="data-item">承認待ち</td> -->
              
              <!-- <td class="data-item">承認済み</td> -->
              @if(Auth::user()->isAdmin())

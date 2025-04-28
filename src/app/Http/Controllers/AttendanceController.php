@@ -9,7 +9,7 @@ use App\Models\BreakTime;
 use App\Models\AttendanceEdit;
 use App\Models\BreakTimeEdit;
 use Carbon\Carbon;
-use App\Http\Requests\AttendanceRequest;
+use App\Http\Requests\UserAttendanceRequest;
 
 class AttendanceController extends Controller
 {
@@ -85,7 +85,7 @@ class AttendanceController extends Controller
         return redirect()->route('user.attendance');
 
     }
-    public function update(AttendanceRequest $request , $id) 
+    public function update(UserAttendanceRequest $request , $id) 
     {
        $user = Auth::user();
        $attendance = Attendance::with('breakTimes')->findOrFail($id);
@@ -111,8 +111,7 @@ $isClockOutChanged = $newClockOut !== null && (
 );
 
 
-        // $isClockInChanged = $newClockIn !== null && $defaultClockIn && Carbon::parse($defaultClockIn)->format('H:i') !== $newClockIn;
-        // $isClockOutChanged = $newClockOut !== null && $defaultClockOut && Carbon::parse($defaultClockOut)->format('H:i') !== $newClockOut;
+       
         $isClockInDeleted = $newClockIn === null && $defaultClockIn !== null;
         $isClockOutDeleted = $newClockOut === null && $defaultClockOut !== null;
 
@@ -187,7 +186,7 @@ $isClockOutChanged = $newClockOut !== null && (
                return redirect()->route('user.stamp_correction_request.list');
 
     }
-    public function store(AttendanceRequest $request)
+    public function store(UserAttendanceRequest $request)
     {
        $user = Auth::user();
        $targetDate = $request->input('date');

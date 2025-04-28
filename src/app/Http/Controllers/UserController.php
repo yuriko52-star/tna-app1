@@ -121,6 +121,7 @@ class UserController extends AttendanceDetailController
                 'clockOut' => $clockOut ? $clockOut->format('H:i') : '',
                 'breakTime' => ($clockIn && $clockOut) ? $this->formatMinutes($totalBreakMinutes) : '',
                 'workingTime' => ($clockIn && $clockOut) ?$this->formatMinutes($workingMinutes) : '',
+                'has_pending_edit' => optional($data)->has_pending_edit ?? false,
             ];
         }
         
