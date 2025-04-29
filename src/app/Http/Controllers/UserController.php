@@ -111,6 +111,17 @@ class UserController extends AttendanceDetailController
             $workingMinutes = $clockIn->diffInMinutes($clockOut) - $totalBreakMinutes;
             }
 
+            $attendancePending = optional($data)->has_pending_edit ?? false;
+
+            $breakPending = false;
+            if($data) {
+                $breakPending = BreakTimeEdit::where('user_id',$user->id)
+                ->where('target_date',$dateKey)
+                ->whereNull('approved_at')
+                ->where('edited_by_admin',0)
+                ->exists();
+            }
+            $hasPendingEdit = $attendancePending || $breakPending;
             // 表示用データに整形
             $attendanceData[] = [
                 
@@ -121,7 +132,7 @@ class UserController extends AttendanceDetailController
                 'clockOut' => $clockOut ? $clockOut->format('H:i') : '',
                 'breakTime' => ($clockIn && $clockOut) ? $this->formatMinutes($totalBreakMinutes) : '',
                 'workingTime' => ($clockIn && $clockOut) ?$this->formatMinutes($workingMinutes) : '',
-                'has_pending_edit' => optional($data)->has_pending_edit ?? false,
+                'has_pending_edit' => $hasPendingEdit,
             ];
         }
         
@@ -178,9 +189,23 @@ class UserController extends AttendanceDetailController
     public function editDetail(Request $request ,$date )
     {
         $user = Auth::user();
+        $attendanceEdit = AttendanceEdit::where('user_id',$user->id)
+        ->where('target_date',$date)
+        ->where('edited_by_admin',0)
+        ->orderByDesc('request_date')
+        ->first();
+
+        $breakEdits = BreakTimeEdit::where('user_id', $user->id)
+        ->where('target_date', $date)
+        ->where('edited_by_admin',0)
+        ->orderByDesc('request_date')// ★最新順に取得
+        ->get();
 
         $data = $this->getAttendanceDetailData($user->id, $date);
-        return view('attendance.approve',$data);
+        return view('attendance.approve',array_merge($data, [
+            'attendanceEdit' => $attendanceEdit,
+            'breakEdits' => $breakEdits,
+        ]));
         /*$targetDate = Carbon::parse($date)->format('Y-m-d');
         $userId =  Auth::id();
     // 出勤データと修正データを取得

@@ -85,12 +85,15 @@
             </td>
         </tr>
     </table>
-    <!-- 承認されたらメッセージを変えたい -->
+    @if(
+        (isset($attendanceEdit) && is_null(optional($attendanceEdit)->approved_at)) || (isset($breakEdits) && $breakEdits->contains(function($edit) {
+            return is_null($edit->approved_at);
+        }))
+    )
     <p class="attention">
         *承認待ちのため修正はできません。
     </p>
-    <p class="attention">
-        *承認されました。
-    </p>
+    @endif
+   
     </div>
 @endsection   

@@ -26,4 +26,11 @@ class BreakTime extends Model
     {
         return $this->hasMany(BreakTimeEdit::class);
     }
+    public function getHasPendingEditAttribute()
+    {
+        return $this->breakTimeEdits()
+            ->whereNull('approved_at')
+            ->where('edited_by_admin',0)
+            ->exists();
+    }
 }
