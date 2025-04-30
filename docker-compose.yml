@@ -38,3 +38,20 @@ services:
       - mysql
     ports:
       - 8080:80
+
+  app:
+    build: ./docker/php
+    container_name: laravel_app_tna1
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www
+    depends_on:
+      - mailhog
+    
+  mailhog:
+    image: mailhog/mailhog
+    
+    ports:
+      - "1025:1025"   # SMTPサーバー
+      - "8025:8025"   # Web UI  

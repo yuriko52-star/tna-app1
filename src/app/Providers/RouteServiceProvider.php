@@ -7,6 +7,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -17,7 +18,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    // public const HOME = '/';
+     public const HOME = '/attendance';
 
     /**
      * The controller namespace for the application.
@@ -38,6 +39,13 @@ class RouteServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         $this->routes(function () {
+
+            Route::middleware(['auth'])->group(function() {
+                Route::get('/email/verify', function () {
+                    return view('auth.verify-email');
+                })->middleware('auth')->name('verification.notice');
+                
+            });
             Route::prefix('api')
                 ->middleware('api')
                 ->namespace($this->namespace)

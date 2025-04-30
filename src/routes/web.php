@@ -10,6 +10,8 @@ use App\Http\Controllers\UserController;
 
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\RequestListController;
+//  use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\EmailVerificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,8 +47,24 @@ Route::get('/admin/login', function () {
 // 管理者用ログアウト
  Route::post('/admin/logout', [AuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
  
+Route::middleware(['auth'])->group(function () {
+   
+    Route::get('/email/verify', [EmailVerificationController::class, 'show'])
+        ->name('verification.notice'); 
+        
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+    Route::post('/email/resend', [EmailVerificationController::class, 'resend'])
+        ->middleware(['throttle:6,1'])
+        ->name('verification.resend');
+});
+
+
+
+
 // 一般ユーザーのダッシュボード（認証が必要）
-Route::middleware(['auth:web'])->group(function () {
+Route::middleware(['auth:web', 'verified'])->group(function () {
      Route::get('/attendance', [UserController::class, 'index'])->name('user.attendance');
     Route::get('/attendance/list' ,[UserController::class,'showList'])->name('user.attendance.list');
     Route::get('/attendance/date/{date}', [UserController::class, 'detailByDate'])->name('user.attendance.detailByDate');
@@ -68,12 +86,11 @@ Route::middleware(['auth:web'])->group(function () {
       
 
 });
+Route::middleware(['auth:web', 'verified'])->get('/stamp_correction_request/list', [RequestListController::class, 'userRequestList'])->name('user.stamp_correction_request.list');
+// 最終的には上とくっつけたい
+
+
    
- 
-
-
-
-
 // 管理者専用ページ（認証が必要）
 Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
     Route::get('/attendance/list', [AdminController::class, 'index'])->name('admin.attendance.index');
@@ -101,7 +118,6 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
 
 
 
-Route::middleware(['auth:web'])->get('/stamp_correction_request/list', [RequestListController::class, 'userRequestList'])->name('user.stamp_correction_request.list');
 
 
 

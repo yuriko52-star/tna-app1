@@ -7,18 +7,16 @@
 <div class="content">
     <p>登録していただいたメールアドレスに認証メールを送付しました。</p>
     <p>メール認証を完了してください。</p>
-   <!-- <a href="http://localhost:8025" class="verify-btn"> -->
-    <a href="" class="verify-btn">
-     認証はこちらから
+   <a href="http://localhost:8025" class="verify-btn">
+    認証はこちらから
    </a>
-  {{--@if (session('message'))--}}
+  @if (session('message'))
             <div class="alert alert-success">
-                {{--{{ session('message') }}--}}
+               {{ session('message') }}
             </div>
-        {{--@endif
+    @endif
     <form action="{{ route('verification.resend') }}" class=""method="post">
-        @csrf--}}
-    <form action="" class="">
+        @csrf
         <button class="btn btn-primary" type="submit">認証メールを再送する</button>
     </form> 
 </div>

@@ -20,6 +20,11 @@ class CustomLoginResponse implements LoginResponseContract
         // 一般ユーザー（web guard）
         $user = Auth::guard('web')->user();
 
+        if($user && ! $user->hasVerifiedEmail()) {
+        // メール未認証なら、認証誘導画面へリダイレクト
+        return redirect()->route('verification.notice');
+        }
+
         if ($user) {
             return redirect('/attendance'); // 一般ユーザーのダッシュボード
         }
