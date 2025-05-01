@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-// use App\Http\Controllers\DebugController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\AdminController;
 
@@ -10,7 +9,6 @@ use App\Http\Controllers\UserController;
 
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\RequestListController;
-//  use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\EmailVerificationController;
 
 /*
@@ -27,10 +25,7 @@ use App\Http\Controllers\EmailVerificationController;
 Route::get('/', function () {
     return view('welcome');
 });
-// 一般ユーザーのログインページ
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+
 // 管理者のログインページ
 Route::get('/admin/login', function () {
     return view('auth.login'); 
@@ -69,9 +64,6 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
     Route::get('/attendance/list' ,[UserController::class,'showList'])->name('user.attendance.list');
     Route::get('/attendance/date/{date}', [UserController::class, 'detailByDate'])->name('user.attendance.detailByDate');
     Route::get('/attendance/{id}' ,[UserController::class,'detail'])->name('user.attendance.detail');
-    
-    
-
     Route::post('/attendance/clock-in',[AttendanceController::class, 'clockIn'])->name('attendance.clockIn');
     Route::post('/attendance/clock-out',[AttendanceController::class, 'clockOut'])->name('attendance.clockOut');
     Route::post('/attendance/break-start',[AttendanceController::class,'breakStart'])->name('attendance.breakStart');
@@ -79,15 +71,12 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
 
      Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
      Route::patch('/attendance/{id}/edit-request', [AttendanceController::class, 'update'])->name('attendance.update');
-   
-     
-      Route::get('/attendance/edit-detail/{date}',[UserController::class,'editDetail'])->name('attendance.editDetail');
-      
-      
+    Route::get('/attendance/edit-detail/{date}',[UserController::class,'editDetail'])->name('attendance.editDetail');
 
+    Route::get('/stamp_correction_request/list',[RequestListController::class,'userRequestList'])->name('user.stamp_correction_request.list');
+    
 });
-Route::middleware(['auth:web', 'verified'])->get('/stamp_correction_request/list', [RequestListController::class, 'userRequestList'])->name('user.stamp_correction_request.list');
-// 最終的には上とくっつけたい
+
 
 
    
@@ -106,7 +95,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
      Route::post('/attendance/store/{id}', [AdminController::class, 'store'])->name('admin.attendance.store.new');
      Route::patch('/attendance/{id}/edit-request', [AdminController::class, 'update'])->name('admin.attendance.update');
     
-     // 出勤修正なし（休憩だけ）→ GETパラメータで受ける
+    
     Route::get('/stamp_correction_request/approve', [AdminController::class, 'approveOnlyBreak'])
     ->name('admin.approveOnlyBreak');
      Route::get('/stamp_correction_request/approve/{attendance_correct_request}',[AdminController::class, 'approvePage'])->name('admin.approvePage');
@@ -114,7 +103,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
     
 });
 
-// 一般ユーザー用ルート
+
 
 
 

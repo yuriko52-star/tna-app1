@@ -19,6 +19,30 @@
 5.  マイグレーションの実行  
     php artisan migrate  
 6. シーディングの実行  
-    php artisan db:seed  
+    php artisan db:seed 
+
+## ユーザーのダミーデータ（管理者）  
+    メールアドレス: dousan@gmail.com  
+    パスワード : mamushinooyazi  
+## ユーザーのダミーデータ  
+
+1.  メールアドレス: asa@gmail.com  
+    パスワード: naganaganaga  
+2.  メールアドレス: cleo@gmail.com  
+    パスワード: patrapatra
+## メール認証  
+1.  .envファイルに追加
+    MAIL_MAILER=smtp
+    MAIL_HOST=mailhog
+    MAIL_PORT=1025
+    MAIL_USERNAME=null
+    MAIL_PASSWORD=null
+    MAIL_ENCRYPTION=null
+    MAIL_FROM_ADDRESS=no-reply@example.com  
+    MAIL_FROM_NAME="Tna App1"  
+2. コンテナ再起動  
+    docker-compose down
+    docker-compose up -d
+
 
 

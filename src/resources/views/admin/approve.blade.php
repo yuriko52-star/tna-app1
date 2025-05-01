@@ -12,8 +12,8 @@
         </div>
           <h1>勤怠詳細</h1> 
 
-           <h2>修正対象: {{ $edit instanceof \App\Models\BreakTimeEdit ? '休憩' : '出退勤' }}</h2>
-    <p>ID: {{ $edit->id }} / 日付: {{ $edit->target_date }}</p>
+           {{--<h2>修正対象: {{ $edit instanceof \App\Models\BreakTimeEdit ? '休憩' : '出退勤' }}</h2>
+    <p>ID: {{ $edit->id }} / 日付: {{ $edit->target_date }}</p>--}}
 
     </div> 
     <table>
