@@ -55,9 +55,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('verification.resend');
 });
 
-
-
-
 // 一般ユーザーのダッシュボード（認証が必要）
 Route::middleware(['auth:web', 'verified'])->group(function () {
      Route::get('/attendance', [UserController::class, 'index'])->name('user.attendance');

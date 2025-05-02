@@ -31,18 +31,42 @@
 2.  メールアドレス: cleo@gmail.com  
     パスワード: patrapatra
 ## メール認証  
-1.  .envファイルに追加
-    MAIL_MAILER=smtp
-    MAIL_HOST=mailhog
-    MAIL_PORT=1025
-    MAIL_USERNAME=null
-    MAIL_PASSWORD=null
-    MAIL_ENCRYPTION=null
+1.  .envファイルに追加  
+    MAIL_MAILER=smtp  
+    MAIL_HOST=mailhog  
+    MAIL_PORT=1025  
+    MAIL_USERNAME=null  
+    MAIL_PASSWORD=null  
+    MAIL_ENCRYPTION=null  
     MAIL_FROM_ADDRESS=no-reply@example.com  
     MAIL_FROM_NAME="Tna App1"  
 2. コンテナ再起動  
     docker-compose down
-    docker-compose up -d
+    docker-compose up -d  
+## テスト  
+1. テスト用データーベースの用意
+    docker-compose exec mysql bash  
+    mysql -u root -p  
+    CREATE DATABASE demo_test;  
+2. テスト用.envファイル作成と編集  
+    $ cp .env .env.testing  
+    APP_NAME=Laravel  
+    APP_ENV=test  
+    APP_KEY=  
+    APP_DEBUG=true  
+    APP_URL=http://localhost  
+    (略)  
+    DB_CONNECTION=mysql  
+    DB_HOST=mysql  
+    DB_PORT=3306  
+    DB_DATABASE=demo_test  
+    DB_USERNAME=root  
+    DB_PASSWORD=root  
+3.  テスト用アプリケーションキーの作成  
+    php artisan key:generate --env=testing  
+    php artisan config:clear  
+4.  マイグレーション  
+    php artisan migrate --env=testing
 
 
 

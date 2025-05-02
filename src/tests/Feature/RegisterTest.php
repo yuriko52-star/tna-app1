@@ -79,12 +79,12 @@ class RegisterTest extends TestCase
 
         $response->assertRedirect('/email/verify');
         $this->assertDatabaseHas('users', [
-            // 'name' => 'カエサル',
+            
             'email' => 'test@example.com',
         ]);
     }
 
-    public function         testUserReceivesVerificationEmailUponRegistration()
+    public function  testUserReceivesVerificationEmailUponRegistration()
     {
         Notification::fake();
 

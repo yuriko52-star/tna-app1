@@ -11,16 +11,13 @@ class EmailVerificationController extends Controller
     {
         return view('auth.verify-email');
     } 
+
     public function verify(EmailVerificationRequest $request)
     {
         $request->fulfill();
 
         $user = $request->user();
        
-        /*if(!$user->profile) {
-        return redirect()->route('profile.show')->with('status', 'Email verified!');
-        }
-        */
         return redirect()->route('user.attendance')->with('status', 'Email verified!');
     }
 
