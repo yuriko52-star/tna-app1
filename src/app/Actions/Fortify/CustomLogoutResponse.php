@@ -18,20 +18,5 @@ class CustomLogoutResponse implements LogoutResponseContract
         return redirect('/admin/login');
         }
         return redirect('/login');
-
-
-
-       // ログアウト後のリダイレクト先を決定
-       /* $redirectTo = $request->is('admin/*') ? '/admin/login' : '/login';
-
-        return redirect($redirectTo);
-        */
-        /*if (Auth::guard('admin')->check()) {
-        return redirect('/admin/login');
     }
-
-    return redirect('/login');
-    */
-    }
-    
 }

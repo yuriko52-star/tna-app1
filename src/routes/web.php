@@ -26,27 +26,20 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// 管理者のログインページ
+
 Route::get('/admin/login', function () {
     return view('auth.login'); 
 })->name('admin.login');
 
+Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
+Route::post('/admin/login', [AuthenticatedSessionController::class, 'store'])->name('admin.login.store');
 
-// 一般ユーザーのログイン処理
- Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
-// 管理者のログイン処理
- Route::post('/admin/login', [AuthenticatedSessionController::class, 'store'])->name('admin.login.store');
-// ユーザー用ログアウト
- Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-
-// 管理者用ログアウト
- Route::post('/admin/logout', [AuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+Route::post('/admin/logout', [AuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
  
 Route::middleware(['auth'])->group(function () {
-   
-    Route::get('/email/verify', [EmailVerificationController::class, 'show'])
+   Route::get('/email/verify', [EmailVerificationController::class, 'show'])
         ->name('verification.notice'); 
-        
     Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');

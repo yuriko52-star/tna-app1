@@ -15,7 +15,7 @@
                {{ session('message') }}
             </div>
     @endif
-    <form action="{{ route('verification.resend') }}" class=""method="post">
+    <form action="{{ route('verification.resend') }}" method="post">
         @csrf
         <button class="btn btn-primary" type="submit">認証メールを再送する</button>
     </form> 

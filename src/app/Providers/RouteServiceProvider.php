@@ -44,8 +44,8 @@ class RouteServiceProvider extends ServiceProvider
                 Route::get('/email/verify', function () {
                     return view('auth.verify-email');
                 })->middleware('auth')->name('verification.notice');
-                
             });
+            
             Route::prefix('api')
                 ->middleware('api')
                 ->namespace($this->namespace)
