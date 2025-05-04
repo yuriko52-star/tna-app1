@@ -28,14 +28,11 @@ class UserController extends AttendanceDetailController
     }
     private function getCurrentStatus($user)
     {
-        // 直近の勤怠データを取得（データベースのカラムに応じて変更）
+        
         $attendance = Attendance::where('user_id',$user->id)->WhereDate('date',now()->toDateString())->latest()->first();
         if(!$attendance) {
             return '勤務外';
         }
-        // 勤怠ステータスの判定
-
-        
         if($attendance->clock_out) {
             return '退勤済';
         } 

@@ -30,8 +30,10 @@ class AttendanceFactory extends Factory
             }
         */
         return [
-            'user_id' => Arr::random([2,3]),
-            'date' => $this->faker->date() ,
+             'user_id' => Arr::random([2,3]),
+            // 'user_id' => fn() => User::factory(),
+             'date' => $this->faker->date() ,
+            // 'date' => now()->toDateString(),
             'clock_in' => null ,
             'clock_out' => null ,
         ];

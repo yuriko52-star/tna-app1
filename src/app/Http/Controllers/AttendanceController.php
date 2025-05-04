@@ -27,16 +27,13 @@ class AttendanceController extends Controller
             $attendance->date = $today;
         }
         
-        //  if(!is_null($attendance->clock_in)) {
-            //  return redirect()->back()->with('message','すでに出勤済みです。');
-        //  }
-        
-          $attendance->clock_in = now();
-          $attendance->save();
+            $attendance->clock_in = now();
+            $attendance->save();
          
             
         return redirect()->route('user.attendance');
     }
+
     public function clockOut()
     {
         $user = Auth::user();
@@ -44,7 +41,7 @@ class AttendanceController extends Controller
         if(!$attendance || $attendance->clock_out) {
             return redirect()->back()->with('msssage','まだ出勤していません。');
         }
-        $attendance->update([
+            $attendance->update([
                 'clock_out' => now()
             ]);
         
@@ -76,8 +73,6 @@ class AttendanceController extends Controller
         if(!$lastBreak || $lastBreak->clock_out) {
             return redirect()->back()->with('message','休憩開始が記録されていません。');
         }
-        
-        
         $lastBreak->update([
             'clock_out' => now(),
         ]);
@@ -85,6 +80,7 @@ class AttendanceController extends Controller
         return redirect()->route('user.attendance');
 
     }
+    
     public function update(UserAttendanceRequest $request , $id) 
     {
        $user = Auth::user();
