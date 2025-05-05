@@ -51,7 +51,7 @@ class AttendanceController extends Controller
     {
         $user = Auth::user();
         $attendance = Attendance::where('user_id', $user->id)->where('date', now()->toDateString())->first();
-        $lastBreak = $attendance->breakTimes()->orderBy->latest()->first();
+        $lastBreak = $attendance->breakTimes()->latest()->first();
         
         if($lastBreak && !$lastBreak->clock_out) {
             // $status = '休憩中';
