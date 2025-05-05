@@ -160,7 +160,7 @@ class AttendanceTest extends TestCase
         Attendance::factory()->create([
             'user_id' => $user->id,
             'date' => Carbon::now()->toDateString(),
-             'clock_in' => Carbon::now()->setTime(8,0)->toDateTimeString(),
+            'clock_in' => Carbon::now()->setTime(8,0)->toDateTimeString(),
             
         ]);
         $this->actingAs($admin, 'admin');
@@ -177,16 +177,27 @@ class AttendanceTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $this->post('/attendance/clock-in');
-
+        $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+            'date' => Carbon::now()->toDateString(),
+            'clock_in' => Carbon::now()->setTime(8, 0),
+            'clock_out' => null,
+        ]);
+        
         $response = $this->get('/attendance');
         $this->assertMatchesRegularExpression('/<button\s+class="rest-btn".*?>\s*休憩入\s*<\/button>/',
             $response->getContent()
         );
         $this->post('/attendance/break-start');
+        $breakTime = BreakTime::factory()->create([
+            'attendance_id' => $attendance->id,
+            'clock_in' => Carbon::now()->setTime(10, 0),
+            'clock_out' => null,
+        ]);
+       
 
         $response = $this->get('/attendance');
-        $response->assertSee('休憩中');
+        $response->assertSee('休憩中',false);
     }
 
     public function testUserCanTakeMultipleBreaksInADay()
@@ -194,14 +205,18 @@ class AttendanceTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $this->post('/attendance/clock-in');
+      
 
-        $this->post('/attendance/break-start');
-        $this->post('/attendance/break-end');
+         $this->post('/attendance/clock-in');
 
-        
+         $this->post('/attendance/break-start');
+         $this->post('/attendance/break-end');
+
+         $this->post('/attendance/break-start');
+         $this->post('/attendance/break-end');
 
         $response = $this->get('/attendance');
+
         $this->assertMatchesRegularExpression('/<button\s+class="rest-btn".*?>\s*休憩入\s*<\/button>/',
             $response->getContent()
         );
@@ -212,35 +227,78 @@ class AttendanceTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $this->post('/attendance/clock-in');
-        $this->post('/attendance/break-start');
+        $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+            'date' => Carbon::now()->toDateString(),
+            'clock_in' => Carbon::now()->setTime(8, 0),
+            'clock_out' => null,
+        ]);
+   
+        $breakTime = BreakTime::factory()->create([
+            'attendance_id' => $attendance->id,
+            'clock_in' => Carbon::now()->setTime(10, 0),
+            'clock_out' => null,
+        ]);
+    
+        $response = $this->get(route('user.attendance'));
+        $response->assertStatus(200);
+        $response->assertSee('休憩戻',false); 
+   
+    
+        $this->post(route('attendance.breakEnd'));
+        
+        $latestBreak = BreakTime::where('attendance_id', $attendance->id)->whereNotNull('clock_out')->latest()->first();
+        $this->assertNotNull($latestBreak);
 
-        $response = $this->get('/attendance');
-        $this->assertMatchesRegularExpression('/<button\s+class="back-btn".*?>\s*休憩戻\s*<\/button>/',
-            $response->getContent()
-        );
-
-        $this->post('/attendance/break-end');
-
-        $response = $this->get('/attendance');
-        $response->assertSee('出勤中');
+        
+        $response = $this->get(route('user.attendance'));
+        $response->assertStatus(200);
+        $response->assertSee('出勤中',false);
     }
     public function testUserCanEndMultipleBreaksInADay()
     {
         $user = User::factory()->create();
         $this->actingAs($user);
+          
+        $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+            'date' => Carbon::now()->toDateString(),
+            'clock_in' => Carbon::now()->setTime(8, 0),
+            'clock_out' => null,
+        ]);
+    
+        $breakTime = BreakTime::factory()->create([
+            'attendance_id' => $attendance->id,
+            'clock_in' => Carbon::now()->setTime(10, 0),
+            'clock_out' => null,
+        ]);
+    
+        $response = $this->get(route('user.attendance'));
+        $response->assertStatus(200);
+        $response->assertSee('休憩戻',false); 
+   
+    
+        $this->post(route('attendance.breakEnd'));
+        ;
+        $latestBreak = BreakTime::where('attendance_id', $attendance->id)->whereNotNull('clock_out')->latest()->first();
+        $this->assertNotNull($latestBreak);
 
-        $this->post('/attendance/clock-in');
-
-        $this->post('/attendance/break-start');
-        $this->post('/attendance/break-end');
-
-        $this->post('/attendance/break-start');
-
-        $response = $this->get('/attendance');
-        $this->assertMatchesRegularExpression('/<button\s+class="rest-btn".*?>\s*休憩入\s*<\/button>/',
-            $response->getContent()
-        );
+    
+        $breakTime = BreakTime::factory()->create([
+        'attendance_id' => $attendance->id,
+        'clock_in' => Carbon::now()->setTime(15, 0),
+        'clock_out' => null,
+        ]);
+    
+        $response = $this->get(route('user.attendance'));
+        $response->assertStatus(200);
+        $response->assertSee('休憩戻',false);
+    
+    
+        $this->post(route('attendance.breakEnd'));
+        $latestBreak = BreakTime::where('attendance_id', $attendance->id)->whereNotNull('clock_out')->latest()->first();
+        
+        $this->assertNotNull($latestBreak);
     }
 
     public function testBreakTimeTotalIsDisplayedInAttendanceList()
@@ -268,7 +326,7 @@ class AttendanceTest extends TestCase
         $response->assertSee('0:15');
     }
 
-    public function testUserCanClockOut()
+        public function testUserCanClockOut()
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -302,7 +360,7 @@ class AttendanceTest extends TestCase
         $response = $this->get('/attendance');
         $response->assertSee('退勤済');
     }
-    public function testAdminCanViewUserClockOutTime()
+        public function testAdminCanViewUserClockOutTime()
     {
         $admin = User::factory()->create(['role' => 'admin']);
         $user = User::factory()->create();

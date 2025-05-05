@@ -37,7 +37,7 @@ class UserController extends AttendanceDetailController
             return '退勤済';
         } 
         
-        $breakTime = BreakTime::where('attendance_id',$attendance->id)->latest()->first();
+        $breakTime = BreakTime::where('attendance_id',$attendance->id)->latest('clock_in')->first();
         if($breakTime && $breakTime->clock_in && !$breakTime->clock_out) {
             return '休憩中';
         } 

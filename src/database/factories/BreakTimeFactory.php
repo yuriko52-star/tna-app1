@@ -20,8 +20,6 @@ class BreakTimeFactory extends Factory
     { 
         // 前のコード
         // $attendance = Attendance::whereNotNull('clock_in')->inRandomOrder()->first();
-
-
         $attendance = Attendance::whereNotNull('clock_in')->orderby('date','asc')->inRandomOrder()->first();
         
         if(!$attendance) {
@@ -29,9 +27,6 @@ class BreakTimeFactory extends Factory
                 
             ];
         }
-        
-        
-        
         $date = Carbon::parse($attendance->date);
         $clockIn = $date->isWeekend() ? null : Carbon::parse($attendance->clock_in)->addHours(rand(2,4))->addMinutes(rand(0,5)*10);
     
@@ -44,4 +39,25 @@ class BreakTimeFactory extends Factory
             'clock_out' => $clockOut,
         ];
     }
+    public function duringBreak()
+{
+    return $this->state(function (array $attributes) {
+        $attendance = $attributes['attendance_id']
+            ? Attendance::find($attributes['attendance_id'])
+            : Attendance::whereNotNull('clock_in')->inRandomOrder()->first();
+
+        if (!$attendance) {
+            return [];
+        }
+
+        $clockIn = Carbon::parse($attendance->clock_in)->addHours(rand(2, 4));
+
+        return [
+            'attendance_id' => $attendance->id,
+            'clock_in' => $clockIn,
+            'clock_out' => null,
+        ];
+    });
+}
+
 }
