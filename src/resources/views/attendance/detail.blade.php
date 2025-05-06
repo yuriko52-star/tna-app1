@@ -1,5 +1,5 @@
 @extends('layouts.app')
-<!--userとadminで画面を分けること。コントローラも -->
+
 @section('css')
 <link rel="stylesheet" href="{{ asset('css/detail.css') }}" class="">
 @endsection

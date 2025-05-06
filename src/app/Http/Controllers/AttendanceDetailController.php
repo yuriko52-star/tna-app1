@@ -130,7 +130,7 @@ class AttendanceDetailController extends Controller
     return [
         'user' => $user,
         'year' => Carbon::parse($targetDate)->format('Y年'),
-        'monthDay' => Carbon::parse($targetDate)->format('m月d日'),
+        'monthDay' => Carbon::parse($targetDate)->format('n月j日'),
         'workclockIn' => $workclockIn,
         'workclockOut' => $workclockOut,
         'mergedBreaks' => $mergedBreaks,

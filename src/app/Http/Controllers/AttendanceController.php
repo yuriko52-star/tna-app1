@@ -180,7 +180,7 @@ $isClockOutChanged = $newClockOut !== null && (
                         ]);
                     }
                  }
-               return redirect()->route('user.stamp_correction_request.list');
+               return redirect()->route('user.stamp_correction_request.list',['tab' => 'waiting']);
 
     }
     public function store(UserAttendanceRequest $request)
@@ -221,7 +221,7 @@ $isClockOutChanged = $newClockOut !== null && (
             ]);
         }
        }
-       return redirect()->route('user.stamp_correction_request.list');
+       return redirect()->route('user.stamp_correction_request.list',['tab' => 'waiting']);
     }
        
 }   
