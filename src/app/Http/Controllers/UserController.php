@@ -203,75 +203,7 @@ class UserController extends AttendanceDetailController
             'attendanceEdit' => $attendanceEdit,
             'breakEdits' => $breakEdits,
         ]));
-        /*$targetDate = Carbon::parse($date)->format('Y-m-d');
-        $userId =  Auth::id();
-    // 出勤データと修正データを取得
-        $attendance = Attendance::where('user_id',$userId)
-        ->where('date' ,$targetDate)
-        ->first();
-        $attendanceEdit = AttendanceEdit::where('user_id',$userId)
-        ->where('target_date',$targetDate)
-        ->first();
-    // 勤務時間（修正があればそれを優先）
-        $workclockIn = $attendanceEdit && $attendanceEdit->new_clock_in !== null ? $attendanceEdit->new_clock_in : ($attendance->clock_in ?? null);
-        // ちょっと個別のコードと違うので個別コード優先
-        $workclockOut = $attendanceEdit && $attendanceEdit->new_clock_out !==null ? $attendanceEdit->new_clock_out : ($attendance->clock_out ?? null);
-         // 休憩データ取得（元データ＋修正データ）
-        $breakTimes = BreakTime::where('attendance_id', $attendance->id ?? null)->get();
         
-        $breakEdits = BreakTimeEdit::where('user_id',$userId)
-        ->where('target_date', $targetDate)
-        ->get();
-
-    // 休憩の表示用データ合成
-        $mergedBreaks = [];
-
-        foreach($breakEdits as $edit) {
-            // 削除申請（両方 null）の場合はスキップ
-            if($edit->new_clock_in === null && $edit->new_clock_out === null) {
-                continue;
-            }
-
-           // 元の休憩とマッチしてる場合
-           if($edit->break_time_id) {
-            $original = $breakTimes->firstWhere('id', $edit->break_time_id);
-
-            $clockIn = $edit->new_clock_in !== null ? $edit->new_clock_in : $original->clock_in;
-
-            $clockOut = $edit->new_clock_out !== null ? $edit->new_clock_out : $original->clock_out;
-           } else {
-            $clockIn = $edit->new_clock_in;
-            $clockOut = $edit->new_clock_out;
-           }
-
-           $mergedBreaks[] = [
-            'clock_in' => $clockIn,
-            'clock_out' => $clockOut,
-           ];
-        }
-        //  元データで修正されていない休憩を表示に追加（削除されたものを除く）
-
-        foreach ($breakTimes as $break) {
-            $alreadyHandled = $breakEdits->contains('break_time_id',$break->id);
-            if(!$alreadyHandled) {
-                $mergedBreaks [] = [
-                    'clock_in' => $break->clock_in,
-                    'clock_out' => $break->clock_out,
-                    ];
-            }
-        }
-        $mergedBreaks = collect($mergedBreaks)
-        ->sortBy('clock_in')
-        ->values();
-        // 名前、日付、理由など（編集申請がある場合）ちょっと保留
-        // // フォーマット用
-        $date = $targetDate;
-        $year = Carbon::parse($date)->format('Y年');
-        $monthDay = Carbon::parse($date)->format('m月d日');
-        $reason = $attendanceEdit->reason ?? $breakEdits->first()->reason ?? '';
-        
-        return view('attendance.approve',compact('user','year','monthDay','workclockIn','workclockOut','mergedBreaks','reason'));
-        */
     }
         
  }

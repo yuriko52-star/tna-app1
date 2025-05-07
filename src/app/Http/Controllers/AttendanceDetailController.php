@@ -42,12 +42,12 @@ class AttendanceDetailController extends Controller
     $breakEdits = BreakTimeEdit::where('user_id', $userId)
         ->where('target_date', $targetDate)
         ->where('edited_by_admin',0)
-        ->orderByDesc('request_date')// ★最新順に取得
+        ->orderByDesc('request_date')
         ->get();
 
      $mergedBreaks = [];
 
-    // 1. 修正対象IDだけ抜き出す（新規追加除外）
+   
     $handledBreakIds = $breakEdits
     ->filter(function ($edit) {
         return $edit->break_time_id !== null;
@@ -60,7 +60,7 @@ class AttendanceDetailController extends Controller
         return $edit->new_clock_in === null && $edit->new_clock_out === null  && $edit->break_time_id !== null;
     })
     ->pluck('break_time_id')
-    // ->filter()
+    
     ->all();
 
 
@@ -69,8 +69,7 @@ class AttendanceDetailController extends Controller
             continue;
         }
  if (is_null($edit->break_time_id)) {
-        // break_time_idがnullなら、新規追加
-        // でも、もしattendance_idに紐づくbreak_timesに同じ休憩があれば無視！
+        
         $alreadyExists = $breakTimes->contains(function ($break) use ($edit) {
             return
                 Carbon::parse($break->clock_in)->format('H:i') === Carbon::parse($edit->new_clock_in)->format('H:i') &&
@@ -78,7 +77,7 @@ class AttendanceDetailController extends Controller
         });
 
         if ($alreadyExists) {
-            continue; // すでにbreak_timesに登録されてるからskip！
+            continue; 
         }
     }
         if ($edit->break_time_id) {
@@ -89,7 +88,7 @@ class AttendanceDetailController extends Controller
             $clockIn = $edit->new_clock_in;
             $clockOut = $edit->new_clock_out;
         }
-// clock_inとclock_outをキーにして管理
+
     $key = ($clockIn ?? '') . '-' . ($clockOut ?? '');
     $mergedBreaks[$key] = [
         'clock_in' => $clockIn,
@@ -98,10 +97,10 @@ class AttendanceDetailController extends Controller
 }
      
     
-    // 次に、編集対象になっていない元の休憩も反映
+    
         foreach ($breakTimes as $break) {
             if (in_array($break->id, $handledBreakIds) || in_array($break->id, $deletedBreakIds))  {
-            continue; // 編集済みならスキップ
+            continue; 
         }
          $key = ($break->clock_in ? \Carbon\Carbon::parse($break->clock_in)->format('H:i') : '') . '-' . ($break->clock_out ? \Carbon\Carbon::parse($break->clock_out)->format('H:i') : '');
         $mergedBreaks[$key] = [
@@ -109,23 +108,9 @@ class AttendanceDetailController extends Controller
             'clock_out' => $break->clock_out,
         ];
     }
-    // 最後にsortしてvalues取り出し
+    
         $mergedBreaks = collect($mergedBreaks)->sortBy('clock_in')->values();
-        // dd($mergedBreaks);
-    /*foreach ($breakTimes as $break) {
-        $alreadyHandled = $breakEdits->contains('break_time_id', $break->id);
-        if (!$alreadyHandled) {
-            $mergedBreaks[] = [
-                'clock_in' => $break->clock_in,
-                'clock_out' => $break->clock_out,
-            ];
-        }
-    }*/
-
-    /*$mergedBreaks = collect($mergedBreaks)->unique(function ($item) {
-        return $item['clock_in'] . '-' . $item['clock_out'];
-    })->sortBy('clock_in')->values();
-    */
+       
 
     return [
         'user' => $user,

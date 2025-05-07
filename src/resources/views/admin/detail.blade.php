@@ -35,9 +35,6 @@
                         $parsedDate = \Carbon\Carbon::parse($attendance->date);
                     @endphp
                      <input type="text"name="target_year" class="date-input" value="{{ old('target_year', $parsedDate->format('Y') . '年') }}">
-                     
-                     
-                     
                      <span class="date-space"></span>
                      <input type="text" class="date-input" name="target_month_day" value="{{ old('target_month_day', $parsedDate->format('n月j日')) }}">
                     
@@ -51,49 +48,7 @@
                      @error('target_month_day')
                       {{ $message }} 
                       @enderror
-                      </p>
-                <!-- <input type="text" class=""> -->
-                {{--<style>
-                    .date-select-wrapper select {
-                        margin-right: 8px;
-                        padding: 5px;
-                        font-size: 1rem;
-                        appearance: none;
-                         border-radius: 4px;
-                        border: 1px solid #E1E1E1;
-                        width:100px;
-                        font-family: Inter;
-                        font-weight: 700;
-                        font-size: 16px;
-                    }
-                    
-                </style>
-                <div class="date-select-wrapper">
-                    @php
-                        $parsedDate = \Carbon\Carbon::parse($attendance->date);
-                    @endphp
-    <select name="target_year">
-        @for ($y = 2023; $y <= 2026; $y++)
-            <option value="{{ $y }}" {{ (old('target_year', $parsedDate->year) == $y) ? 'selected' : '' }}>
-                {{ $y }}年
-            </option>
-        @endfor
-    </select>
-    <select name="target_month">
-        @for ($m = 1; $m <= 12; $m++)
-            <option value="{{ $m }}" {{ (old('target_month', $parsedDate->month) == $m) ? 'selected' : '' }}>
-                {{ $m }}月
-            </option>
-        @endfor
-    </select>
-    <select name="target_day">
-        @for ($d = 1; $d <= 31; $d++)
-            <option value="{{ $d }}" {{ (old('target_day', $parsedDate->day) == $d) ? 'selected' : '' }}>
-                {{ $d }}日
-            </option>
-        @endfor
-    </select>
-</div>--}}
+                </p>
             </td>
         </tr>
         <tr>
@@ -106,7 +61,6 @@
                 
                 <span class="time-separator">~</span>
                 <input type="text" class="time-input" name="clock_out"value="{{ old('clock_out', $attendance->clock_out ? \Carbon\Carbon::parse($attendance->clock_out)->format('H:i') : '') }}">
-                
             </div> 
                  <p class="form_error">
                     @error('clock_time_invalid')
@@ -123,9 +77,7 @@
                     {{ $message}} 
                     @enderror
                 </p>    
-                
             </td>
-            
         </tr>
           @php
     
