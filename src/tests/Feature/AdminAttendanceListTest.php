@@ -248,5 +248,269 @@ class AdminAttendanceListTest extends TestCase
         
         Carbon::setTestNow();
     }
-    
+    public function test_admin_can_view_users_page()
+    {
+        $admin = User::factory()->create();
+        $users = User::factory()->count(3)->create();
+        $response  = $this->actingAs($admin, 'admin')->get(route('admin.staff.list'));
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.staff-list');
+
+        foreach($users as $user) {
+            $response->assertSeeText($user->name);
+            $response->assertSeeText($user->email);
+        }
+    }
+
+     public function test_admin_can_view_users_monthly_attendance()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create();
+        
+        $targetMonth = Carbon::create(2025,5);
+        $startOfMonth = $targetMonth->copy()->startOfMonth();
+        $endOfMonth = $targetMonth->copy()->endOfMonth();
+        $attendanceIds = [];
+        for ($date = $startOfMonth->copy(); $date <= $endOfMonth; $date->addDays(2)) {
+                $attendance = Attendance::factory()->create([
+                'user_id' => $user->id,
+                'date' => $date->toDateString(),
+                'clock_in' => $date->copy()->setTime(9, 0),
+                'clock_out' => $date->copy()->setTime(17, 0),
+            
+                ]);
+            BreakTime::factory()->create([
+                'attendance_id' => $attendance->id,
+                'clock_in' => $date->copy()->setTime(10, 0),
+                'clock_out' => $date->copy()->setTime(10, 30),
+                ]);
+            BreakTime::factory()->create([
+                'attendance_id' => $attendance->id,
+                'clock_in' => $date->copy()->setTime(12, 0),
+                'clock_out' => $date->copy()->setTime(13, 0),
+                ]);
+                $attendanceIds[$date->toDateString()] = $attendance->id; 
+            }
+
+
+        $response = $this->actingAs($admin, 'admin')->get(route('admin.attendance.staff',[
+                    'id' => $user->id,
+                    'month' => $targetMonth->format('Y-m')
+                ]));
+         $response->assertStatus(200);
+        $response->assertViewIs('admin.month-list');
+        $expectedBreakTime = '1:30';
+        $expectedWorkTime = '6:30';
+
+        for ($date = $startOfMonth->copy(); $date <= $endOfMonth; $date->addDay()) {
+            $response->assertSee($date->format('m/d'));
+
+            $weekday = $date->format('D');
+            $weekdayJapanese = [
+            'Sun' => '日', 'Mon' => '月', 'Tue' => '火',
+            'Wed' => '水', 'Thu' => '木', 'Fri' => '金', 'Sat' => '土',
+            ][$weekday];
+            $response->assertSee($weekdayJapanese);
+            if (array_key_exists($date->toDateString(), $attendanceIds)) {
+                $attendanceId = $attendanceIds[$date->toDateString()];
+                $response->assertSee('<a href="' . url('/admin/attendance/' . $attendanceId) . '" class="data-link">詳細</a>', false);
+                $response->assertSee('09:00');
+                $response->assertSee('17:00');
+                $response->assertSee($expectedBreakTime);
+                $response->assertSee($expectedWorkTime);
+            
+            } else {
+            
+                $response->assertSee('<a href="' . route('admin.attendance.detailByDateForAdmin', [
+                'id' => $user->id,
+                'date' => $date->toDateString()
+            ]) . '" class="data-link">詳細</a>', false);
+        }
+    }
 }
+
+    public function test_admin_can_view_previous_monthly_attendance_list()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create();
+        
+    $previousMonth = Carbon::create(2025, 4, 1); 
+        $startOfMonth = $previousMonth->copy()->startOfMonth();
+        $endOfMonth = $previousMonth->copy()->endOfMonth();
+         $attendanceIds = [];
+        for ($date = $startOfMonth->copy(); $date <= $endOfMonth; $date->addDays(2)) {
+            $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+            'date' => $date->toDateString(),
+            'clock_in' => $date->copy()->setTime(9, 0),
+            'clock_out' => $date->copy()->setTime(17, 0),
+            
+            ]);
+         BreakTime::factory()->create([
+            'attendance_id' => $attendance->id,
+            'clock_in' => $date->copy()->setTime(10, 0),
+            'clock_out' => $date->copy()->setTime(10, 30),
+            
+             ]);
+         BreakTime::factory()->create([
+            'attendance_id' => $attendance->id,
+            'clock_in' => $date->copy()->setTime(12, 0),
+            'clock_out' => $date->copy()->setTime(13, 0),
+            
+            ]);
+             $attendanceIds[$date->toDateString()] = $attendance->id;
+        }
+        $response = $this->actingAs($admin, 'admin')->get(route('admin.attendance.staff', [
+                'id' => $user->id,
+                'month' => $previousMonth->format('Y-m')
+        ]));
+
+        
+         $response->assertStatus(200);
+        $response->assertViewIs('admin.month-list');
+
+        $expectedBreakTime = '1:30';
+        $expectedWorkTime = '6:30';
+
+        for ($date = $startOfMonth->copy(); $date <= $endOfMonth; $date->addDay()) {
+            $response->assertSee($date->format('m/d'));
+
+            $weekday = $date->format('D');
+            $weekdayJapanese = [
+            'Sun' => '日', 'Mon' => '月', 'Tue' => '火',
+            'Wed' => '水', 'Thu' => '木', 'Fri' => '金', 'Sat' => '土',
+            ][$weekday];
+            $response->assertSee($weekdayJapanese);
+             
+         if (array_key_exists($date->toDateString(), $attendanceIds)) {
+                $attendanceId = $attendanceIds[$date->toDateString()];
+                $response->assertSee('<a href="' . url('/admin/attendance/' . $attendanceId) . '" class="data-link">詳細</a>', false);
+                $response->assertSee('09:00');
+                $response->assertSee('17:00');
+                $response->assertSee($expectedBreakTime);
+                $response->assertSee($expectedWorkTime);
+            } else {$response->assertSee('<a href="' . route('admin.attendance.detailByDateForAdmin', [
+                'id' => $user->id,
+                'date' => $date->toDateString()
+            ]) . '" class="data-link">詳細</a>', false);}
+            $response->assertSee(Carbon::parse($previousMonth)->format('Y/m'));
+
+        }
+
+    }
+
+    
+     public function test_admin_can_view_next_monthly_attendance_list()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create();
+        
+        $nextMonth = Carbon::create(2025, 6, 1); 
+        $startOfMonth = $nextMonth->copy()->startOfMonth();
+        $endOfMonth = $nextMonth->copy()->endOfMonth();
+        $attendanceIds = [];
+
+        for ($date = $startOfMonth->copy(); $date <= $endOfMonth; $date->addDays(2)) {
+            $attendance = Attendance::factory()->create([
+            'user_id' => $user->id,
+            'date' => $date->toDateString(),
+            'clock_in' => $date->copy()->setTime(9, 0),
+            'clock_out' => $date->copy()->setTime(17, 0),
+            
+            ]);
+         BreakTime::factory()->create([
+            'attendance_id' => $attendance->id,
+            'clock_in' => $date->copy()->setTime(10, 0),
+            'clock_out' => $date->copy()->setTime(10, 30),
+            
+             ]);
+         BreakTime::factory()->create([
+            'attendance_id' => $attendance->id,
+            'clock_in' => $date->copy()->setTime(12, 0),
+            'clock_out' => $date->copy()->setTime(13, 0),
+            
+            ]);
+            $attendanceIds[$date->toDateString()] = $attendance->id;
+        }
+        $response = $this->actingAs($admin, 'admin')->get(route('admin.attendance.staff', [
+        'id' => $user->id,
+        'month' => $nextMonth->format('Y-m')
+        ]));
+        
+         $response->assertStatus(200);
+        $response->assertViewIs('admin.month-list');
+
+        $expectedBreakTime = '1:30';
+        $expectedWorkTime = '6:30';
+
+        for ($date = $startOfMonth->copy(); $date <= $endOfMonth; $date->addDay()) {
+            $response->assertSee($date->format('m/d'));
+
+            $weekday = $date->format('D');
+            $weekdayJapanese = [
+            'Sun' => '日', 'Mon' => '月', 'Tue' => '火',
+            'Wed' => '水', 'Thu' => '木', 'Fri' => '金', 'Sat' => '土',
+            ][$weekday];
+            $response->assertSee($weekdayJapanese);
+            if (array_key_exists($date->toDateString(), $attendanceIds)) {
+                $attendanceId = $attendanceIds[$date->toDateString()];
+                $response->assertSee('<a href="' . url('/admin/attendance/' . $attendanceId) . '" class="data-link">詳細</a>', false);
+                $response->assertSee('09:00');
+                $response->assertSee('17:00');
+                $response->assertSee($expectedBreakTime);
+                $response->assertSee($expectedWorkTime);
+            } else {$response->assertSee('<a href="' . route('admin.attendance.detailByDateForAdmin', [
+                'id' => $user->id,
+                'date' => $date->toDateString()
+            ]) . '" class="data-link">詳細</a>', false);
+            }
+
+            $response->assertSee(Carbon::parse($nextMonth)->format('Y/m'));
+        }
+    }
+
+    public function test_attendance_detail_link_navigates_to_detail_page()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create();
+         $targetMonth = Carbon::create(2025,5);
+
+        $attendance =  Attendance::factory()->create([
+            'user_id' => $user->id,
+            'date' => Carbon::now()->toDateString(),
+            'clock_in' => Carbon::now()->setTime(9, 0),
+            'clock_out' => Carbon::now()->setTime(17, 0),
+        ]);
+        BreakTime::factory()->create([
+            'attendance_id' => $attendance->id,
+            'clock_in' => Carbon::now()->setTime(10, 0),
+            'clock_out' => Carbon::now()->setTime(10, 30),
+            
+        ]);
+         BreakTime::factory()->create([
+            'attendance_id' => $attendance->id,
+            'clock_in' => Carbon::now()->setTime(12, 0),
+            'clock_out' =>Carbon::now()->setTime(13, 0),
+            
+        ]);
+        $response = $this->actingAs($admin, 'admin')->get(route('admin.attendance.staff', [
+        'id' => $user->id,
+        'month' => $targetMonth->format('Y-m')
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.month-list');
+        
+         $response->assertSee(route('admin.attendance.detail',['id' => $attendance->id]));
+
+         $response = $this->get(route('admin.attendance.detail',['id' => $attendance->id]));
+        $response->assertStatus(200);
+        $response->assertSee('09:00');
+        $response->assertSee('17:00');
+        $response->assertSee('10:00');
+        $response->assertSee('10:30');
+        $response->assertSee('12:00');$response->assertSee('13:00');
+    }
+
+}    
+
