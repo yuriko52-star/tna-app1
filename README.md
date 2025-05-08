@@ -26,7 +26,7 @@
     パスワード : mamushinooyazi  
 ## ユーザーのダミーデータ  
 
-1.  メールアドレス: asa@gmail.com  
+1.  メールアドレス: asano@gmail.com  
     パスワード: naganaganaga  
 2.  メールアドレス: cleo@gmail.com  
     パスワード: patrapatra
@@ -68,5 +68,19 @@
 4.  マイグレーション  
     php artisan migrate --env=testing
 
+## URL  
+- 開発環境：http://localhost/  
 
+- phpMyAdmin:http://localhost:8080/  
 
+- メール認証(MailHog): http://localhost:8025/  
+
+## ER図  
+
+![ER図](erd.png)  
+
+## 使用技術（実行環境）  
+- PHP7.4.9  
+- Laravel8.83.29  
+- MySQL8.0.26  
+   

@@ -149,7 +149,7 @@ class UserController extends AttendanceDetailController
         }
 
         $date = Carbon::parse($attendance->date);
-        $year = $date->format('Y');
+        $year = $date->format('Y年');
         $monthDay = $date->format('n月j日');
         return view('attendance.detail',compact('attendance','year','monthDay'));
 
@@ -177,7 +177,7 @@ class UserController extends AttendanceDetailController
 
         // 年・日付表示用に整形
         $carbonDate = \Carbon\Carbon::parse($date);
-        $year = $carbonDate->format('Y');
+        $year = $carbonDate->format('Y年');
         $monthDay = $carbonDate->format('n月j日');
 
         return view('attendance.detail', compact('attendance', 'year', 'monthDay'));
