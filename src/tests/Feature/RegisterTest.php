@@ -101,6 +101,17 @@ class RegisterTest extends TestCase
         Notification::assertSentTo($user, VerifyEmail::class);
     }
 
+    public function test_RedirectToMailHogFromVerificationGuide()
+    {
+        $user = User::factory()->unverified()->create();
+        $response = $this->actingAs($user)->get('/email/verify');
+        $response->assertStatus(200);
+        $response->assertSee('認証はこちらから');
+
+        $response = $this->get('http://localhost:8025');
+        $response->assertStatus(200);
+        
+    }
     public function testEmailVerificationRedirectsToAttendance()
     {
         $user = User::factory()->unverified()->create();

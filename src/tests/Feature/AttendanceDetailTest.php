@@ -202,14 +202,17 @@ class AttendanceDetailTest extends TestCase
     {
         $user = User::factory()->create();
         $this->actingAs($user);
+        $targetDate = Carbon::create(2025, 4, rand(1, 28));
         $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
-            'date' => '2025-05-01',
+            // 'date' => '2025-05-01',
+            'date' => $targetDate->toDateString(),
         ]);
 
         $editsFactory = AttendanceEdit::factory()->count(3)
          ->state(function (array $attributes) use ($user, $attendance) {
-        $targetDate = Carbon::create(2025, 5, 1);
+        // $targetDate = Carbon::create(2025, 5, 1);
+        $targetDate = Carbon::create(2025, 4, rand(1, 28));
         return [
             'user_id' => $user->id,
             'attendance_id' => $attendance->id,
@@ -231,7 +234,8 @@ class AttendanceDetailTest extends TestCase
         ]);
         $breakEditsFactory = BreakTimeEdit::factory()->count(3)
          ->state(function (array $attributes) use ($user, $breakTime) {
-        $targetDate = Carbon::create(2025, 5, 1);
+        //  $targetDate = Carbon::create(2025, 5, 1);
+        $targetDate = Carbon::create(2025, 4, rand(1, 28));
         return [
             'user_id' => $user->id,
             'break_time_id' => $breakTime->id,
@@ -269,15 +273,17 @@ class AttendanceDetailTest extends TestCase
     {
         $user = User::factory()->create();
         $this->actingAs($user);
-
+        $targetDate = Carbon::create(2025, 4, rand(1, 28));
          $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
-            'date' => '2025-05-01',
+            // 'date' => '2025-05-01',
+            'date' => $targetDate->toDateString(),
         ]);
 
         $editsFactory = AttendanceEdit::factory()->count(3)
          ->state(function (array $attributes) use ($user, $attendance) {
-        $targetDate = Carbon::create(2025, 5, 1);
+        // $targetDate = Carbon::create(2025, 5, 1);
+        $targetDate = Carbon::create(2025, 4, rand(1, 28));
         return [
             'user_id' => $user->id,
             'attendance_id' => $attendance->id,
@@ -299,7 +305,8 @@ class AttendanceDetailTest extends TestCase
         ]);
         $breakEditsFactory = BreakTimeEdit::factory()->count(3)
          ->state(function (array $attributes) use ($user, $breakTime) {
-        $targetDate = Carbon::create(2025, 5, 1);
+        // $targetDate = Carbon::create(2025, 5, 1);
+        $targetDate = Carbon::create(2025, 4, rand(1, 28));
         return [
             'user_id' => $user->id,
             'break_time_id' => $breakTime->id,
