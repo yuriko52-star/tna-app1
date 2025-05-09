@@ -202,18 +202,20 @@ class AttendanceDetailTest extends TestCase
     {
         $user = User::factory()->create();
         $this->actingAs($user);
-        $targetDate = Carbon::create(2025, 4, rand(1, 28));
-        $attendance = Attendance::factory()->create([
+
+        $requestCount = 3;
+        $startDate = Carbon::create(2025, 4, 1);
+       
+        for ($i = 0; $i < $requestCount; $i++) {
+            $targetDate = $startDate->copy()->addDays($i * 3); 
+            $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
-            // 'date' => '2025-05-01',
+            
             'date' => $targetDate->toDateString(),
         ]);
 
-        $editsFactory = AttendanceEdit::factory()->count(3)
-         ->state(function (array $attributes) use ($user, $attendance) {
-        // $targetDate = Carbon::create(2025, 5, 1);
-        $targetDate = Carbon::create(2025, 4, rand(1, 28));
-        return [
+        
+        AttendanceEdit::factory()->create([
             'user_id' => $user->id,
             'attendance_id' => $attendance->id,
             'target_date' => $targetDate->toDateString(), 
@@ -223,20 +225,12 @@ class AttendanceDetailTest extends TestCase
             'reason' => '修正申請',
             'edited_by_admin' => false,
             'approved_at' => null,
-        ];
-    });
-    $edits = $editsFactory->create();
-    
-
+        ]);
         $breakTime = BreakTime::factory()->create([
             'attendance_id' => $attendance->id,
-            
-        ]);
-        $breakEditsFactory = BreakTimeEdit::factory()->count(3)
-         ->state(function (array $attributes) use ($user, $breakTime) {
-        //  $targetDate = Carbon::create(2025, 5, 1);
-        $targetDate = Carbon::create(2025, 4, rand(1, 28));
-        return [
+            ]);
+        
+        BreakTimeEdit::factory()->create([
             'user_id' => $user->id,
             'break_time_id' => $breakTime->id,
             'target_date' => $targetDate->toDateString(), 
@@ -246,24 +240,25 @@ class AttendanceDetailTest extends TestCase
             'reason' => '修正申請',
             'edited_by_admin' => false,
             'approved_at' => null,
-            ];
-        });
-        $breakEdits = $breakEditsFactory->create();
-
+            ]);
+        }
+        
         $response = $this->get(route('user.stamp_correction_request.list', ['tab' => 'waiting']));
 
         $response->assertStatus(200);
+        $edits = AttendanceEdit::where('user_id', $user->id)->get();
+        $breakEdits = BreakTimeEdit::where('user_id', $user->id)->get();
+
+
         foreach($edits as $edit) {
             $response->assertSee($user->name);
-            $response->assertSee($edit->target_date);
+            $response->assertSee(Carbon::parse($edit->target_date)->format('Y/m/d'));
             $response->assertSee(Carbon::create(2025, 5, 6)->format('Y/m/d'));
-            
-             $response->assertSee($edit->reason);
+            $response->assertSee($edit->reason);
         }
         foreach($breakEdits as $breakEdit) {
             $response->assertSee($user->name);
-            $response->assertSee($breakEdit->target_date);
-            
+            $response->assertSee(Carbon::parse($breakEdit->target_date)->format('Y/m/d'));
             $response->assertSee(Carbon::create(2025, 5, 6)->format('Y/m/d'));
              $response->assertSee($breakEdit->reason);
         }
@@ -273,18 +268,20 @@ class AttendanceDetailTest extends TestCase
     {
         $user = User::factory()->create();
         $this->actingAs($user);
-        $targetDate = Carbon::create(2025, 4, rand(1, 28));
+        $requestCount = 3;
+
+        
+        $startDate = Carbon::create(2025, 4, 1);
+        $requestCount = 3;
+
+        for ($i = 0; $i < $requestCount; $i++) {
+            $targetDate = $startDate->copy()->addDays($i * 3); 
          $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
-            // 'date' => '2025-05-01',
+           
             'date' => $targetDate->toDateString(),
         ]);
-
-        $editsFactory = AttendanceEdit::factory()->count(3)
-         ->state(function (array $attributes) use ($user, $attendance) {
-        // $targetDate = Carbon::create(2025, 5, 1);
-        $targetDate = Carbon::create(2025, 4, rand(1, 28));
-        return [
+         AttendanceEdit::factory()->create([
             'user_id' => $user->id,
             'attendance_id' => $attendance->id,
             'target_date' => $targetDate->toDateString(), 
@@ -294,20 +291,12 @@ class AttendanceDetailTest extends TestCase
             'reason' => '修正申請',
             'edited_by_admin' => false,
             'approved_at' => now(),
-        ];
-    });
-        $edits = $editsFactory->create();
-    
-
+        ]);
         $breakTime = BreakTime::factory()->create([
             'attendance_id' => $attendance->id,
-            
-        ]);
-        $breakEditsFactory = BreakTimeEdit::factory()->count(3)
-         ->state(function (array $attributes) use ($user, $breakTime) {
-        // $targetDate = Carbon::create(2025, 5, 1);
-        $targetDate = Carbon::create(2025, 4, rand(1, 28));
-        return [
+            ]);
+        
+         BreakTimeEdit::factory()->create([
             'user_id' => $user->id,
             'break_time_id' => $breakTime->id,
             'target_date' => $targetDate->toDateString(), 
@@ -317,24 +306,26 @@ class AttendanceDetailTest extends TestCase
             'reason' => '修正申請',
             'edited_by_admin' => false,
             'approved_at' => now(),
-            ];
-        });
-        $breakEdits = $breakEditsFactory->create();
+            ]);
+        }
+        
 
         $response = $this->get(route('user.stamp_correction_request.list', ['tab' => 'approved']));
 
         $response->assertStatus(200);
+
+        $edits = AttendanceEdit::where('user_id', $user->id)->get();
+        $breakEdits = BreakTimeEdit::where('user_id', $user->id)->get();
+
         foreach($edits as $edit) {
             $response->assertSee($user->name);
-            $response->assertSee($edit->target_date);
+            $response->assertSee(Carbon::parse($edit->target_date)->format('Y/m/d'));
             $response->assertSee(Carbon::create(2025, 5, 6)->format('Y/m/d'));
-            
-             $response->assertSee($edit->reason);
+            $response->assertSee($edit->reason);
         }
         foreach($breakEdits as $breakEdit) {
             $response->assertSee($user->name);
-            $response->assertSee($breakEdit->target_date);
-            
+            $response->assertSee(Carbon::parse($breakEdit->target_date)->format('Y/m/d'));
             $response->assertSee(Carbon::create(2025, 5, 6)->format('Y/m/d'));
              $response->assertSee($breakEdit->reason);
         }

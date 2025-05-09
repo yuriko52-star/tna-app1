@@ -6,6 +6,8 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
 
 class UsersTableSeeder extends Seeder
 {
@@ -21,6 +23,7 @@ class UsersTableSeeder extends Seeder
             'email' => 'dousan@gmail.com',
             'password' => Hash::make('mamushinooyazi'),
             'role' => 'admin',
+            'email_verified_at' => null,
         ];
         DB::table('users')->insert($data);
 
@@ -29,6 +32,7 @@ class UsersTableSeeder extends Seeder
             'email' => 'asano@gmail.com',
             'password' => Hash::make('naganaganaga'),
             'role' => 'user',
+            'email_verified_at' => Carbon::now(),
         ];
         DB::table('users')->insert($data);
 
@@ -37,6 +41,7 @@ class UsersTableSeeder extends Seeder
             'email' => 'cleo@gmail.com',
             'password' => Hash::make('patrapatra'),
             'role' => 'user',
+            'email_verified_at' => Carbon::now(),
         ];
         DB::table('users')->insert($data);
     }

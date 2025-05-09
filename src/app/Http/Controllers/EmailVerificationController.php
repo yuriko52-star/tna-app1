@@ -23,9 +23,7 @@ class EmailVerificationController extends Controller
 
     public function resend(Request $request)
     {
-          $user = $request->user();
         
-         $user->sendEmailVerificationNotification();
         return back()->with('message', 'Verification email resent!');
     }
 

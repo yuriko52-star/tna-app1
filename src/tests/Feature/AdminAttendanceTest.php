@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-use Illuminate\Support\Facades\DB;
 Use App\Models\User;
 use App\Models\Attendance;
 use App\Models\BreakTime;
@@ -125,15 +124,6 @@ class AdminAttendanceTest extends TestCase
     }
     public function test_admin_can_confirm_that_waiting_tab_shows_user_requests()
     {
-        // データベースをクリア
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-    User::truncate();
-    Attendance::truncate();
-    AttendanceEdit::truncate();
-    BreakTime::truncate();
-    BreakTimeEdit::truncate();
-     DB::statement('SET FOREIGN_KEY_CHECKS=1;'); 
-
         $admin = User::factory()->create(['role' => 'admin']);
 
        $users = collect([
@@ -141,10 +131,11 @@ class AdminAttendanceTest extends TestCase
         User::factory()->create(['name' => '山岸 里佳']),
         User::factory()->create(['name' => '野村 知実']),
     ]);
-       
+       $startDate = Carbon::create(2025, 4, 1);
         
-        foreach($users as $user) {
-        $targetDate = Carbon::create(2025, 4, rand(1, 28));
+        foreach($users as $index => $user) {
+        
+            $targetDate = $startDate->copy()->addDays($index * 5);
             $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
             'date' => $targetDate->toDateString(),
@@ -204,22 +195,19 @@ class AdminAttendanceTest extends TestCase
     }
     public function test_admin_can_confirm_that_approved_tab_shows_user_requests()
     {
-        // データベースをクリア
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-            User::truncate();
-            Attendance::truncate();
-            AttendanceEdit::truncate();
-            BreakTime::truncate();
-            BreakTimeEdit::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;'); 
-
         $admin = User::factory()->create(['role' => 'admin']);
 
-        $users = User::factory()->count(3)->create();
-       
         
-        foreach($users as $user) {
-        $targetDate = Carbon::create(2025, 4, rand(1, 28));
+        $users = collect([
+        User::factory()->create(['name' => '近藤 春香']),
+        User::factory()->create(['name' => '山岸 里佳']),
+        User::factory()->create(['name' => '野村 知実']),
+    ]);
+        $startDate = Carbon::create(2025, 4, 1);
+        
+        foreach($users as $index => $user) {
+        
+        $targetDate = $startDate->copy()->addDays($index * 5);
             $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
             'date' => $targetDate->toDateString(),

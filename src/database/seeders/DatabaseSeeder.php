@@ -18,15 +18,24 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         //  \App\Models\User::factory(10)->create();
-        // $this->call(UsersTableSeeder::class);
+        //    $this->call(UsersTableSeeder::class);
          
          
         // ここから勤務、退勤時間
-         $users = [2,3];
+           $users = [2,3];
 
-        foreach($users as $user) {
+        /* foreach($users as $user) {
             $dates = collect(range(0,59))->map(fn ($i) => Carbon::create(2025,2,1)->addDays($i));
+            */
+    foreach ($users as $user) {
+    // 4月のデータ（60日分）
+        $aprilDates = collect(range(0, 29))->map(fn ($i) => Carbon::create(2025, 4, 1)->addDays($i));
 
+        $mayDates = collect(range(0, 5))->map(fn ($i) => Carbon::create(2025, 5, 1)->addDays($i));
+    // 6月のデータ（60日分）
+        $juneDates = collect(range(0, 29))->map(fn ($i) => Carbon::create(2025, 6, 1)->addDays($i));
+     // 統合して60日分に調整
+        $dates = $aprilDates->merge($mayDates)->merge($juneDates);
             foreach($dates as $date) {
                 if($date->isWeekend()) {
                    $clockIn = null;
@@ -48,7 +57,7 @@ class DatabaseSeeder extends Seeder
                 if ($date->isWeekend()) {
                     BreakTime::factory()->create([
                     'attendance_id' => $attendance->id,
-                    // 'date' => $attendance->date,
+                    
                     'clock_in' => null,
                     'clock_out' => null,
                     ]);
@@ -64,7 +73,7 @@ class DatabaseSeeder extends Seeder
             
                         BreakTime::factory()->create([
                             'attendance_id' => $attendance->id,
-                            // 'date' => $attendance->date,
+                            
                             'clock_in' => $breakClockIn,
                             'clock_out' => $breakClockOut,
                             ]);
@@ -79,7 +88,7 @@ class DatabaseSeeder extends Seeder
 
                 BreakTime::factory()->create([
                     'attendance_id' => $attendance->id,
-                    // 'date' => $attendance->date,
+                    
                     'clock_in' => $breakClockIn,
                     'clock_out' => $breakClockOut,
                     ]);

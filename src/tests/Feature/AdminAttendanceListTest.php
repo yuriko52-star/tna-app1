@@ -31,7 +31,7 @@ class AdminAttendanceListTest extends TestCase
     $mins = $minutes % 60;
     return sprintf('%d:%02d', $hours, $mins);
 }
-
+// その日になされた全ユーザーの勤怠情報が正確に確認できる
     public function test_admin_can_view_users_attendances()
     {
          $admin = User::factory()->create(['role' => 'admin']);
@@ -201,6 +201,7 @@ class AdminAttendanceListTest extends TestCase
         Carbon::setTestNow();
     }
     public function test_admin_can_view_attendance_detail()
+    // 勤怠詳細画面に表示されるデータが選択したものになっている
     {
         Carbon::setTestNow('2025-04-06');
 
@@ -261,7 +262,7 @@ class AdminAttendanceListTest extends TestCase
             $response->assertSeeText($user->email);
         }
     }
-
+// ユーザーの勤怠情報が正しく表示される
      public function test_admin_can_view_users_monthly_attendance()
     {
         $admin = User::factory()->create(['role' => 'admin']);
