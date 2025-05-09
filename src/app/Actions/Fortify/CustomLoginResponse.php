@@ -18,16 +18,15 @@ class CustomLoginResponse implements LoginResponseContract
 
         $user = Auth::guard('web')->user();
 
-        // if($user && ! $user->hasVerifiedEmail()) {
-        if($user && ! $user->hasVerifiedEmail() && $user->created_at->gt(now()->subMinutes(10))) {
+         if($user && ! $user->hasVerifiedEmail()) {
+        
             return redirect()->route('verification.notice');
         }
-
-        if ($user) {
+            if ($user) {
             return redirect('/attendance'); 
         }
-
-        return redirect('/login');
+           return redirect('/login');  
+        
     }
         
-}
+}   
