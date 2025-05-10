@@ -51,9 +51,7 @@ class DatabaseSeeder extends Seeder
                     'clock_in' => $clockIn,
                     'clock_out' => $clockOut,
                 ]);
-        // ここから休憩時間
-                
-                
+        
                 if ($date->isWeekend()) {
                     BreakTime::factory()->create([
                     'attendance_id' => $attendance->id,
@@ -64,9 +62,8 @@ class DatabaseSeeder extends Seeder
                     continue; 
                 }
 
-                 $previousBreakClockOut = null; // 直前の休憩終了時間を保存
-
-                $takeFirstBreak = rand(0, 1); // 0: 休憩なし, 1: 休憩あり
+                 $previousBreakClockOut = null; 
+                $takeFirstBreak = rand(0, 1); 
                 if ($takeFirstBreak) {
                         $breakClockIn = $date->copy()->setTime(10, 0);
                         $breakClockOut = $date->copy()->setTime(10, 15);
@@ -82,7 +79,7 @@ class DatabaseSeeder extends Seeder
                     }
             
         
-                $lunchStartMinutes = rand(0, 5) * 10; // 0, 10, 20, 30, 40, 50 のいずれか
+                $lunchStartMinutes = rand(0, 5) * 10; 
                 $breakClockIn = $date->copy()->setTime(12, $lunchStartMinutes);
                 $breakClockOut = $breakClockIn->copy()->addMinutes(50);
 

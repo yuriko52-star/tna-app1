@@ -54,7 +54,7 @@ class AttendanceController extends Controller
         $lastBreak = $attendance->breakTimes()->latest()->first();
         
         if($lastBreak && !$lastBreak->clock_out) {
-            // $status = '休憩中';
+           
              return redirect()->back()->with('message','すでに休憩中です。');
         }
         $attendance->breakTimes()->create([
@@ -89,7 +89,7 @@ class AttendanceController extends Controller
         if ($attendance->user_id !== $user->id) {
         abort(403, '権限がありません');
         }
-         // 出退勤の修正申請
+        
          
          $newClockIn = $request->input('clock_in');
          $newClockOut = $request->input('clock_out');
@@ -99,13 +99,13 @@ class AttendanceController extends Controller
          $targetDate = $attendance->date;
          $now = now();
          $reason = $request->input('reason');
-        // 出勤・退勤の変更判定（時間のみ比較）
-$isClockInChanged = $newClockIn !== null && (
-    $defaultClockIn === null || Carbon::parse($defaultClockIn)->format('H:i') !== $newClockIn
-);
-$isClockOutChanged = $newClockOut !== null && (
-    $defaultClockOut === null || Carbon::parse($defaultClockOut)->format('H:i') !== $newClockOut
-);
+        
+        $isClockInChanged = $newClockIn !== null && (
+            $defaultClockIn === null || Carbon::parse($defaultClockIn)->format('H:i') !== $newClockIn
+        );
+            $isClockOutChanged = $newClockOut !== null && (
+            $defaultClockOut === null || Carbon::parse($defaultClockOut)->format('H:i') !== $newClockOut
+        );
 
 
        
@@ -123,55 +123,43 @@ $isClockOutChanged = $newClockOut !== null && (
                 'reason' => $reason,
             ]);
          }
-         // 休憩の修正申請
+         
         $breaks = $request->input('breaks', []);
-        //  $breakTimeMap = $attendance->breakTimes->keyBy('id'); // ← IDで紐付け！消してみた。
-
-         foreach($breaks as $break)
+       
+        foreach($breaks as $break)
        {
             $breakId = $break['id'] ?? null;
-
             $newIn = $break['clock_in'] ?? null;
             $newOut = $break['clock_out'] ?? null;
-                // 新規追加の休憩（break_idがない）
+               
             if ($breakId === null) {
-        // 両方入力されていれば新規登録
+        
                 if ($newIn !== null || $newOut !== null) {
                 BreakTimeEdit::create([
-                'break_time_id' => null, // 新規なのでnull
+                'break_time_id' => null, 
                 'user_id' => $user->id,
                 'request_date' => $now,
                 'target_date' => $targetDate,
-                
                 'new_clock_in' => $newIn ? Carbon::parse("$targetDate $newIn") : null,
                 'new_clock_out' => $newOut ? Carbon::parse("$targetDate $newOut") : null,
-                
                 'reason' => $reason,
             ]);
         }
         continue;
     }
-    
-        //  既存の休憩：修正 or 削除のチェック
+  
             $defaultBreak = $attendance->breakTimes->firstWhere('id', $breakId);
             $defaultIn = optional($defaultBreak)->clock_in;
             $defaultOut = optional($defaultBreak)->clock_out;
     
-        // 修正
-                
-                
             $isBreakInChanged = $newIn !== null && $defaultIn && Carbon::parse($defaultIn)->format('H:i') !== $newIn;
             $isBreakOutChanged = $newOut !== null && $defaultOut && Carbon::parse($defaultOut)->format('H:i') !== $newOut;
             $isBreakDeleted = $newIn === null && $newOut === null && ($defaultIn || $defaultOut);
 
              if ($isBreakInChanged || $isBreakOutChanged || $isBreakDeleted) {
                     BreakTimeEdit::create([
-                        
-                        
                         'break_time_id' => $breakId ,
-
                         'user_id' => $user->id,
-                       
                         'request_date' => $now,
                         'target_date' => $targetDate,
                         'new_clock_in' => $isBreakInChanged ? Carbon::parse("$targetDate $newIn") : null,
@@ -194,7 +182,7 @@ $isClockOutChanged = $newClockOut !== null && (
        
        if($newClockIn || $newClockOut) {
         AttendanceEdit::create([
-             'attendance_id' => null, // 新規なのでnull
+             'attendance_id' => null, 
             'user_id' => $user->id,
             'request_date' => $now,
             'target_date' => $targetDate,

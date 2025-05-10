@@ -27,42 +27,97 @@ class AttendanceDetailTest extends TestCase
         $response->assertStatus(200);
     }
     */
-    public function test_attendance_detail_shows_correct_information()
-    {
-        $user = User::factory()->create();
-        $this->actingAs($user);
+    
+    public function test_user_name_is_displayed_correctly()
+{
+    $user = User::factory()->create();
+    $this->actingAs($user);
 
-        $attendance = Attendance::factory()->create([
-            'user_id' => $user->id,
-            
-            'date' => '2025-05-01',
-            'clock_in' => Carbon::now()->setTime(9, 0),
-            'clock_out' => Carbon::now()->setTime(17, 0),
-        ]);
-        BreakTime::factory()->create([
-            'attendance_id' => $attendance->id,
-            'clock_in' => Carbon::now()->setTime(10, 0),
-            'clock_out' => Carbon::now()->setTime(10, 30),
-            
-        ]);
-         BreakTime::factory()->create([
-            'attendance_id' => $attendance->id,
-            'clock_in' => Carbon::now()->setTime(12, 0),
-            'clock_out' =>Carbon::now()->setTime(13, 0),
-            
-        ]);
-        $response = $this->get(route('user.attendance.detail',['id' => $attendance->id]));
+    $attendance = Attendance::factory()->create([
+        'user_id' => $user->id,
+        'date' => '2025-05-01',
+    ]);
 
-        $response->assertStatus(200);
-        $response->assertSee($user->name);
-        $response->assertSee('5月1日');
-        $response->assertSee('09:00');
-        $response->assertSee('17:00');
-        $response->assertSee('10:00');
-        $response->assertSee('10:30');
-        $response->assertSee('12:00');
-        $response->assertSee('13:00');
-    }
+    $response = $this->get(route('user.attendance.detail', ['id' => $attendance->id]));
+    $response->assertStatus(200);
+    $response->assertSee($user->name);
+}
+
+public function test_attendance_date_is_displayed_correctly()
+{
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $attendance = Attendance::factory()->create([
+        'user_id' => $user->id,
+        'date' => '2025-05-01',
+    ]);
+
+    $response = $this->get(route('user.attendance.detail', ['id' => $attendance->id]));
+    $response->assertStatus(200);
+    $response->assertSee('5月1日');
+}
+
+public function test_attendance_time_is_displayed_correctly()
+{
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $attendance = Attendance::factory()->create([
+        'user_id' => $user->id,
+        'date' => '2025-05-01',
+        'clock_in' => Carbon::now()->setTime(9, 0),
+        'clock_out' => Carbon::now()->setTime(17, 0),
+    ]);
+
+    $response = $this->get(route('user.attendance.detail', ['id' => $attendance->id]));
+    $response->assertStatus(200);
+    $response->assertSee('09:00');
+    $response->assertSee('17:00');
+}
+
+public function test_break_times_are_displayed_correctly()
+{
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $attendance = Attendance::factory()->create([
+        'user_id' => $user->id,
+        'date' => '2025-05-01',
+        'clock_in' => Carbon::create(2025, 5, 1, 9, 0, 0),
+        'clock_out' => Carbon::create(2025, 5, 1, 17, 0, 0),
+        
+    ]);
+
+    BreakTime::factory()->create([
+        'attendance_id' => $attendance->id,
+        'clock_in' => Carbon::create(2025, 5, 1, 10, 0, 0),
+        'clock_out' => Carbon::create(2025, 5, 1, 10, 30, 0),
+       
+    ]);
+
+    BreakTime::factory()->create([
+        'attendance_id' => $attendance->id,
+        'clock_in' => Carbon::create(2025, 5, 1, 12, 0, 0),
+        'clock_out' => Carbon::create(2025, 5, 1, 13, 0, 0),
+        
+    ]);
+
+    $attendance->refresh();
+    $attendance->load('breakTimes');
+
+    $response = $this->get(route('user.attendance.detail', ['id' => $attendance->id]));
+
+    $response->assertStatus(200);
+
+    $response->assertSee('09:00');
+    $response->assertSee('17:00');
+    $response->assertSee('10:00');
+    $response->assertSee('10:30');
+    $response->assertSee('12:00');
+    $response->assertSee('13:00');
+}
+
     public function test_clock_in_after_clock_out_shows_error()
     {
         $user = User::factory()->create();

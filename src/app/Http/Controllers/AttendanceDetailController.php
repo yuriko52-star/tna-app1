@@ -25,7 +25,7 @@ class AttendanceDetailController extends Controller
     $attendanceEdit = AttendanceEdit::where('user_id', $userId)
         ->where('target_date', $targetDate)
         ->where('edited_by_admin',0)
-        ->orderByDesc('request_date')// ★追加：新しい申請が優先
+        ->orderByDesc('request_date')
         ->first();
 
     $workclockIn = $attendanceEdit && $attendanceEdit->new_clock_in !== null

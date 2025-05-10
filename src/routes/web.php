@@ -3,10 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\AdminController;
-
 use App\Http\Controllers\UserController;
- use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController as FortifyAuthenticatedSessionController;
-
+use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController as FortifyAuthenticatedSessionController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\RequestListController;
 use App\Http\Controllers\EmailVerificationController;
@@ -48,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('verification.resend');
 });
 
-// 一般ユーザーのダッシュボード（認証が必要）
+
 Route::middleware(['auth:web', 'verified'])->group(function () {
      Route::get('/attendance', [UserController::class, 'index'])->name('user.attendance');
     Route::get('/attendance/list' ,[UserController::class,'showList'])->name('user.attendance.list');
@@ -58,39 +56,28 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
     Route::post('/attendance/clock-out',[AttendanceController::class, 'clockOut'])->name('attendance.clockOut');
     Route::post('/attendance/break-start',[AttendanceController::class,'breakStart'])->name('attendance.breakStart');
     Route::post('/attendance/break-end',[AttendanceController::class, 'breakEnd'])->name('attendance.breakEnd');
-
-     Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
-     Route::patch('/attendance/{id}/edit-request', [AttendanceController::class, 'update'])->name('attendance.update');
+    Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
+    Route::patch('/attendance/{id}/edit-request', [AttendanceController::class, 'update'])->name('attendance.update');
     Route::get('/attendance/edit-detail/{date}',[UserController::class,'editDetail'])->name('attendance.editDetail');
-
     Route::get('/stamp_correction_request/list',[RequestListController::class,'userRequestList'])->name('user.stamp_correction_request.list');
-    
 });
 
 
-
-   
-// 管理者専用ページ（認証が必要）
 Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
     Route::get('/attendance/list', [AdminController::class, 'index'])->name('admin.attendance.index');
     Route::get('/staff/list',[AdminController::class, 'staffList'])->name('admin.staff.list');
-    
     Route::get('/stamp_correction_request/list', [RequestListController::class, 'adminRequestList'])->name('admin.stamp_correction_request.list'); 
     Route::get('/attendance/staff/{id}',[AdminController::class,'showList'])->name('admin.attendance.staff');  
     Route::get('/attendance/staff/{id}/csv',[AdminController::class,'downloadCsv'])->name('admin.attendance.downloadCsv');
     Route::get('/attendance/detail/{id}/{date}',[AdminController::class ,'detailByDateForAdmin'])->name('admin.attendance.detailByDateForAdmin');
     Route::get('/attendance/{id}',[AdminController::class,'detailForAdmin'])->name('admin.attendance.detail');
-     Route::post('/attendance-edit/{id}/approve',[AdminController::class,'approveAttendanceEdit'])->name('admin.attendanceEdit.approve');
-     Route::post('/break-edit/{id}/approve',[AdminController::class,'approveBreakEdit'])->name('admin.breakEdit.approve');
-     Route::post('/attendance/store/{id}', [AdminController::class, 'store'])->name('admin.attendance.store.new');
-     Route::patch('/attendance/{id}/edit-request', [AdminController::class, 'update'])->name('admin.attendance.update');
-    
-    
+    Route::post('/attendance-edit/{id}/approve',[AdminController::class,'approveAttendanceEdit'])->name('admin.attendanceEdit.approve');
+    Route::post('/break-edit/{id}/approve',[AdminController::class,'approveBreakEdit'])->name('admin.breakEdit.approve');
+    Route::post('/attendance/store/{id}', [AdminController::class, 'store'])->name('admin.attendance.store.new');
+    Route::patch('/attendance/{id}/edit-request', [AdminController::class, 'update'])->name('admin.attendance.update');
     Route::get('/stamp_correction_request/approve', [AdminController::class, 'approveOnlyBreak'])
     ->name('admin.approveOnlyBreak');
-     Route::get('/stamp_correction_request/approve/{attendance_correct_request}',[AdminController::class, 'approvePage'])->name('admin.approvePage');
-    
-    
+    Route::get('/stamp_correction_request/approve/{attendance_correct_request}',[AdminController::class, 'approvePage'])->name('admin.approvePage');
 });
 
 
@@ -105,4 +92,3 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
 
 
 
-// Route::get('/preview/{viewName}', [DebugController::class, 'show']);

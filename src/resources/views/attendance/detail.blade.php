@@ -64,27 +64,21 @@
                     {{ $message}} 
                     @enderror
                 </p>    
-                
             </td>
         </tr>
 @php
-    // 出勤情報があるかチェック
     $hasAttendance = isset($attendance) && $attendance->id !== null;
 
-    // 出勤しているかどうか（時間が入っているか）
     $hasWorked = $hasAttendance && ($attendance->clock_in || $attendance->clock_out);
 
-    // 新規 or 土日（時間がすべてnull）の場合 → 休憩欄を2つ出す
     $showEmptyBreaks = !$hasWorked;
 
-    // 既存休憩数（あっても null の日なら 0 に扱う）
     $existingCount = $showEmptyBreaks ? 0 : $attendance->breakTimes->count();
 
-    // 追加する休憩欄の数
-    $additional = $showEmptyBreaks ? 2 : 1;
+   $additional = $showEmptyBreaks ? 2 : 1;
 @endphp
 
-{{-- 既存の休憩表示（時間がある人のみ） --}}
+
 @if ($hasWorked)
  @php $displayedIndex = 0; @endphp
     @foreach($attendance->breakTimes as $break)
@@ -93,14 +87,11 @@
         @endphp
 
         @if ($hasTime)
-
-       
         <tr>
             <th class="data-label">{{ $displayedIndex === 0 ? '休憩' : '休憩' . ($displayedIndex + 1)}}</th>
             <td class="data-item">
                 <div class="time-wrapper">
                     <input type="hidden" class=""name="breaks[{{ $displayedIndex }}][id]" value="{{$break->id ?? ' '}}">
-
                     <input type="text" class="time-input"name="breaks[{{ $displayedIndex}}][clock_in]" value="{{ old("breaks.$displayedIndex.clock_in",$break->clock_in  ? \Carbon\Carbon::parse($break->clock_in)->format('H:i') : '') }}">
                     <span class="time-separator">~</span> 
                     <input type="text" class="time-input"name="breaks[{{$displayedIndex}}][clock_out]" value="{{ old("breaks.$displayedIndex.clock_out",$break->clock_out ? \Carbon\Carbon::parse($break->clock_out)->format('H:i') : '') }}">
@@ -109,7 +100,7 @@
                 @error("breaks.$displayedIndex.break_time_invalid")
                 {{$message}}
                 @enderror
-            </p>
+                </p>
                 <p class="form_error">
                     @error("breaks.$displayedIndex.outside_working_time")
                     {{$message}}
@@ -129,33 +120,32 @@
         </tr>
         @php $displayedIndex++; @endphp
         @endif
-        @endforeach
+    @endforeach
 @endif
-{{-- 追加の空の休憩欄 --}}
+
 @for ($j = 0; $j < $additional; $j++)
     @php $i = $existingCount + $j; @endphp
     <tr>
          <th class="data-label">休憩{{ $i === 0 ? '' :$i+ 1}} </th>
-            <td class="data-item">
-                <div class="time-wrapper">
+        <td class="data-item">
+            <div class="time-wrapper">
                     <input type="text" class="time-input" name="breaks[{{$i}}][clock_in]"value="{{ old("breaks.$i.clock_in") }}">
                     <span class="time-separator">~</span> 
                     <input type="text" class="time-input"name ="breaks[{{$i}}][clock_out]" value="{{ old("breaks.$i.clock_out") }}">
-
-                </div>
-                <p class="form_error">
-               @error("breaks.$i.outside_working_time")
-                    {{$message}}
-                @enderror
-                </p>
+            </div>
             <p class="form_error">
-                    @error("breaks.$i.clock_in")
-                    {{ $message}} 
-                    @enderror
+                @error("breaks.$i.outside_working_time")
+                {{$message}}
+                @enderror
+            </p>
+            <p class="form_error">
+                @error("breaks.$i.clock_in")
+                {{ $message}} 
+                @enderror
             </p>    
             <p class="form_error">
-               @error("breaks.$i.clock_out")
-                    {{$message}}
+                @error("breaks.$i.clock_out")
+                {{$message}}
                 @enderror
             </p>
             <p class="form_error">
@@ -165,20 +155,18 @@
             </p>
         </td>
     </tr>
-       
-    @endfor
+@endfor
     <tr>
         <th class="data-label">備考</th>
         <td class="data-item">
             <textarea class="reason-input" name="reason"></textarea>
-            
             <p class="form_error">
                 @error('reason')
                 {{ $message}}
                 @enderror
             </p>
-            </td>
-        </tr>
+        </td>
+    </tr>
     </table>
         <div class="button">
             <button class="edit-btn" type="submit">修正</button>

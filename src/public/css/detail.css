@@ -30,7 +30,6 @@ h1 {
 table {
     border-collapse: collapse;
     margin-bottom: 30px;
-   
     height: 450PX;
     background-color: #fff;
     border-radius: 10px;
@@ -60,22 +59,17 @@ th, td {
     display: flex;
     align-items: center;
     width: 320px;
-    /* 一般ユーザーの時はwidth:300pxで
-     */
-    
 }
 .year {
     margin-left: 26px;
 }
 .date-space {
     flex-grow: 1;
-    /* 自動的に空間を調整 */
 }
 
 .data-label {
     color: #737373;
     width: 250px;
-    
 }
 .date {
     margin-right: 23px;
@@ -96,7 +90,6 @@ th, td {
 }
 .time-separator {
     flex-grow: 1;
-    /* 空間を自動調整 */
     text-align: center;
 }
 input {

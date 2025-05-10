@@ -44,12 +44,10 @@
             </tr>
               <tr class="row">
             @foreach($datas as $data)
-            @php
-              $attendanceEdit = $data['attendance_edits']->first();
-              $breakEdit = $data['break_time_edits']->first();
-
-              // approved_at があるものを優先して $edit に使う
-              $edit = null;
+              @php
+                $attendanceEdit = $data['attendance_edits']->first();
+                $breakEdit = $data['break_time_edits']->first();
+                $edit = null;
               if ($attendanceEdit && $attendanceEdit->approved_at) {
               $edit = $attendanceEdit;
               } elseif ($breakEdit && $breakEdit->approved_at) {
@@ -57,32 +55,28 @@
               } else {
               $edit = $attendanceEdit ?? $breakEdit;
               }
-            @endphp
+              @endphp
           
               <td class="data-item">
                  {{is_null(optional($edit)->approved_at) ? '承認待ち' : '承認済み' }}
                
               </td>  
-             <!-- <td class="data-item">承認待ち</td> -->
              
-             <!-- <td class="data-item">承認済み</td> -->
-             @if(Auth::user()->isAdmin())
+            @if(Auth::user()->isAdmin())
              <td class="data-item">{{$data['user']->name}}</td>
-             @else
+            @else
               <td class="data-item">{{Auth::user()->name}}</td>
-              @endif
-              <td class="data-item">{{\Carbon\Carbon::parse($data['target_date'])->format('Y/m/d') }}</td>
-             <td class="data-item">{{$data['reason']}}</td>
-             <td class="data-item">{{\Carbon\Carbon::parse($data['request_date'])->format('Y/m/d') }}</td>
-              <td class="data-item">
+            @endif
+            <td class="data-item">{{\Carbon\Carbon::parse($data['target_date'])->format('Y/m/d') }}</td>
+            <td class="data-item">{{$data['reason']}}</td>
+            <td class="data-item">{{\Carbon\Carbon::parse($data['request_date'])->format('Y/m/d') }}</td>
+            <td class="data-item">
                <a href="{{ route('attendance.editDetail', ['date' => \Carbon\Carbon::parse($data['target_date'])->format('Y-m-d')]) }}" class="data-link">詳細</a>
-              
-              </td>
-            </tr>
+            </td>
+          </tr>
             @endforeach
-            
-           </table>
+            </table>
           </div>
-        </div> 
+    </div> 
 </div>
 @endsection

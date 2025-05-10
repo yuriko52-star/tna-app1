@@ -81,13 +81,11 @@
           </tbody>
           </table>
           </div>
-          
           <form action="{{route('admin.attendance.downloadCsv', ['id' => $user->id]) }}" method="GET">
            <input type="hidden" name="month" value="{{$thisMonth}}">
           <div class="button">
             <button class="csv-btn" type="submit">CSV出力</button>
           </div>
           </form>
-         
 </div>
 @endsection

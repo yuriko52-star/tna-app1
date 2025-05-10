@@ -30,7 +30,6 @@ h1 {
 table {
     border-collapse: collapse;
     margin: 0 auto 320px;
-    /* margin-top: 46px; */
     background-color: #fff;
     border-radius: 10px;
     table-layout: fixed;

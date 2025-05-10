@@ -6,23 +6,16 @@
 
 @section('content')
 <div class="content">
-    
-       
-      <label class="title">
+    <label class="title">
         <div class="image">
           <img src="{{asset('img/Line 2.png')}}" style="height:40px;width:8px;"alt="" class="img">
         </div>
-       
-          <h1>勤怠一覧</h1>
-          
-      </label>    
+       <h1>勤怠一覧</h1>
+    </label>    
         <div class="top-content"> 
           <div class="months">
             <label class="last-month">
-              
-            
               <a href="{{ url('/attendance/list?month=' . $previousMonth) }}" class="month-link"><img src="{{asset('img/image 2.png')}} "style="height:15px; width:20px;" alt="" class="img">前月</a>
-              
             </label>
             <label class="this-month">
                 <div class="image">
@@ -31,9 +24,7 @@
                 <p class="date">{{ $thisMonth}}</p>
               </label>
               <label class="next-month">
-                 
                  <a href="{{ url('/attendance/list?month=' . $nextMonth) }}" class="month-link">翌月<img src="{{ asset('img/image 3.png')}}"style="height:15px; width:20px;" alt="" class="img"></a>
-                
               </label>
           </div>
         </div>
@@ -75,12 +66,11 @@
                @else
                <a href="{{route('user.attendance.detailByDate',['date'=> $day['raw_date']])}}" class="data-link">詳細</a>
                @endif
-                
               </td>
             </tr>
             @endforeach
           </tbody>
           </table>
-          </div>
+        </div>
 </div>
 @endsection

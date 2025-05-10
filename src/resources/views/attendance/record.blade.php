@@ -20,8 +20,7 @@
   @if($status === '勤務外')
     <form action="{{ route('attendance.clockIn') }}" method="POST">
       @csrf
-    
-      <button class="work-btn" type="submit">出勤</button>
+    <button class="work-btn" type="submit">出勤</button>
     </form>
   @endif
   @if($status === '出勤中')

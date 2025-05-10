@@ -9,7 +9,7 @@
     <h1>会員登録</h1>
     <form action="/register" class="" method="post" novalidate>
         @csrf
-    <form action="" class="">  
+   
     <label for="name" >
         <h2 class="label-title">名前</h2>
     </label>
@@ -42,10 +42,7 @@
         <h2 class="label-title">パスワード確認</h2>
     </label>
     <input type="password" name="password_confirmation" id="password_confirm"class="text" >
-          
-        
     <button class="register-btn" type="submit">登録する</button>
-       
     <a href="/login" class="link">ログインはこちら</a>
     </form>
     

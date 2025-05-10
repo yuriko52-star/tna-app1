@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\BreakTime;
 use App\Models\Attendance;
 use Carbon\Carbon;
-// 新しくつけた
+
 
 class BreakTimeFactory extends Factory
 {
@@ -18,8 +18,7 @@ class BreakTimeFactory extends Factory
      */
    public function definition()
     { 
-        // 前のコード
-        // $attendance = Attendance::whereNotNull('clock_in')->inRandomOrder()->first();
+        
         $attendance = Attendance::whereNotNull('clock_in')->orderby('date','asc')->inRandomOrder()->first();
         
         if(!$attendance) {
@@ -34,7 +33,6 @@ class BreakTimeFactory extends Factory
         
         return [
             'attendance_id' => $attendance->id,
-            // 'date' => $attendance->date,
             'clock_in' => $clockIn,
             'clock_out' => $clockOut,
         ];

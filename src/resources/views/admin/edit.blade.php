@@ -17,14 +17,11 @@
             <nav>
                 <ul>
                   <li>
-                  
-                    <a href="{{ route('admin.stamp_correction_request.list',['tab'=> 'waiting']) }}" class="tab-link {{ request('tab') === 'waiting' ? 'active-tab' : '' }}">承認待ち</a>
+                  <a href="{{ route('admin.stamp_correction_request.list',['tab'=> 'waiting']) }}" class="tab-link {{ request('tab') === 'waiting' ? 'active-tab' : '' }}">承認待ち</a>
                   </li>
                   <li>
                     <a href="{{ route('admin.stamp_correction_request.list',['tab' => 'approved']) }}" class="tab-link {{ request('tab') === 'approved' ? 'active-tab' : '' }}">承認済み</a>
-  
-   
-                    </li>
+                  </li>
                 </ul>
             </nav>
         </div> 
@@ -47,12 +44,12 @@
               <th class="data-label">詳細</th>
             </tr>
         <tr class="row">
-            @foreach($datas as $data)
+          @foreach($datas as $data)
             @php
               $attendanceEdit = $data['attendance_edits']->first();
               $breakEdit = $data['break_time_edits']->first();
 
-              // approved_at があるものを優先して $edit に使う
+              
               $edit = null;
               if ($attendanceEdit && $attendanceEdit->approved_at) {
               $edit = $attendanceEdit;
@@ -62,48 +59,29 @@
               $edit = $attendanceEdit ?? $breakEdit;
               }
             @endphp
-
-
-      {{--@php
-        $attendanceEdit = $data['attendance_edits']->first(); // 最初の1件を仮に取り出す
-        $breakEdit = $data['break_time_edits']->first();
-        $edit = $attendanceEdit ?? $breakEdit; // どちらかあれば使う
-      @endphp--}}
-            
-              <td class="data-item">
-                
-              
-            {{is_null($edit->approved_at) ? '承認待ち' : '承認済み' }}
+            <td class="data-item">
+                {{is_null($edit->approved_at) ? '承認待ち' : '承認済み' }}
             </td>  
-             
-            
-              <td class="data-item">{{$data['user']->name}}</td>
-              <td class="data-item">{{\Carbon\Carbon::parse($data['target_date'])->format('Y/m/d') }}</td>
-               
-             <td class="data-item">{{$data['reason']}}</td>
-             <td class="data-item">{{\Carbon\Carbon::parse($data['request_date'])->format('Y/m/d') }}</td>
-              <td class="data-item">
-                @php
-    $attendanceEdit = $data['attendance_edits']->first();
-    $hasAttendanceChange = $attendanceEdit && ($attendanceEdit->new_clock_in || $attendanceEdit->new_clock_out);
-@endphp
-
-@if($hasAttendanceChange)
-                
-                    <a href="{{ route('admin.approvePage', ['attendance_correct_request' => $attendanceEdit->id]) }}" class="data-link">詳細</a>
-               @else
-                    <a href="{{ route('admin.approveOnlyBreak', [
-                'user_id' => $data['user']->id,
-                 'date' => $data['target_date']
-                 ]) }}" class="data-link">詳細</a>
-               @endif
-              
-              </td>
-            </tr>
-            @endforeach
-            
-           </table>
+            <td class="data-item">{{$data['user']->name}}</td>
+            <td class="data-item">{{\Carbon\Carbon::parse($data['target_date'])->format('Y/m/d') }}</td>
+            <td class="data-item">{{$data['reason']}}</td>
+            <td class="data-item">{{\Carbon\Carbon::parse($data['request_date'])->format('Y/m/d') }}</td>
+            <td class="data-item">
+            @php
+              $attendanceEdit = $data['attendance_edits']->first();
+              $hasAttendanceChange = $attendanceEdit && ($attendanceEdit->new_clock_in || $attendanceEdit->new_clock_out);
+            @endphp
+            @if($hasAttendanceChange)
+                <a href="{{ route('admin.approvePage', ['attendance_correct_request' => $attendanceEdit->id]) }}" class="data-link">詳細</a>
+            @else
+                <a href="{{ route('admin.approveOnlyBreak', ['user_id' => $data['user']->id, 'date' => $data['target_date'] ]) }}" class="data-link">詳細
+                </a>
+            @endif
+            </td>
+        </tr>
+          @endforeach
+            </table>
           </div>
-        </div> 
+    </div> 
 </div>
 @endsection

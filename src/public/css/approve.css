@@ -69,9 +69,6 @@ td {
     display: flex;
     align-items: center;
     width: 320px;
-    /* 一般ユーザーの時はwidth:300pxで
-     */
-
 }
 
 .year {
@@ -82,7 +79,7 @@ td {
 }
 .date-space {
     flex-grow: 1;
-    /* 自動的に空間を調整 */
+    
 }
 
 .data-label {
@@ -109,7 +106,6 @@ td {
 
 .time-separator {
     flex-grow: 1;
-    /* 空間を自動調整 */
     text-align: center;
 }
 .button {

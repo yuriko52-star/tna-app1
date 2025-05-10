@@ -62,16 +62,14 @@ class UserController extends AttendanceDetailController
 
         $startOfMonth = $targetMonth->copy()->startOfMonth();
         $endOfMonth = $targetMonth->copy()->endOfMonth();
-        // 全日付を作成
-
+        
         $dates = [];
         $currentDate = $startOfMonth->copy();
         while ($currentDate <= $endOfMonth) {
             $dates[] = $currentDate->copy();
             $currentDate->addDay();
         }
-        // 勤怠データをまとめて取得
-        
+       
         $attendances = Attendance::with('breakTimes')
         ->where('user_id',$user->id)
         ->WhereBetween('date', [$startOfMonth, $endOfMonth])
@@ -92,18 +90,17 @@ class UserController extends AttendanceDetailController
             $clockIn = optional($data)->clock_in ? Carbon::parse($data->clock_in) : null;
             $clockOut = optional($data)->clock_out ? Carbon::parse($data->clock_out) : null;
 
-            // 休憩時間の合計（分単位）
+           
             $totalBreakMinutes = 0;
             if($data && $data->breakTimes) {
                 foreach($data->breakTimes as $break_time) {
                     $breakStart = Carbon::parse($break_time->clock_in);
                     $breakEnd = Carbon::parse($break_time->clock_out);
-                    
                     $totalBreakMinutes += $breakStart->diffInMinutes($breakEnd);
                 }
             }
              
-        $workingMinutes = 0;
+            $workingMinutes = 0;
             if ($clockIn && $clockOut) {
             $workingMinutes = $clockIn->diffInMinutes($clockOut) - $totalBreakMinutes;
             }
@@ -119,7 +116,7 @@ class UserController extends AttendanceDetailController
                 ->exists();
             }
             $hasPendingEdit = $attendancePending || $breakPending;
-            // 表示用データに整形
+            
             $attendanceData[] = [
                 
                  'id'=> optional($data)->id, 
@@ -157,14 +154,12 @@ class UserController extends AttendanceDetailController
     public function detailByDate($date)
     {
         $user = Auth::user();
-
-    // 該当する勤怠データを取得（なければ null）
         $attendance = Attendance::with('breakTimes')
         ->where('user_id', $user->id)
         ->whereDate('date', $date)
         ->first();
 
-    // データがない場合は空の Attendance オブジェクトを作成して渡す（修正申請の入力用）
+    
         if (!$attendance) {
             $attendance = new Attendance([
             'user_id' => $user->id,
@@ -172,10 +167,10 @@ class UserController extends AttendanceDetailController
             'clock_in' => null,
             'clock_out' => null,
             ]);
-            $attendance->breakTimes = collect(); // 空のコレクションを渡す
+            $attendance->breakTimes = collect(); 
         }
 
-        // 年・日付表示用に整形
+        
         $carbonDate = \Carbon\Carbon::parse($date);
         $year = $carbonDate->format('Y年');
         $monthDay = $carbonDate->format('n月j日');
@@ -195,7 +190,7 @@ class UserController extends AttendanceDetailController
         $breakEdits = BreakTimeEdit::where('user_id', $user->id)
         ->where('target_date', $date)
         ->where('edited_by_admin',0)
-        ->orderByDesc('request_date')// ★最新順に取得
+        ->orderByDesc('request_date')
         ->get();
 
         $data = $this->getAttendanceDetailData($user->id, $date);
@@ -203,7 +198,6 @@ class UserController extends AttendanceDetailController
             'attendanceEdit' => $attendanceEdit,
             'breakEdits' => $breakEdits,
         ]));
-        
     }
         
  }

@@ -19,14 +19,13 @@
                 <img src="{{ asset('img/CoachTech_White 1 (1).png') }}" > 
             </a>
 
-        <nav>
-            <ul class="header-nav">
+            <nav>
+                <ul class="header-nav">
                 
                 @if(Auth::guard('admin')->check() && Auth::guard('admin')->user()->isAdmin())
-                <li><a href="{{ url('/admin/attendance/list') }}" class="header-nav-link">勤怠一覧</a></li>
-                <li><a href="{{ url('/admin/staff/list') }}" class="header-nav-link"> スタッフ一覧</a></li>
-               
-                 <li><a href="{{ route('admin.stamp_correction_request.list',['tab'=> 'waiting']) }}" class="header-nav-link">申請一覧 </a></li>
+                    <li><a href="{{ url('/admin/attendance/list') }}" class="header-nav-link">勤怠一覧</a></li>
+                    <li><a href="{{ url('/admin/staff/list') }}" class="header-nav-link"> スタッフ一覧</a></li>
+                    <li><a href="{{ route('admin.stamp_correction_request.list',['tab'=> 'waiting']) }}" class="header-nav-link">申請一覧 </a></li>
                 @elseif(Auth::check())
                     @if(($status ?? '')=== '退勤済')
                     <li><a href="{{ url('/attendance/list') }}" class="header-nav-link">今月の出勤一覧</a></li>
@@ -37,27 +36,23 @@
                     <li><a href="{{ route('user.stamp_correction_request.list',['tab'=> 'waiting'] ) }}" class="header-nav-link">申請</a></li>
                     @endif
                 @endif
-                <li>
+                    <li>
                     <form action="{{ Request::is('admin/*') ? route('admin.logout') : route('logout') }}" class="" method="post" novalidate >
                     @csrf
                     <button type="submit" class="btn logout-btn">ログアウト</button>
                     </form>
-                </li>
-            </ul>
-        </nav>
+                    </li>
+                </ul>
+            </nav>
             </div> 
         </div>
     </header>
 
     <main>
-
-        
         @yield('content')
-
-        
     </main>    
    
-</div>
+    </div>
 
 </body>
 </html>

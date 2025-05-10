@@ -18,7 +18,6 @@
             <td class="data-item">
                 <span class="name">{{ $user->name}}</span>
             </td>
-            
         </tr>
         <tr>
             <th class="data-label">日付</th>
@@ -63,9 +62,9 @@
             </div>
             </td>
         </tr>
-        @php $displayedIndex++; @endphp
+            @php $displayedIndex++; @endphp
         @endif
-         @endforeach
+        @endforeach
          
          <tr>
             <th class="data-label">{{ $displayedIndex === 0 ? '休憩' : '休憩' . ($displayedIndex + 1)}}</th>

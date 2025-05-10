@@ -29,7 +29,6 @@ h1 {
     height: 60px;
     margin: 0 auto ;
     text-align: center;
-    /* margin-top: 27px; */
     background-color: #fff;
     border-radius: 10px;
 }
@@ -129,6 +128,4 @@ th, td {
     .under-content {
         width: 90%;
     }
-
-    
 }

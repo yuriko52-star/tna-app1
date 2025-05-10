@@ -70,7 +70,7 @@ class AttendanceRequest extends FormRequest
         ];
 
         foreach ($this->input('breaks', []) as $index => $break) {
-        //   $label = $index === 0 ? '休憩' : '休憩' . ($index + 1);
+       
             $messages["breaks.$index.clock_in.date_format"] = "開始時間はスペースを入れずに半角で入力してください（例: 10:00）";
             $messages["breaks.$index.clock_out.date_format"] = "終了時間はスペースを入れずに半角で入力してください(例: 10:30)";
         }

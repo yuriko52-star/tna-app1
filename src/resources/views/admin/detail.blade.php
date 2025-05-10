@@ -79,24 +79,13 @@
                 </p>    
             </td>
         </tr>
-          @php
-    
+@php
     $hasAttendance = isset($attendance) && $attendance->id !== null;
-
-   
     $hasWorked = $hasAttendance && ($attendance->clock_in || $attendance->clock_out);
-
-    
     $showEmptyBreaks = !$hasWorked;
-
-    
     $existingCount = $showEmptyBreaks ? 0 : $attendance->breakTimes->count();
-
-    
     $additional = $showEmptyBreaks ? 2 : 1;
 @endphp
-
-
 @if ($hasWorked)
     @php $displayedIndex = 0; @endphp
         @foreach($attendance->breakTimes as $break)
@@ -115,36 +104,33 @@
                 
                 <span class="time-separator">~</span> 
                 <input type="text" class="time-input" name="breaks[{{$displayedIndex}}][clock_out]"value="{{ old("breaks.$displayedIndex.clock_out",$break->clock_out ? \Carbon\Carbon::parse($break->clock_out)->format('H:i') : '') }}">
-               
             </div>
             <p class="form_error">
                 @error("breaks.$displayedIndex.break_time_invalid")
                 {{$message}}
                 @enderror
             </p>
-                <p class="form_error">
-                    @error("breaks.$displayedIndex.outside_working_time")
-                    {{$message}}
-                    @enderror
-                </p>
-                 <p class="form_error">
-                    @error("breaks.$displayedIndex.clock_in")
-                    {{ $message}} 
-                    @enderror
-                </p>    
             <p class="form_error">
-                    @error("breaks.$displayedIndex.clock_out")
-                    {{ $message}} 
-                    @enderror
-                </p>
+                @error("breaks.$displayedIndex.outside_working_time")
+                {{$message}}
+                @enderror
+            </p>
+            <p class="form_error">
+                @error("breaks.$displayedIndex.clock_in")
+                {{ $message}} 
+                @enderror
+            </p>    
+            <p class="form_error">
+                @error("breaks.$displayedIndex.clock_out")
+                {{ $message}} 
+                @enderror
+            </p>
             </td>
         </tr>
          @php $displayedIndex++; @endphp
-        @endif
+            @endif
         @endforeach
-        
-    @endif
-
+@endif
 @for ($j = 0; $j < $additional; $j++)
     @php $i = $existingCount + $j; @endphp
     <tr>
@@ -157,18 +143,18 @@
                 <input type="text" name ="breaks[{{$i}}][clock_out]"class="time-input" value="{{ old("breaks.$i.clock_out") }}">
             </div>
             <p class="form_error">
-                    @error("breaks.$i.outside_working_time")
-                    {{$message}}
-                    @enderror
+                @error("breaks.$i.outside_working_time")
+                {{$message}}
+                @enderror
             </p>
             <p class="form_error">
-                    @error("breaks.$i.clock_in")
-                    {{ $message}} 
-                    @enderror
+                @error("breaks.$i.clock_in")
+                {{ $message}} 
+                @enderror
             </p>    
             <p class="form_error">
                @error("breaks.$i.clock_out")
-                    {{$message}}
+                {{$message}}
                 @enderror
             </p>
             <p class="form_error">
@@ -178,19 +164,17 @@
             </p>
             </td>
         </tr>
-        @endfor
+@endfor
         <tr>
             <th class="data-label">備考</th>
             <td class="data-item">
                <textarea class="reason-input" name="reason">{{old('reason')}}</textarea>
-               
-              <p class="form_error">
+            <p class="form_error">
                 @error('reason')
                 {{ $message}}
                 @enderror
             </p>
             </td>
-          
         </tr>
     </table>
     <div class="button">

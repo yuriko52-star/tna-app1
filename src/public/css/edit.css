@@ -47,11 +47,10 @@ h1 {
     margin-left: 100px;
 }
 .tab-link {
-        font-family: Inter;
-        font-size: 16px;
-        color: #000;
-        font-weight: 400;
-        /* font-weight:400px;表示していないタブ */
+    font-family: Inter;
+    font-size: 16px;
+    color: #000;
+    font-weight: 400;
 }
 .tab-link:hover {
     color:#555;

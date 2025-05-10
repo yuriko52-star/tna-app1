@@ -269,16 +269,13 @@ class AdminAttendanceTest extends TestCase
        $admin = User::factory()->create(['role' => 'admin']);
 
         $user = User::factory()->create();
-       
-        
-        
         $targetDate = Carbon::create(2025, 5,1);
             $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
             'date' => $targetDate->toDateString(),
             ]);
           
-            $attendanceEdit =  AttendanceEdit::factory()->create([
+        $attendanceEdit =  AttendanceEdit::factory()->create([
                 'user_id' => $user->id,
                 'attendance_id' => $attendance->id,
                 'target_date' => $targetDate->toDateString(), 
