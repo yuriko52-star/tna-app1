@@ -83,4 +83,30 @@
 - PHP7.4.9  
 - Laravel8.83.29  
 - MySQL8.0.26  
+## クローン  
+1. cd coachtech/laravel  
+2. git clone git@github.com:yuriko52-star/tna-app1.git  
+3. mv tna-app1 app-check3  
+4. cd app-check3  
+5. git remote set-url origin git@github.com:yuriko52-star/app-check3.git  
+6. git remote -v  
+7. git add .  
+8. git commit -m "コメント"  
+9. git push origin main  
+10. メール認証　docker-compose.ymlのcontainer_nameを修整  
+11. docker-compose up -d --build  
+12. composer install  
+13. cp .env.example .env  
+14. .envに環境変数  
+    MAIL_FROM_ADDRESS=no-reply@example.com  
+    MAIL_FROM_NAME="Tna App1"を追加(上記参照)  
+15. php artisan key:generate  
+16. php artisan migrate  
+17. php artisan db:seed  
+18. docker-compose exec mysql bash  
+19. mysql -u root -p  
+20. CREATE DATABASE demo_test;  
+21. php artisan migrate --env=testing
+
+
    
