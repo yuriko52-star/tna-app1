@@ -30,20 +30,20 @@ class UserController extends AttendanceDetailController
     {
         
         $attendance = Attendance::where('user_id',$user->id)->WhereDate('date',now()->toDateString())->latest()->first();
-        if(!$attendance) {
-            return '勤務外';
-        }
-        if($attendance->clock_out) {
-            return '退勤済';
-        } 
+            if(!$attendance) {
+                return '勤務外';
+            }
+            if($attendance->clock_out) {
+                return '退勤済';
+            } 
         
         $breakTime = BreakTime::where('attendance_id',$attendance->id)->latest('clock_in')->first();
-        if($breakTime && $breakTime->clock_in && !$breakTime->clock_out) {
-            return '休憩中';
-        } 
-         if ($attendance->clock_in) {
-             return '出勤中';
-         }
+            if($breakTime && $breakTime->clock_in && !$breakTime->clock_out) {
+                return '休憩中';
+            } 
+             if ($attendance->clock_in) {
+                return '出勤中';
+            }
         
         return '勤務外';
 
@@ -141,9 +141,9 @@ class UserController extends AttendanceDetailController
     public function detail($id) {
         $attendance = Attendance::with('breakTimes')->findOrFail($id);
 
-        if($attendance->user_id !== Auth::id()) {
-            abort(403,'この勤怠情報にアクセスする権限がありません。');
-        }
+            if($attendance->user_id !== Auth::id()) {
+                abort(403,'この勤怠情報にアクセスする権限がありません。');
+            }
 
         $date = Carbon::parse($attendance->date);
         $year = $date->format('Y年');

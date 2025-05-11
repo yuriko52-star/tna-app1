@@ -23,7 +23,9 @@ class AdminController extends AttendanceDetailController
 
         return view ('admin.staff-list',compact('users'));
     }
-    public function showList(Request $request,$id) {
+
+    public function showList(Request $request,$id) 
+    {
         $admin = Auth::guard('admin')->user();
         $user = User::findOrFail($id);
         $monthParam = $request->query('month');
@@ -38,10 +40,10 @@ class AdminController extends AttendanceDetailController
         
         $dates = [];
         $currentDate = $startOfMonth->copy();
-        while ($currentDate <= $endOfMonth) {
-            $dates[] = $currentDate->copy();
-            $currentDate->addDay();
-        }
+            while ($currentDate <= $endOfMonth) {
+                $dates[] = $currentDate->copy();
+                $currentDate->addDay();
+            }
         
         $attendances = Attendance::with('breakTimes')
         ->where('user_id',$user->id)
@@ -93,6 +95,7 @@ class AdminController extends AttendanceDetailController
         
         return view ('admin.month-list' ,compact('thisMonth','previousMonth','nextMonth','attendanceData','user'));
     }
+
         private function formatMinutes($minutes) {
         $hours = floor($minutes/ 60);
         $mins = $minutes % 60;
@@ -107,6 +110,7 @@ class AdminController extends AttendanceDetailController
         $monthDay = $date->format('n月j日');
         return view('admin.detail',compact('attendance','year','monthDay'));
     }
+
     public function detailByDateForAdmin($id,$date)
     {
         
@@ -115,27 +119,27 @@ class AdminController extends AttendanceDetailController
          ->where('user_id', $user->id)
         ->whereDate('date', $date)
         ->first();
-        if (!$attendance) {
+            if (!$attendance) {
 
-            $attendance = new Attendance([
-            'user_id' => $user->id,
-            'date' => $date,
-            'clock_in' => null,
-            'clock_out' => null,
-        ]);
-        $attendance->breakTimes = collect(); 
-    }
+                $attendance = new Attendance([
+                'user_id' => $user->id,
+                'date' => $date,
+                'clock_in' => null,
+                'clock_out' => null,
+            ]);
+            $attendance->breakTimes = collect(); 
+        }
 
    
-    $carbonDate = \Carbon\Carbon::parse($date);
+        $carbonDate = \Carbon\Carbon::parse($date);
    
-    $year = $carbonDate->format('Y');
-    $monthDay = $carbonDate->format('n月j日');
+        $year = $carbonDate->format('Y');
+        $monthDay = $carbonDate->format('n月j日');
     
-    $raw_date = $carbonDate->format('Y-m-d');
+        $raw_date = $carbonDate->format('Y-m-d');
 
-    return view('admin.detail', compact('attendance', 'year', 'monthDay','user','raw_date'));
-}
+        return view('admin.detail', compact('attendance', 'year', 'monthDay','user','raw_date'));
+    }
 
     public function index(Request $request)
     {
@@ -184,126 +188,127 @@ class AdminController extends AttendanceDetailController
         return view ('admin.list' ,compact('thisDay','previousDay','nextDay','today','attendanceData',));
     }
 
-public function update(AttendanceRequest $request, $id)
-{
+    public function update(AttendanceRequest $request, $id)
+    {
    
 
-    $admin = Auth::guard('admin')->user();
-    $attendance = Attendance::with('breakTimes')->findOrFail($id);
-    $user = $attendance->user;
+        $admin = Auth::guard('admin')->user();
+        $attendance = Attendance::with('breakTimes')->findOrFail($id);
+        $user = $attendance->user;
 
-    $now = now();
-    $reason = $request->input('reason');
+        $now = now();
+        $reason = $request->input('reason');
 
-    $newClockIn = $request->input('clock_in') !== '' ? $request->input('clock_in') : null;
-    $newClockOut = $request->input('clock_out') !== '' ? $request->input('clock_out') : null;
+        $newClockIn = $request->input('clock_in') !== '' ? $request->input('clock_in') : null;
+        $newClockOut = $request->input('clock_out') !== '' ? $request->input('clock_out') : null;
 
-    $year = $request->input('target_year');
-    $year = preg_replace('/[^0-9]/', '', $year);
-    $monthDay = $request->input('target_month_day');
-    if(preg_match('/(\d+)月(\d+)日/', $monthDay, $matches)) {
-        $month = $matches[1];
-        $day = $matches[2];
-    }else {
-         return back()->withErrors(['target_month_day' => '月日を正しく入力してください（例：4月26日）']); 
-    }
+        $year = $request->input('target_year');
+        $year = preg_replace('/[^0-9]/', '', $year);
+        $monthDay = $request->input('target_month_day');
+            if(preg_match('/(\d+)月(\d+)日/', $monthDay, $matches)) {
+                $month = $matches[1];
+                $day = $matches[2];
+            }else {
+            return back()->withErrors(['target_month_day' => '月日を正しく入力してください（例：4月26日）']); 
+            }
     
-    try {
-        $targetDate = Carbon::createFromDate($year, $month, $day);
-        $formattedDate = $targetDate->format('Y-m-d');
-    } catch (\Exception $e) {
-        return back()->withErrors(['target_date' => '日付が正しくありません']);
-    }
+        try {
+                $targetDate = Carbon::createFromDate($year, $month, $day);
+                $formattedDate = $targetDate->format('Y-m-d');
+            } catch (\Exception $e) {
+                return back()->withErrors(['target_date' => '日付が正しくありません']);
+            }
 
-    $defaultClockIn = optional($attendance)->clock_in;
-    $defaultClockOut = optional($attendance)->clock_out;
-    $originalDate = Carbon::parse($attendance->date)->format('Y-m-d');
+        $defaultClockIn = optional($attendance)->clock_in;
+        $defaultClockOut = optional($attendance)->clock_out;
+        $originalDate = Carbon::parse($attendance->date)->format('Y-m-d');
 
-    $isClockInChanged = $newClockIn !== null && ($defaultClockIn === null || Carbon::parse($defaultClockIn)->format('H:i') !== $newClockIn);
-    $isClockOutChanged = $newClockOut !== null && ($defaultClockOut === null || Carbon::parse($defaultClockOut)->format('H:i') !== $newClockOut);
-    $isClockInDeleted = $newClockIn === null && $defaultClockIn !== null;
-    $isClockOutDeleted = $newClockOut === null && $defaultClockOut !== null;
-    $isDateChanged = $formattedDate !== $originalDate;
+        $isClockInChanged = $newClockIn !== null && ($defaultClockIn === null || Carbon::parse($defaultClockIn)->format('H:i') !== $newClockIn);
+        $isClockOutChanged = $newClockOut !== null && ($defaultClockOut === null || Carbon::parse($defaultClockOut)->format('H:i') !== $newClockOut);
+        $isClockInDeleted = $newClockIn === null && $defaultClockIn !== null;
+        $isClockOutDeleted = $newClockOut === null && $defaultClockOut !== null;
+        $isDateChanged = $formattedDate !== $originalDate;
 
    
-    if ($isDateChanged) {
+        if ($isDateChanged) {
        
-        Attendance::where('user_id', $user->id)
-            ->where('date', $formattedDate)
-            ->where('id', '!=', $attendance->id)
-            ->delete();
+            Attendance::where('user_id', $user->id)
+                ->where('date', $formattedDate)
+                ->where('id', '!=', $attendance->id)
+                ->delete();
      
-        BreakTime::whereHas('attendance', function ($query) use ($user, $formattedDate, $attendance) {
-            $query->where('user_id', $user->id)
+            BreakTime::whereHas('attendance', function ($query) use ($user, $formattedDate, $attendance) {
+                $query->where('user_id', $user->id)
                   ->where('date', $formattedDate)
                   ->where('id', '!=', $attendance->id);
-        })->delete();
-    }
+            })->delete();
+        }
 
     
-    if ($isClockInChanged || $isClockOutChanged || $isClockInDeleted || $isClockOutDeleted || $isDateChanged) {
-        AttendanceEdit::create([
-            'attendance_id' => $attendance->id,
-            'user_id' => $user->id,
-            'request_date' => $now,
-            'target_date' => $formattedDate,
-            'new_clock_in' => $isClockInChanged ? Carbon::parse($formattedDate . ' ' . $newClockIn) : null,
-            'new_clock_out' => $isClockOutChanged ? Carbon::parse($formattedDate . ' ' . $newClockOut) : null,
-            'reason' => $reason,
-            'edited_by_admin' => true,
-        ]);
-    }
-
-     
-    $attendance->date = $formattedDate;
-    $attendance->clock_in = $newClockIn ? Carbon::parse($formattedDate . ' ' . $newClockIn) : null;
-    $attendance->clock_out = $newClockOut ? Carbon::parse($formattedDate . ' ' . $newClockOut) : null;
-    $attendance->save();
-
-    
-    $breaks = $request->input('breaks', []);
-   
-    $attendance->breakTimes()->delete(); 
-   
-    foreach ($breaks as $break) {
-        $newIn = trim($break['clock_in'] ?? '') ?: null;
-        $newOut = trim($break['clock_out'] ?? '') ?: null;
-
-        if ($newIn || $newOut) {
-            
-            BreakTimeEdit::create([
-                'break_time_id' => null,
+        if ($isClockInChanged || $isClockOutChanged || $isClockInDeleted || $isClockOutDeleted || $isDateChanged) {
+            AttendanceEdit::create([
+                'attendance_id' => $attendance->id,
                 'user_id' => $user->id,
                 'request_date' => $now,
                 'target_date' => $formattedDate,
-                'new_clock_in' => $newIn ? Carbon::parse($formattedDate . ' ' . $newIn) : null,
-                'new_clock_out' => $newOut ? Carbon::parse($formattedDate . ' ' . $newOut) : null,
+                'new_clock_in' => $isClockInChanged ? Carbon::parse($formattedDate . ' ' . $newClockIn) : null,
+                'new_clock_out' => $isClockOutChanged ? Carbon::parse($formattedDate . ' ' . $newClockOut) : null,
                 'reason' => $reason,
                 'edited_by_admin' => true,
             ]);
-             
-            BreakTime::create([
-                'attendance_id' => $attendance->id,
-                'user_id' => $user->id,
-                'clock_in' => $newIn ? Carbon::parse($formattedDate . ' ' . $newIn) : null,
-                'clock_out' => $newOut ? Carbon::parse($formattedDate . ' ' . $newOut) : null,
-            ]);
         }
+
+     
+        $attendance->date = $formattedDate;
+        $attendance->clock_in = $newClockIn ? Carbon::parse($formattedDate . ' ' . $newClockIn) : null;
+        $attendance->clock_out = $newClockOut ? Carbon::parse($formattedDate . ' ' . $newClockOut) : null;
+        $attendance->save();
+
+    
+        $breaks = $request->input('breaks', []);
+   
+        $attendance->breakTimes()->delete(); 
+   
+        foreach ($breaks as $break) {
+            $newIn = trim($break['clock_in'] ?? '') ?: null;
+            $newOut = trim($break['clock_out'] ?? '') ?: null;
+
+            if ($newIn || $newOut) {
+            
+                BreakTimeEdit::create([
+                    'break_time_id' => null,
+                    'user_id' => $user->id,
+                    'request_date' => $now,
+                    'target_date' => $formattedDate,
+                    'new_clock_in' => $newIn ? Carbon::parse($formattedDate . ' ' . $newIn) : null,
+                    'new_clock_out' => $newOut ? Carbon::parse($formattedDate . ' ' . $newOut) : null,
+                    'reason' => $reason,
+                    'edited_by_admin' => true,
+                ]);
+             
+                BreakTime::create([
+                    'attendance_id' => $attendance->id,
+                    'user_id' => $user->id,
+                    'clock_in' => $newIn ? Carbon::parse($formattedDate . ' ' . $newIn) : null,
+                    'clock_out' => $newOut ? Carbon::parse($formattedDate . ' ' . $newOut) : null,
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.attendance.staff',['id' => $attendance->user_id])
+            ->with('message', '更新が完了しました。');
     }
 
-    return redirect()->route('admin.attendance.staff',['id' => $attendance->user_id])
-        ->with('message', '更新が完了しました。');
-}
     public function store(AttendanceRequest $request,$id)
     {
-         $admin = Auth::guard('admin')->user();
+        $admin = Auth::guard('admin')->user();
       
         $user = User::findOrFail($id);
     
-       $now = now();
-       $reason = $request->input('reason');
-       $newClockIn = $request->input('clock_in');
-       $newClockOut = $request->input('clock_out');
+        $now = now();
+        $reason = $request->input('reason');
+        $newClockIn = $request->input('clock_in');
+        $newClockOut = $request->input('clock_out');
         $year = $request->input('target_year');
         $year = preg_replace('/[^0-9]/', '', $year);
         $monthDay = $request->input('target_month_day');
@@ -312,46 +317,48 @@ public function update(AttendanceRequest $request, $id)
                 $month = $matches[1];
                 $day = $matches[2];
             }else {
-         return back()->withErrors(['target_month_day' => '月日を正しく入力してください（例：4月26日）']); 
+                return back()->withErrors(['target_month_day' => '月日を正しく入力してください（例：4月26日）']); 
             }
 
         try {
         $targetDate = Carbon::createFromDate($year, $month, $day);
         
-    } catch (\Exception $e) {
-    return back()->withErrors(['target_date' => '日付が正しくありません']);
-    }
-       if($newClockIn || $newClockOut) {
-        AttendanceEdit::create([
-             'attendance_id' => null, 
-            'user_id' => $user->id,
-            'request_date' => $now,
-            'target_date' => $targetDate->format('Y-m-d'),
-            'new_clock_in' => $newClockIn ? Carbon::parse($targetDate->format('Y-m-d') . ' ' .  $newClockIn) : null,
-            'new_clock_out' => $newClockOut ? Carbon::parse($targetDate->format('Y-m-d') . ' ' .  $newClockOut) : null,
-            'reason' => $reason,
-            'edited_by_admin' => true,
-        ]);
+        } catch (\Exception $e) {
+        return back()->withErrors(['target_date' => '日付が正しくありません']);
+        }
 
-        $attendance = Attendance::firstOrNew([
-            'user_id' => $user->id,
-            'date' => $targetDate->format('Y-m-d'),
-        ]);
+        if($newClockIn || $newClockOut) {
+            AttendanceEdit::create([
+                'attendance_id' => null, 
+                'user_id' => $user->id,
+                'request_date' => $now,
+                'target_date' => $targetDate->format('Y-m-d'),
+                'new_clock_in' => $newClockIn ? Carbon::parse($targetDate->format('Y-m-d') . ' ' .  $newClockIn) : null,
+                'new_clock_out' => $newClockOut ? Carbon::parse($targetDate->format('Y-m-d') . ' ' .  $newClockOut) : null,
+                'reason' => $reason,
+                'edited_by_admin' => true,
+            ]);
+
+            $attendance = Attendance::firstOrNew([
+                'user_id' => $user->id,
+                'date' => $targetDate->format('Y-m-d'),
+            ]);
         
-        if (!is_null($newClockIn)) {
-            $attendance->clock_in = Carbon::parse($targetDate->format('Y-m-d') . ' ' .    $newClockIn);
-        }
-        if (!is_null($newClockOut)) {
-            $attendance->clock_out = Carbon::parse($targetDate->format('Y-m-d') . ' ' . $newClockOut);
-        }
-        $attendance->save();
+            if (!is_null($newClockIn)) {
+                $attendance->clock_in = Carbon::parse($targetDate->format('Y-m-d') . ' ' .    $newClockIn);
+            }
+            if (!is_null($newClockOut)) {
+                $attendance->clock_out = Carbon::parse($targetDate->format('Y-m-d') . ' ' . $newClockOut);
+            }
+            $attendance->save();
 
-       }
-       $breaks = $request->input('breaks', []);
+        }
 
-       foreach($breaks as $break) {
-        $newIn = trim($break['clock_in'] ?? ' ') ?: null;
-        $newOut = trim($break['clock_out'] ?? ' ') ?: null;
+        $breaks = $request->input('breaks', []);
+
+        foreach($breaks as $break) {
+            $newIn = trim($break['clock_in'] ?? ' ') ?: null;
+            $newOut = trim($break['clock_out'] ?? ' ') ?: null;
 
         
                 if ($newIn !== null || $newOut !== null) {
@@ -426,66 +433,64 @@ public function update(AttendanceRequest $request, $id)
 
         if(is_null($edit->attendance_id)) {
         
-        Attendance::create([
-            'user_id' => $edit->user_id,
-            'date' => $edit->target_date,
-            'clock_in' => $edit->new_clock_in,
-            'clock_out' => $edit->new_clock_out,
-        ]);
-        }else {
+            Attendance::create([
+                'user_id' => $edit->user_id,
+                'date' => $edit->target_date,
+                'clock_in' => $edit->new_clock_in,
+                'clock_out' => $edit->new_clock_out,
+            ]);
+            }else {
             $attendance = $edit->attendance;
 
-            if($attendance) {
-            $attendance->clock_in = $edit->new_clock_in ?? $attendance->clock_in;
-            $attendance->clock_out = $edit->new_clock_out ?? $attendance->clock_out;
-            $attendance->date = $edit->target_date ?? $attendance->date;
-            $attendance->save();
+                if($attendance) {
+                    $attendance->clock_in = $edit->new_clock_in ?? $attendance->clock_in;
+                    $attendance->clock_out = $edit->new_clock_out ?? $attendance->clock_out;
+                    $attendance->date = $edit->target_date ?? $attendance->date;
+                    $attendance->save();
+                }
             }
-        }
          
-    $breakEdits = BreakTimeEdit::where('user_id', $edit->user_id)
-        ->where('target_date', $edit->target_date)
-        ->where('edited_by_admin', 0)
-        ->distinct()
-        ->whereNull('approved_at') 
-        ->get();
+        $breakEdits = BreakTimeEdit::where('user_id', $edit->user_id)
+            ->where('target_date', $edit->target_date)
+            ->where('edited_by_admin', 0)
+            ->distinct()
+            ->whereNull('approved_at') 
+            ->get();
 
-    foreach ($breakEdits as $bedit) {
+        foreach ($breakEdits as $bedit) {
        
-        if ($bedit->break_time_id && is_null($bedit->new_clock_in) && is_null($bedit->new_clock_out)) {
-            $break = $bedit->breakTime;
-            if ($break) $break->delete();
-        }
-        
-         elseif (is_null($bedit->break_time_id)) {
-            $attendance = Attendance::firstOrCreate(
-                ['user_id' => $bedit->user_id, 'date' => $bedit->target_date],
-                ['clock_in' => null, 'clock_out' => null]
-            );
-            BreakTime::create([
-                'user_id' => $bedit->user_id,
-                'attendance_id' => $attendance->id,
-                'clock_in' => $bedit->new_clock_in,
-                'clock_out' => $bedit->new_clock_out,
-            ]);
-        }else {
-            $break = $bedit->breakTime;
-            if ($break) {
-                $break->clock_in = $bedit->new_clock_in ?? $break->clock_in;
-                $break->clock_out = $bedit->new_clock_out ?? $break->clock_out;
-                $break->save();
+            if ($bedit->break_time_id && is_null($bedit->new_clock_in) && is_null($bedit->new_clock_out)) {
+                $break = $bedit->breakTime;
+                if ($break) 
+                    $break->delete();
+           
+            }elseif (is_null($bedit->break_time_id)) {
+                $attendance = Attendance::firstOrCreate(
+                    ['user_id' => $bedit->user_id, 'date' => $bedit->target_date],
+                    ['clock_in' => null, 'clock_out' => null]
+                );
+                BreakTime::create([
+                    'user_id' => $bedit->user_id,
+                    'attendance_id' => $attendance->id,
+                    'clock_in' => $bedit->new_clock_in,
+                    'clock_out' => $bedit->new_clock_out,
+                ]);
+            }else {
+                $break = $bedit->breakTime;
+                if ($break) {
+                    $break->clock_in = $bedit->new_clock_in ?? $break->clock_in;
+                    $break->clock_out = $bedit->new_clock_out ?? $break->clock_out;
+                    $break->save();
+                }
             }
-        }
             $bedit->approved_at = now();
             $bedit->save();
-    }
+        }
         return redirect()->route('admin.approvePage', ['attendance_correct_request' => $edit->id])
-                 ->with('message', '承認が完了しました。');
-
-
+                ->with('message', '承認が完了しました。');
     } 
-        public function approveBreakEdit($id)
 
+        public function approveBreakEdit($id)
     {
         
          $edit = BreakTimeEdit::findOrFail($id);
@@ -499,24 +504,24 @@ public function update(AttendanceRequest $request, $id)
         foreach($edits as $edit) {
             if ($edit->break_time_id && is_null($edit->new_clock_in) && is_null($edit->new_clock_out)) {
              $break = $edit->breakTime;
-            if ($break) {
+                if ($break) {
                     $break->delete();
                 }
              }elseif (is_null($edit->break_time_id)) {
-        if(!is_null($edit->new_clock_in) || !is_null($edit->new_clock_out)) {
+                if(!is_null($edit->new_clock_in) || !is_null($edit->new_clock_out)) {
         
-            $attendance = Attendance::firstOrCreate(
-                ['user_id' => $edit->user_id, 'date' => $edit->target_date],
-                ['clock_in' => null, 'clock_out' => null]
-            );
-            BreakTime::create([
-                'user_id' => $edit->user_id,
-                'attendance_id' => $attendance->id,
-               'clock_in' => $edit->new_clock_in,
-                'clock_out' => $edit->new_clock_out,
-                ]);
-            }
-        }else {
+                $attendance = Attendance::firstOrCreate(
+                    ['user_id' => $edit->user_id, 'date' => $edit->target_date],
+                    ['clock_in' => null, 'clock_out' => null]
+                );
+                BreakTime::create([
+                    'user_id' => $edit->user_id,
+                    'attendance_id' => $attendance->id,
+                    'clock_in' => $edit->new_clock_in,
+                    'clock_out' => $edit->new_clock_out,
+                    ]);
+                }
+            }else {
                 $break = $edit->breakTime;
                  if ($break) {
                     $break->clock_in = $edit->new_clock_in ?? $break->clock_in;
@@ -525,8 +530,8 @@ public function update(AttendanceRequest $request, $id)
                 }
             }
     
-        $edit->approved_at = now();
-        $edit->save();
+            $edit->approved_at = now();
+            $edit->save();
         }
          return redirect()->back()->with('message', '出勤データの承認が完了しました。');
     }
@@ -557,6 +562,7 @@ public function update(AttendanceRequest $request, $id)
         ->keyBy(function($item) {
             return Carbon::parse($item->date)->format('Y-m-d');
         });
+
         $weekMap = [
             'Sun' => '日', 'Mon' => '月', 'Tue' => '火',
             'Wed' => '水', 'Thu' => '木', 'Fri' => '金', 'Sat' => '土',
@@ -580,7 +586,7 @@ public function update(AttendanceRequest $request, $id)
                 }
             }
              
-        $workingMinutes = 0;
+            $workingMinutes = 0;
 
             if ($clockIn && $clockOut) {
             $workingMinutes = $clockIn->diffInMinutes($clockOut) - $totalBreakMinutes;
@@ -616,14 +622,11 @@ public function update(AttendanceRequest $request, $id)
         });
 
         $safeUserName = preg_replace('/[^\w\-]/u', '_' , $user->name);
-       $filename = 'attendance_' . $safeUserName . '_' . $targetMonth->format('Y_m') . '.csv';
+        $filename = 'attendance_' . $safeUserName . '_' . $targetMonth->format('Y_m') . '.csv';
 
-       $response->headers->set('Content-Type', 'text/csv; charset=Shift-JIS');
-       $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+        $response->headers->set('Content-Type', 'text/csv; charset=Shift-JIS');
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
 
-       return $response;
+        return $response;
     }
-        
-
-    
 }

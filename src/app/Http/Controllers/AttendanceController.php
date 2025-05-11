@@ -21,14 +21,14 @@ class AttendanceController extends Controller
 
         $today = now()->toDateString();
         $attendance = Attendance::where('user_id',$user->id)->where('date',$today)->first();
-        if(!$attendance) {
-            $attendance = new Attendance();
-            $attendance->user_id = $user->id;
-            $attendance->date = $today;
-        }
+            if(!$attendance) {
+                $attendance = new Attendance();
+                $attendance->user_id = $user->id;
+                $attendance->date = $today;
+            }
         
-            $attendance->clock_in = now();
-            $attendance->save();
+                $attendance->clock_in = now();
+                $attendance->save();
          
             
         return redirect()->route('user.attendance');
@@ -38,31 +38,32 @@ class AttendanceController extends Controller
     {
         $user = Auth::user();
         $attendance = Attendance::where('user_id', $user->id)->where('date', now()->toDateString())->first();
-        if(!$attendance || $attendance->clock_out) {
-            return redirect()->back()->with('msssage','まだ出勤していません。');
-        }
-            $attendance->update([
+            if(!$attendance || $attendance->clock_out) {
+                return redirect()->back()->with('msssage','まだ出勤していません。');
+            }
+        $attendance->update([
                 'clock_out' => now()
             ]);
         
         return redirect()->route('user.attendance');
     }
+
     public function breakStart()
     {
         $user = Auth::user();
         $attendance = Attendance::where('user_id', $user->id)->where('date', now()->toDateString())->first();
         $lastBreak = $attendance->breakTimes()->latest()->first();
         
-        if($lastBreak && !$lastBreak->clock_out) {
+            if($lastBreak && !$lastBreak->clock_out) {
            
-             return redirect()->back()->with('message','すでに休憩中です。');
-        }
+                return redirect()->back()->with('message','すでに休憩中です。');
+            }
         $attendance->breakTimes()->create([
-            'clock_in' => now(),
-        ]);
+                'clock_in' => now(),
+            ]);
         return redirect()->route('user.attendance');
-        
     }
+
     public function breakEnd()
     {
         $user = Auth::user();
@@ -71,9 +72,9 @@ class AttendanceController extends Controller
         ->first();
         $lastBreak = $attendance->breakTimes()->latest()->first();
 
-        if(!$lastBreak || $lastBreak->clock_out) {
+            if(!$lastBreak || $lastBreak->clock_out) {
             return redirect()->back()->with('message','休憩開始が記録されていません。');
-        }
+            }
         $lastBreak->update([
             'clock_out' => now(),
         ]);
@@ -86,19 +87,19 @@ class AttendanceController extends Controller
     {
        $user = Auth::user();
        $attendance = Attendance::with('breakTimes')->findOrFail($id);
-        if ($attendance->user_id !== $user->id) {
-        abort(403, '権限がありません');
-        }
+            if ($attendance->user_id !== $user->id) {
+            abort(403, '権限がありません');
+            }
         
          
-         $newClockIn = $request->input('clock_in');
-         $newClockOut = $request->input('clock_out');
+        $newClockIn = $request->input('clock_in');
+        $newClockOut = $request->input('clock_out');
         
         $defaultClockIn = optional($attendance)->clock_in;
-         $defaultClockOut = optional($attendance)->clock_out;
-         $targetDate = $attendance->date;
-         $now = now();
-         $reason = $request->input('reason');
+        $defaultClockOut = optional($attendance)->clock_out;
+        $targetDate = $attendance->date;
+        $now = now();
+        $reason = $request->input('reason');
         
         $isClockInChanged = $newClockIn !== null && (
             $defaultClockIn === null || Carbon::parse($defaultClockIn)->format('H:i') !== $newClockIn
@@ -112,7 +113,7 @@ class AttendanceController extends Controller
         $isClockInDeleted = $newClockIn === null && $defaultClockIn !== null;
         $isClockOutDeleted = $newClockOut === null && $defaultClockOut !== null;
 
-        if ($isClockInChanged || $isClockOutChanged || $isClockInDeleted || $isClockOutDeleted) {
+            if ($isClockInChanged || $isClockOutChanged || $isClockInDeleted || $isClockOutDeleted) {
                 AttendanceEdit::create([
                 'attendance_id' => $attendance->id,
                 'user_id' => $user->id,
@@ -121,8 +122,8 @@ class AttendanceController extends Controller
                 'new_clock_in' => $isClockInChanged ? Carbon::parse("$targetDate $newClockIn") : null,
                 'new_clock_out' => $isClockOutChanged ? Carbon::parse("$targetDate $newClockOut") : null,
                 'reason' => $reason,
-            ]);
-         }
+                ]);
+            }
          
         $breaks = $request->input('breaks', []);
        
@@ -136,17 +137,17 @@ class AttendanceController extends Controller
         
                 if ($newIn !== null || $newOut !== null) {
                 BreakTimeEdit::create([
-                'break_time_id' => null, 
-                'user_id' => $user->id,
-                'request_date' => $now,
-                'target_date' => $targetDate,
-                'new_clock_in' => $newIn ? Carbon::parse("$targetDate $newIn") : null,
-                'new_clock_out' => $newOut ? Carbon::parse("$targetDate $newOut") : null,
-                'reason' => $reason,
-            ]);
-        }
-        continue;
-    }
+                    'break_time_id' => null, 
+                    'user_id' => $user->id,
+                    'request_date' => $now,
+                    'target_date' => $targetDate,
+                    'new_clock_in' => $newIn ? Carbon::parse("$targetDate $newIn") : null,
+                    'new_clock_out' => $newOut ? Carbon::parse("$targetDate $newOut") : null,
+                    'reason' => $reason,
+                    ]);
+                }
+                continue;
+            }
   
             $defaultBreak = $attendance->breakTimes->firstWhere('id', $breakId);
             $defaultIn = optional($defaultBreak)->clock_in;
@@ -156,7 +157,7 @@ class AttendanceController extends Controller
             $isBreakOutChanged = $newOut !== null && $defaultOut && Carbon::parse($defaultOut)->format('H:i') !== $newOut;
             $isBreakDeleted = $newIn === null && $newOut === null && ($defaultIn || $defaultOut);
 
-             if ($isBreakInChanged || $isBreakOutChanged || $isBreakDeleted) {
+                if ($isBreakInChanged || $isBreakOutChanged || $isBreakDeleted) {
                     BreakTimeEdit::create([
                         'break_time_id' => $breakId ,
                         'user_id' => $user->id,
@@ -167,8 +168,8 @@ class AttendanceController extends Controller
                         'reason' => $reason,
                         ]);
                     }
-                 }
-               return redirect()->route('user.stamp_correction_request.list',['tab' => 'waiting']);
+        }
+            return redirect()->route('user.stamp_correction_request.list',['tab' => 'waiting']);
 
     }
     public function store(UserAttendanceRequest $request)
@@ -180,16 +181,16 @@ class AttendanceController extends Controller
        $newClockIn = $request->input('clock_in');
        $newClockOut = $request->input('clock_out');
        
-       if($newClockIn || $newClockOut) {
-        AttendanceEdit::create([
-             'attendance_id' => null, 
-            'user_id' => $user->id,
-            'request_date' => $now,
-            'target_date' => $targetDate,
-            'new_clock_in' => $newClockIn ? Carbon::parse("$targetDate $newClockIn") : null,
-            'new_clock_out' => $newClockOut ? Carbon::parse("$targetDate $newClockOut") : null,
-            'reason' => $reason,
-        ]);
+        if($newClockIn || $newClockOut) {
+            AttendanceEdit::create([
+                'attendance_id' => null, 
+                'user_id' => $user->id,
+                'request_date' => $now,
+                'target_date' => $targetDate,
+                'new_clock_in' => $newClockIn ? Carbon::parse("$targetDate $newClockIn") : null,
+                'new_clock_out' => $newClockOut ? Carbon::parse("$targetDate $newClockOut") : null,
+                'reason' => $reason,
+            ]);
        }
        $breaks = $request->input('breaks', []);
 
@@ -197,17 +198,17 @@ class AttendanceController extends Controller
         $newIn = $break['clock_in'] ?? null;
         $newOut = $break['clock_out'] ?? null;
 
-        if($newIn || $newOut) {
-            BreakTimeEdit::create([
-                'break_time_id' => null,
-                'user_id' => $user->id,
-                'request_date' => $now,
-                'target_date' => $targetDate,
-                'new_clock_in' => $newIn ? Carbon::parse("$targetDate $newIn") : null,
-                'new_clock_out' => $newOut ? Carbon::parse("$targetDate $newOut") : null,
-                'reason' => $reason,
-            ]);
-        }
+            if($newIn || $newOut) {
+                BreakTimeEdit::create([
+                    'break_time_id' => null,
+                    'user_id' => $user->id,
+                    'request_date' => $now,
+                    'target_date' => $targetDate,
+                    'new_clock_in' => $newIn ? Carbon::parse("$targetDate $newIn") : null,
+                    'new_clock_out' => $newOut ? Carbon::parse("$targetDate $newOut") : null,
+                    'reason' => $reason,
+                ]);
+            }
        }
        return redirect()->route('user.stamp_correction_request.list',['tab' => 'waiting']);
     }

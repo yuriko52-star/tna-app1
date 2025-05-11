@@ -14,12 +14,7 @@ class RequestListController extends Controller
     {
         $admin = Auth::guard('admin')->user();
         $user = Auth::guard('web')->user();
-        /*dd([
-        'admin' => Auth::guard('admin')->user(),
-        'web' => Auth::guard('web')->user(),
-        'default' => Auth::user(),
-        ]);
-    */
+        
         if ($admin) {
             return $this->adminRequestList($admin);
         } elseif ($user) {
@@ -42,16 +37,16 @@ class RequestListController extends Controller
         ->where('user_id', $user->id)
         ->where('edited_by_admin', false);
 
-    if ($tab === 'waiting') {
-        $queryAttendance->whereNull('approved_at');
-        $queryBreak->whereNull('approved_at');
-    } elseif ($tab === 'approved') {
-        $queryAttendance->whereNotNull('approved_at');
-        $queryBreak->whereNotNull('approved_at');
-    }
+        if ($tab === 'waiting') {
+            $queryAttendance->whereNull('approved_at');
+            $queryBreak->whereNull('approved_at');
+        } elseif ($tab === 'approved') {
+            $queryAttendance->whereNotNull('approved_at');
+            $queryBreak->whereNotNull('approved_at');
+        }
 
-    $attendanceEdits = $queryAttendance->get()->groupBy('target_date');
-    $breakEdits = $queryBreak->get()->groupBy('target_date');
+        $attendanceEdits = $queryAttendance->get()->groupBy('target_date');
+        $breakEdits = $queryBreak->get()->groupBy('target_date');
 
     
         $mergedData = [];
@@ -99,45 +94,45 @@ class RequestListController extends Controller
         $queryBreak = BreakTimeEdit::with(['user', 'breakTime', 'attendance'])
        ->where('edited_by_admin', false);
 
-    if ($tab === 'waiting') {
-        $queryAttendance->whereNull('approved_at');
-        $queryBreak->whereNull('approved_at');
-    } elseif ($tab === 'approved') {
-        $queryAttendance->whereNotNull('approved_at');
-        $queryBreak->whereNotNull('approved_at');
-    }
-     $attendanceEdits = $queryAttendance->get();
+        if ($tab === 'waiting') {
+            $queryAttendance->whereNull('approved_at');
+            $queryBreak->whereNull('approved_at');
+        } elseif ($tab === 'approved') {
+            $queryAttendance->whereNotNull('approved_at');
+            $queryBreak->whereNotNull('approved_at');
+        }
+        $attendanceEdits = $queryAttendance->get();
     
-    $breakEdits = $queryBreak->get();
+        $breakEdits = $queryBreak->get();
     
-    $groupedAttendance = $attendanceEdits->groupBy('target_date');
-    $groupedBreaks = $breakEdits->groupBy('target_date');
+        $groupedAttendance = $attendanceEdits->groupBy('target_date');
+        $groupedBreaks = $breakEdits->groupBy('target_date');
     
-    $allDates = $groupedAttendance->keys()->merge($groupedBreaks->keys())->unique();
-    $mergedData = [];
+        $allDates = $groupedAttendance->keys()->merge($groupedBreaks->keys())->unique();
+        $mergedData = [];
 
         foreach ($allDates as $date ) {
             $attendanceGroup = $groupedAttendance->get($date, collect());
             $breakGroup = $groupedBreaks->get($date, collect());
 
-        if ($tab === 'approved') {
+            if ($tab === 'approved') {
                 $hasApprovedAttendance = $attendanceGroup->contains(function ($edit) {
                 return !is_null($edit->approved_at);
-            });
+                });
 
-            $hasApprovedBreak = $breakGroup->contains(function ($edit) {
+                $hasApprovedBreak = $breakGroup->contains(function ($edit) {
                 return !is_null($edit->approved_at);
-            });
+                });
 
-            if (!$hasApprovedAttendance && !$hasApprovedBreak) {
-                continue;
+                if (!$hasApprovedAttendance && !$hasApprovedBreak) {
+                    continue;
+                }
             }
-        }
         
-        $user = $attendanceGroup->first()->user ?? $breakGroup->first()->user;
+            $user = $attendanceGroup->first()->user ?? $breakGroup->first()->user;
        
-        $requestDate = $attendanceGroup->first()->request_date ?? $breakGroup->first()->request_date;
-        $reason = $attendanceGroup->first()->reason ?? $breakGroup->first()->reason;
+            $requestDate = $attendanceGroup->first()->request_date ?? $breakGroup->first()->request_date;
+            $reason = $attendanceGroup->first()->reason ?? $breakGroup->first()->reason;
 
             $mergedData[$date] = [
                 

@@ -30,21 +30,21 @@ class AuthenticatedSessionController extends FortifyAuthenticatedSessionControll
             if (Auth::guard('admin')->attempt($credentials, $remember)) {
                 return redirect('/admin/attendance/list');
                 }
-            } else {
-        if (Auth::guard('web')->attempt($credentials, $remember)) {
+            }else {   
+            if (Auth::guard('web')->attempt($credentials, $remember)) {
                 return redirect('/attendance');
             }
         }
 
             return back()->withErrors([
                 'email' => 'ログイン情報が正しくありません。',
-        ]);
+            ]);
     }
 
        
     public function destroy(Request $request): LogoutResponse
     {
-         if (Auth::guard('admin')->check()) {
+        if (Auth::guard('admin')->check()) {
             Auth::guard('admin')->logout();
         } elseif (Auth::guard('web')->check()) {
             Auth::guard('web')->logout();
