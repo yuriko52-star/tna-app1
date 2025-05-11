@@ -86,27 +86,29 @@
 ## クローン  
 1. cd coachtech/laravel  
 2. git clone git@github.com:yuriko52-star/tna-app1.git  
-3. mv tna-app1 app-check3  
-4. cd app-check3  
-5. git remote set-url origin git@github.com:yuriko52-star/app-check3.git  
-6. git remote -v  
-7. git add .  
-8. git commit -m "コメント"  
-9. git push origin main  
-10. メール認証　docker-compose.ymlのcontainer_nameを修整  
-11. docker-compose up -d --build  
-12. composer install  
-13. cp .env.example .env  
-14. .envに環境変数  
+3. mv tna-app1 app-check3
+4. app-check3のリポジトリ作成  
+5. cd app-check3  
+6. git remote set-url origin git@github.com:yuriko52-star/app-check3.git  
+7. git remote -v  
+8. git add .  
+9. git commit -m "コメント"  
+10. git push origin main  
+11. メール認証　docker-compose.ymlのcontainer_nameを修整  
+12. docker-compose up -d --build 
+13. docker-compose exec php bash   
+14. composer install  
+15. cp .env.example .env  
+16. .envに環境変数  
     MAIL_FROM_ADDRESS=no-reply@example.com  
     MAIL_FROM_NAME="Tna App1"を追加(上記参照)  
-15. php artisan key:generate  
-16. php artisan migrate  
-17. php artisan db:seed  
-18. docker-compose exec mysql bash  
-19. mysql -u root -p  
-20. CREATE DATABASE demo_test;  
-21. php artisan migrate --env=testing
+17. php artisan key:generate  
+18. php artisan migrate  
+19. php artisan db:seed  
+20. docker-compose exec mysql bash  
+21. mysql -u root -p  
+22. CREATE DATABASE demo_test;  
+23. php artisan migrate --env=testing
 
 
    
