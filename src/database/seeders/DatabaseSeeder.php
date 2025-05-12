@@ -18,10 +18,11 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         //  \App\Models\User::factory(10)->create();
-            // $this->call(UsersTableSeeder::class);
+        //1. ユーザーのダミーデータから作成
+         $this->call(UsersTableSeeder::class);
          
          
-        
+        //2.勤怠のダミーデータ作成 
         $users = [2,3];
 
        
@@ -91,7 +92,7 @@ class DatabaseSeeder extends Seeder
             }
         
         }
-      
+    //   勤怠のダミーデータここまで
     }
     
 } 
