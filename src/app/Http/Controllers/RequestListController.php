@@ -10,7 +10,7 @@ use Carbon\Carbon;
 
 class RequestListController extends Controller
 {
-    public function index()
+    /*public function index()
     {
         $admin = Auth::guard('admin')->user();
         $user = Auth::guard('web')->user();
@@ -23,7 +23,7 @@ class RequestListController extends Controller
 
         return redirect('/login');
     }
-
+*/
     protected function userRequestList()
     {
          $user = Auth::guard('web')->user();

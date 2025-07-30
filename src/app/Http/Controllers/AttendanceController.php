@@ -20,7 +20,9 @@ class AttendanceController extends Controller
         $user = Auth::user();
 
         $today = now()->toDateString();
-        $attendance = Attendance::where('user_id',$user->id)->where('date',$today)->first();
+        $attendance = Attendance::where('user_id',$user->id)
+            ->where('date',$today)
+            ->first();
             if(!$attendance) {
                 $attendance = new Attendance();
                 $attendance->user_id = $user->id;
@@ -37,7 +39,10 @@ class AttendanceController extends Controller
     public function clockOut()
     {
         $user = Auth::user();
-        $attendance = Attendance::where('user_id', $user->id)->where('date', now()->toDateString())->first();
+        $today = now()->toDateString();
+        $attendance = Attendance::where('user_id', $user->id)
+            ->where('date', $today)
+            ->first();
             if(!$attendance || $attendance->clock_out) {
                 return redirect()->back()->with('msssage','まだ出勤していません。');
             }
@@ -51,8 +56,13 @@ class AttendanceController extends Controller
     public function breakStart()
     {
         $user = Auth::user();
-        $attendance = Attendance::where('user_id', $user->id)->where('date', now()->toDateString())->first();
-        $lastBreak = $attendance->breakTimes()->latest()->first();
+        $today = now()->toDateString();
+        $attendance = Attendance::where('user_id', $user->id)
+            ->where('date', $today)
+            ->first();
+        $lastBreak = $attendance->breakTimes()
+            ->latest()
+            ->first();
         
             if($lastBreak && !$lastBreak->clock_out) {
            
@@ -67,10 +77,13 @@ class AttendanceController extends Controller
     public function breakEnd()
     {
         $user = Auth::user();
+        $today = now()->toDateString();
         $attendance = Attendance::where('user_id', $user->id)
-        ->where('date', now()->toDateString())
-        ->first();
-        $lastBreak = $attendance->breakTimes()->latest()->first();
+            ->where('date', $today)
+            ->first();
+        $lastBreak = $attendance->breakTimes()  
+            ->latest()
+            ->first();
 
             if(!$lastBreak || $lastBreak->clock_out) {
             return redirect()->back()->with('message','休憩開始が記録されていません。');

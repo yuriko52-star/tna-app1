@@ -11,7 +11,7 @@
     {{ $status }}
   </label> 
     <div class="date">
-    {{ $today}}
+    {{ $todayText}}
     </div>
     <div class="time">
     {{ $currentTime }}

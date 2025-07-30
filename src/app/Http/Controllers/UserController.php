@@ -16,20 +16,26 @@ class UserController extends AttendanceDetailController
     public function index() {
         $user = Auth::user();
         
-        $today = now()->isoFormat('YYYY年M月D日(ddd)');
+        $todayText = now()->isoFormat('YYYY年M月D日(ddd)');
+        // $todayから名前を変更
         $currentTime = now()->format('H:i');
 
 
-        $attendance = Attendance::where('user_id',$user->id)->whereDate('date',now()->toDateString())->first();
+        // $attendance = Attendance::where('user_id',$user->id)->whereDate('date',now()->toDateString())->first();
         
         $status = $this->getCurrentStatus($user);
        
-        return view('attendance.record',compact('status','today','currentTime'));
+        return view('attendance.record',compact('status','todayText','currentTime'));
     }
     private function getCurrentStatus($user)
     {
-        
-        $attendance = Attendance::where('user_id',$user->id)->WhereDate('date',now()->toDateString())->latest()->first();
+        $today = now()->toDateString();
+        // 追加して
+        $attendance = Attendance::where('user_id',$user->id)
+            ->WhereDate('date',$today)
+        //now()->toDateString()を $todayに変えた 
+            ->latest()
+            ->first();
             if(!$attendance) {
                 return '勤務外';
             }
@@ -37,7 +43,9 @@ class UserController extends AttendanceDetailController
                 return '退勤済';
             } 
         
-        $breakTime = BreakTime::where('attendance_id',$attendance->id)->latest('clock_in')->first();
+        $breakTime = BreakTime::where('attendance_id',$attendance->id)
+            ->latest('clock_in')
+            ->first();
             if($breakTime && $breakTime->clock_in && !$breakTime->clock_out) {
                 return '休憩中';
             } 

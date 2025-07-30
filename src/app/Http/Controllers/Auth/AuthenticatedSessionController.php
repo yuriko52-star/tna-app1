@@ -22,7 +22,8 @@ class AuthenticatedSessionController extends FortifyAuthenticatedSessionControll
         $user = User::where('email', $credentials['email'])->first();
 
         if (!$user) {
-            return back()->withErrors(['email' => 'メールアドレスが存在しません。']);
+            // return back()->withErrors(['email' => 'メールアドレスが存在しません。']);
+            return back()->withErrors(['email' => __('auth.failed')]);
         }
 
     
@@ -37,7 +38,8 @@ class AuthenticatedSessionController extends FortifyAuthenticatedSessionControll
         }
 
             return back()->withErrors([
-                'email' => 'ログイン情報が正しくありません。',
+                // 'email' => 'ログイン情報が正しくありません。',
+                'email' => __('auth.failed'),
             ]);
     }
 
